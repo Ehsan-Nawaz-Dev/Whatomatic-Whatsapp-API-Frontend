@@ -1,0 +1,10 @@
+# Vercel deployment ignore patterns
+node_modules
+.git
+*.log
+.env.local
+.vscode
+.idea
+*.md
+!README.md
+.eslintcache
