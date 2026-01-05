@@ -8,6 +8,7 @@ import {
   generateWhatsAppQR,
   fetchWhatsAppStatus,
   disconnectWhatsApp,
+  getWhatsAppPairingCode,
   WhatsAppQRCodeResponse,
   WhatsAppStatusResponse,
 } from "@/lib/api";
@@ -18,6 +19,8 @@ const WhatsAppConnection = () => {
   const [qrData, setQrData] = useState<WhatsAppQRCodeResponse | null>(null);
   const [pollingInterval, setPollingInterval] = useState<number | null>(null);
   const [connectionMethod, setConnectionMethod] = useState<"qr" | "phone" | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [pairingCode, setPairingCode] = useState<string | null>(null);
 
   // Fetch WhatsApp connection status
   const { data: status, isLoading } = useQuery<WhatsAppStatusResponse>({
@@ -40,6 +43,19 @@ const WhatsAppConnection = () => {
     },
   });
 
+  // Pairing code mutation
+  const pairingCodeMutation = useMutation({
+    mutationFn: (phone: string) => getWhatsAppPairingCode(phone),
+    onSuccess: (data) => {
+      setPairingCode(data.pairingCode);
+      setPollingInterval(3000);
+      toast.success("Pairing code received! Enter it on your phone.");
+    },
+    onError: () => {
+      toast.error("Failed to get pairing code. Please check the number and try again.");
+    },
+  });
+
   // Disconnect mutation
   const disconnectMutation = useMutation({
     mutationFn: disconnectWhatsApp,
@@ -59,6 +75,7 @@ const WhatsAppConnection = () => {
     if (status?.connected) {
       setPollingInterval(null);
       setQrData(null);
+      setPairingCode(null);
     } else if (status && !status.connected && connectionMethod === "qr" && !qrData && !generateQRMutation.isPending) {
       // Fetch QR if QR method selected but not yet generated
       generateQRMutation.mutate();
@@ -235,6 +252,109 @@ const WhatsAppConnection = () => {
                 </Button>
               </div>
             </>
+          ) : connectionMethod === "phone" ? (
+            <div className="space-y-6 max-w-xs mx-auto">
+              {!pairingCode ? (
+                <>
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Smartphone className="w-10 h-10 text-primary" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="font-semibold text-foreground">Connect with phone number</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Enter your WhatsApp number to receive a pairing code on your phone.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex flex-col items-start gap-1.5">
+                      <label htmlFor="phoneNumber" className="text-xs font-medium text-muted-foreground ml-1">Phone Number</label>
+                      <input
+                        id="phoneNumber"
+                        type="tel"
+                        placeholder="+1 (555) 000-0000"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-full px-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
+                      />
+                    </div>
+                    <Button
+                      variant="hero"
+                      className="w-full"
+                      onClick={() => phoneNumber && pairingCodeMutation.mutate(phoneNumber)}
+                      disabled={pairingCodeMutation.isPending || !phoneNumber}
+                    >
+                      {pairingCodeMutation.isPending ? "Getting code..." : "Get Pairing Code"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setConnectionMethod(null)}
+                      disabled={pairingCodeMutation.isPending}
+                    >
+                      Back to methods
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-6">
+                  <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 text-center animate-in zoom-in duration-300">
+                    <p className="text-xs font-medium text-primary uppercase tracking-wider mb-2">Your Pairing Code</p>
+                    <div className="text-4xl font-mono font-bold text-foreground tracking-[0.2em] py-2">
+                      {pairingCode}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 text-left">
+                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                      <Smartphone className="w-4 h-4 text-primary" />
+                      How to use this code:
+                    </h3>
+                    <ol className="text-xs text-muted-foreground space-y-3">
+                      <li className="flex gap-2">
+                        <span className="font-bold text-primary">1.</span>
+                        Open WhatsApp → Settings → Linked Devices
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="font-bold text-primary">2.</span>
+                        Tap <span className="text-foreground font-medium">Link a Device</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="font-bold text-primary">3.</span>
+                        Tap <span className="text-foreground font-medium">Link with phone number instead</span> at the bottom
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="font-bold text-primary">4.</span>
+                        Enter the 8-character code shown above
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div className="pt-2 flex flex-col gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setPairingCode(null)}
+                    >
+                      Use different number
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => {
+                        setConnectionMethod(null);
+                        setPairingCode(null);
+                      }}
+                    >
+                      Back to methods
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="space-y-6 max-w-xs mx-auto">
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">

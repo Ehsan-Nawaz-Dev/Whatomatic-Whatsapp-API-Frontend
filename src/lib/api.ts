@@ -170,6 +170,16 @@ export const generateWhatsAppQR = async (): Promise<WhatsAppQRCodeResponse> => {
   };
 };
 
+export const getWhatsAppPairingCode = async (phone: string): Promise<{ pairingCode: string }> => {
+  const url = new URL(withShopParam("/whatsapp/pair"));
+  url.searchParams.set("phone", phone);
+  const res = await fetch(url.toString(), {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error("Failed to get pairing code");
+  return res.json();
+};
+
 
 export const fetchWhatsAppStatus = async (): Promise<WhatsAppStatusResponse> => {
   const res = await fetch(withShopParam("/whatsapp/status"));
