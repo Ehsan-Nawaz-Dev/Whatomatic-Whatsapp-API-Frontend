@@ -10,6 +10,13 @@ const withShopParam = (path: string) => {
   return url.toString();
 };
 
+const sanitizePhone = (phone: string) => {
+  // Remove everything except digits and leading +
+  const cleaned = phone.replace(/[^\d+]/g, "");
+  // Ensure it starts with + if digits-only version doesn't
+  return cleaned.startsWith("+") ? cleaned : `+${cleaned.replace(/^\+/, "")}`;
+};
+
 export interface MerchantSettingsPayload {
   storeName?: string;
   whatsappNumber?: string;
@@ -171,12 +178,26 @@ export const generateWhatsAppQR = async (): Promise<WhatsAppQRCodeResponse> => {
 };
 
 export const getWhatsAppPairingCode = async (phone: string): Promise<{ pairingCode: string }> => {
-  const url = new URL(withShopParam("/whatsapp/pair"));
-  url.searchParams.set("phone", phone);
-  const res = await fetch(url.toString(), {
+  const sanitizedPhone = sanitizePhone(phone);
+  const url = withShopParam("/whatsapp/pair");
+
+  console.log(`[API] Requesting pairing code for ${sanitizedPhone} to ${url}`);
+
+  const res = await fetch(url, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      phone: sanitizedPhone,
+      shop: DEFAULT_SHOP
+    }),
   });
-  if (!res.ok) throw new Error("Failed to get pairing code");
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error(`[API] Pairing error: ${res.status} ${res.statusText}`, errorText);
+    throw new Error(`Failed to get pairing code: ${res.statusText}`);
+  }
+
   return res.json();
 };
 

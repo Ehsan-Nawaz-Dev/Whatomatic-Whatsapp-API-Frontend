@@ -137,14 +137,14 @@ const WhatsAppConnection = () => {
         )}
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-12">
-          <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-sm text-muted-foreground">Checking connection status...</p>
-        </div>
-      ) : !status?.connected ? (
+      {!status?.connected ? (
         <div className="text-center py-8">
-          {!connectionMethod ? (
+          {isLoading && !connectionMethod ? (
+            <div className="space-y-4 max-w-xs mx-auto">
+              <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+              <p className="text-sm text-muted-foreground">Checking connection status...</p>
+            </div>
+          ) : !connectionMethod ? (
             <div className="space-y-4 max-w-xs mx-auto">
               <p className="text-sm text-muted-foreground mb-6">
                 Choose how you want to connect your WhatsApp account to WhatFlow.
