@@ -17,6 +17,7 @@ const WhatsAppConnection = () => {
   const queryClient = useQueryClient();
   const [qrData, setQrData] = useState<WhatsAppQRCodeResponse | null>(null);
   const [pollingInterval, setPollingInterval] = useState<number | null>(null);
+  const [connectionMethod, setConnectionMethod] = useState<"qr" | "phone" | null>(null);
 
   // Fetch WhatsApp connection status
   const { data: status, isLoading } = useQuery<WhatsAppStatusResponse>({
@@ -58,8 +59,8 @@ const WhatsAppConnection = () => {
     if (status?.connected) {
       setPollingInterval(null);
       setQrData(null);
-    } else if (status && !status.connected && !qrData && !generateQRMutation.isPending) {
-      // Auto-fetch QR if not connected and we don't have it yet
+    } else if (status && !status.connected && connectionMethod === "qr" && !qrData && !generateQRMutation.isPending) {
+      // Fetch QR if QR method selected but not yet generated
       generateQRMutation.mutate();
     }
   }, [status?.connected, status, qrData, generateQRMutation.isPending]);
@@ -126,80 +127,150 @@ const WhatsAppConnection = () => {
         </div>
       ) : !status?.connected ? (
         <div className="text-center py-8">
-          {/* QR Code Display */}
-          <div className="w-64 h-64 mx-auto mb-6 bg-white rounded-2xl flex items-center justify-center border-2 border-border p-4 overflow-hidden">
-            {qrData?.qrCode ? (
-              qrData.qrCode.startsWith("data:image") ? (
-                <img
-                  src={qrData.qrCode}
-                  alt="WhatsApp QR Code"
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <QRCodeSVG
-                  value={qrData.qrCode}
-                  size={224}
-                  level="H"
-                  includeMargin={false}
-                />
-              )
-            ) : (
-              <div className="text-center px-4">
-                <QrCode className="w-16 h-16 mx-auto text-muted-foreground mb-2" />
-                <p className="text-xs text-muted-foreground">
-                  {generateQRMutation.isPending
-                    ? "Generating session..."
-                    : "Click below to generate"}
+          {!connectionMethod ? (
+            <div className="space-y-4 max-w-xs mx-auto">
+              <p className="text-sm text-muted-foreground mb-6">
+                Choose how you want to connect your WhatsApp account to WhatFlow.
+              </p>
+              <Button
+                variant="hero"
+                className="w-full justify-start gap-3 h-14"
+                onClick={() => setConnectionMethod("phone")}
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                  <Smartphone className="w-5 h-5 text-white" />
+                </div>
+                Connect with phone number
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 h-14 border-2"
+                onClick={() => setConnectionMethod("qr")}
+              >
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <QrCode className="w-5 h-5 text-primary" />
+                </div>
+                Connect with QR code
+              </Button>
+            </div>
+          ) : connectionMethod === "qr" ? (
+            <>
+              {/* QR Code Display */}
+              <div className="w-64 h-64 mx-auto mb-6 bg-white rounded-2xl flex items-center justify-center border-2 border-border p-4 overflow-hidden relative group">
+                {qrData?.qrCode ? (
+                  qrData.qrCode.startsWith("data:image") ? (
+                    <img
+                      src={qrData.qrCode}
+                      alt="WhatsApp QR Code"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <QRCodeSVG
+                      value={qrData.qrCode}
+                      size={224}
+                      level="H"
+                      includeMargin={false}
+                    />
+                  )
+                ) : (
+                  <div className="text-center px-4">
+                    <QrCode className="w-16 h-16 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-xs text-muted-foreground">
+                      {generateQRMutation.isPending
+                        ? "Generating session..."
+                        : "Preparing QR code..."}
+                    </p>
+                  </div>
+                )}
+
+                {generateQRMutation.isPending && (
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center rounded-2xl">
+                    <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
+
+              {qrData && (
+                <div className="mb-4 flex items-center justify-center gap-2 text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 rounded-lg mx-auto max-w-xs">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>QR code expires in 60 seconds</span>
+                </div>
+              )}
+
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                  <Smartphone className="w-4 h-4" />
+                  <span>Link via QR Code</span>
+                </div>
+                <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
+                  <li className="flex gap-2">
+                    <span className="font-semibold text-primary">1.</span>
+                    Open WhatsApp → Settings → Linked Devices
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="font-semibold text-primary">2.</span>
+                    Tap "Link a Device" and scan this code
+                  </li>
+                </ol>
+              </div>
+
+              <div className="flex flex-col gap-2 max-w-xs mx-auto">
+                <Button
+                  variant="hero"
+                  onClick={handleGenerateQR}
+                  disabled={generateQRMutation.isPending || !!qrData}
+                >
+                  {generateQRMutation.isPending ? "Generating..." : qrData ? "Waiting for scan..." : "Full Refresh"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setConnectionMethod(null);
+                    setQrData(null);
+                  }}
+                  disabled={generateQRMutation.isPending}
+                >
+                  Change method
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-6 max-w-xs mx-auto">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Smartphone className="w-10 h-10 text-primary" />
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="font-semibold text-foreground">Connect with phone number</h3>
+                <p className="text-sm text-muted-foreground">
+                  Enter your WhatsApp number to receive a pairing code on your phone.
                 </p>
               </div>
-            )}
-          </div>
 
-          {qrData && (
-            <div className="mb-4 flex items-center justify-center gap-2 text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 rounded-lg mx-auto max-w-xs">
-              <AlertCircle className="w-4 h-4" />
-              <span>QR code expires in 60 seconds</span>
+              <div className="space-y-3">
+                <div className="flex flex-col items-start gap-1.5">
+                  <label htmlFor="phoneNumber" className="text-xs font-medium text-muted-foreground ml-1">Phone Number</label>
+                  <input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="+1 (555) 000-0000"
+                    className="w-full px-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                </div>
+                <Button variant="hero" className="w-full">
+                  Get Pairing Code
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setConnectionMethod(null)}
+                >
+                  Back to methods
+                </Button>
+              </div>
             </div>
           )}
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Smartphone className="w-4 h-4" />
-              <span>Open WhatsApp on your phone</span>
-            </div>
-            <ol className="text-sm text-muted-foreground space-y-2 text-left max-w-xs mx-auto">
-              <li className="flex gap-2">
-                <span className="font-medium text-foreground">1.</span>
-                Go to Settings → Linked Devices
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-foreground">2.</span>
-                Tap "Link a Device"
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-foreground">3.</span>
-                Point your phone at this screen
-              </li>
-            </ol>
-          </div>
-
-          <Button
-            variant="hero"
-            className="mt-6"
-            onClick={handleGenerateQR}
-            disabled={generateQRMutation.isPending || !!qrData}
-          >
-            {generateQRMutation.isPending ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                Generating...
-              </>
-            ) : qrData ? (
-              "Waiting for scan..."
-            ) : (
-              "Generate QR Code"
-            )}
-          </Button>
         </div>
       ) : (
         <div className="space-y-4">
