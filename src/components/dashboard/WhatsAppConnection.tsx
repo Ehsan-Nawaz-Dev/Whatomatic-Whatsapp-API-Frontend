@@ -51,8 +51,8 @@ const WhatsAppConnection = () => {
       setPollingInterval(3000);
       toast.success("Pairing code received! Enter it on your phone.");
     },
-    onError: () => {
-      toast.error("Failed to get pairing code. Please check the number and try again.");
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to get pairing code. Please check the number and try again.");
     },
   });
 
@@ -272,11 +272,12 @@ const WhatsAppConnection = () => {
                       <input
                         id="phoneNumber"
                         type="tel"
-                        placeholder="+1 (555) 000-0000"
+                        placeholder="+92 312 3456789"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         className="w-full px-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
                       />
+                      <p className="text-[10px] text-muted-foreground ml-1">Include country code (e.g. +92 for Pakistan)</p>
                     </div>
                     <Button
                       variant="hero"
@@ -434,8 +435,9 @@ const WhatsAppConnection = () => {
             </Button>
           </div>
         </div>
-      )}
-    </motion.div>
+      )
+      }
+    </motion.div >
   );
 };
 

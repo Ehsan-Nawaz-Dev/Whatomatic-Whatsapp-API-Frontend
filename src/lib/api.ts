@@ -11,10 +11,8 @@ const withShopParam = (path: string) => {
 };
 
 const sanitizePhone = (phone: string) => {
-  // Remove everything except digits and leading +
-  const cleaned = phone.replace(/[^\d+]/g, "");
-  // Ensure it starts with + if digits-only version doesn't
-  return cleaned.startsWith("+") ? cleaned : `+${cleaned.replace(/^\+/, "")}`;
+  // Remove everything except digits and +
+  return phone.replace(/[^\d+]/g, "");
 };
 
 export interface MerchantSettingsPayload {
@@ -179,26 +177,37 @@ export const generateWhatsAppQR = async (): Promise<WhatsAppQRCodeResponse> => {
 
 export const getWhatsAppPairingCode = async (phone: string): Promise<{ pairingCode: string }> => {
   const sanitizedPhone = sanitizePhone(phone);
-  const url = withShopParam("/whatsapp/pair");
+  // Send in query params AND body for maximum compatibility
+  const urlObj = new URL(withShopParam("/whatsapp/pair"));
+  urlObj.searchParams.set("phone", sanitizedPhone);
+  const url = urlObj.toString();
 
   console.log(`[API] Requesting pairing code for ${sanitizedPhone} to ${url}`);
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      phone: sanitizedPhone,
-      shop: DEFAULT_SHOP
-    }),
-  });
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: sanitizedPhone,
+        shop: DEFAULT_SHOP
+      }),
+    });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error(`[API] Pairing error: ${res.status} ${res.statusText}`, errorText);
-    throw new Error(`Failed to get pairing code: ${res.statusText}`);
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const message = errorData.error || errorData.message || `Server error (${res.status})`;
+      console.error(`[API] Pairing error: ${res.status} ${res.statusText}`, errorData);
+      throw new Error(message);
+    }
+
+    return res.json();
+  } catch (err: any) {
+    if (err.message === "Failed to fetch") {
+      throw new Error("Cannot connect to backend. Please check your internet or API URL.");
+    }
+    throw err;
   }
-
-  return res.json();
 };
 
 
