@@ -413,3 +413,46 @@ export const createActivityLog = async (payload: ActivityLogPayload) => {
   if (!res.ok) throw new Error("Failed to create activity log");
   return res.json();
 };
+
+// Campaigns API
+export const sendCampaign = async (payload: { contacts: any[]; message: string }) => {
+  const res = await fetch(withShopParam("/campaigns/send"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to send campaign");
+  return res.json();
+};
+
+// Chat Button API
+export interface ChatButtonSettings {
+  enabled: boolean;
+  phoneNumber: string;
+  buttonText: string;
+  position: string;
+  themeColor: string;
+}
+
+export const fetchChatButtonSettings = async (): Promise<ChatButtonSettings> => {
+  const res = await fetch(withShopParam("/settings/chat-button"));
+  if (!res.ok) throw new Error("Failed to fetch chat button settings");
+  return res.json();
+};
+
+export const updateChatButtonSettings = async (payload: ChatButtonSettings) => {
+  const res = await fetch(withShopParam("/settings/chat-button"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to update chat button settings");
+  return res.json();
+};
+
+// Automations Stats API
+export const fetchAutomationsStats = async () => {
+  const res = await fetch(withShopParam("/automations/stats"));
+  if (!res.ok) throw new Error("Failed to fetch automations stats");
+  return res.json();
+};

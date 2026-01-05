@@ -10,6 +10,9 @@ import AnalyticsOverview from "@/components/dashboard/AnalyticsOverview";
 import NotificationsList from "@/components/dashboard/NotificationsList";
 import ContactsManagement from "@/components/dashboard/ContactsManagement";
 import WhatsAppCloudSettings from "@/components/dashboard/WhatsAppCloudSettings";
+import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
+import BulkMessenger from "@/components/dashboard/BulkMessenger";
+import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -35,6 +38,12 @@ const Dashboard = () => {
           {activeTab === "templates" && <MessageTemplates />}
 
           {activeTab === "contacts" && <ContactsManagement />}
+
+          {activeTab === "automations" && <AutomationsOverview />}
+
+          {activeTab === "campaigns" && <BulkMessenger />}
+
+          {activeTab === "chat-button" && <ChatButtonConfig />}
 
           {activeTab === "whatsapp-cloud" && <WhatsAppCloudSettings />}
 

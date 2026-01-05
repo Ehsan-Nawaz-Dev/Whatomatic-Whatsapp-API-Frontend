@@ -17,11 +17,13 @@ interface SidebarProps {
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "automations", label: "Automations", icon: Bell },
+  { id: "campaigns", label: "Campaigns", icon: MessageSquare },
+  { id: "chat-button", label: "Chat Button", icon: MessageCircle },
   { id: "contacts", label: "Contacts", icon: Users },
   { id: "templates", label: "Templates", icon: MessageSquare },
   { id: "whatsapp-cloud", label: "Cloud API", icon: Cloud },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "notifications", label: "Notifications", icon: Bell },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -46,8 +48,8 @@ const Sidebar = ({ activeTab, setActiveTab }: SidebarProps) => {
               <button
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === item.id
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
               >
                 <item.icon className="w-5 h-5" />
