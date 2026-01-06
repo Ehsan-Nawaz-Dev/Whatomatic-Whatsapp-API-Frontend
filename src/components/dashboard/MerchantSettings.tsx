@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchSettings, updateSettings } from "@/lib/api";
+import { fetchSettings, updateSettings, API_BASE_URL } from "@/lib/api";
 
 const MerchantSettings = () => {
   const [storeName, setStoreName] = useState("");
@@ -38,8 +38,7 @@ const MerchantSettings = () => {
       setOrderCancelTag("Cancelled");
     }
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-    setWebhookUrl(`${baseUrl.replace(/\/api$/, "")}/api/webhooks/shopify/orders/create`);
+    setWebhookUrl(`${API_BASE_URL.replace(/\/api$/, "")}/api/webhooks/shopify/orders/create`);
   }, [data]);
 
   const mutation = useMutation({

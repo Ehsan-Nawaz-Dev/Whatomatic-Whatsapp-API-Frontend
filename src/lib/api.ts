@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://backend-wfmy.onrender.com/api").replace(/\/$/, "");
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://backend-wfmy.onrender.com/api").replace(/\/$/, "");
 const RAW_SHOP = import.meta.env.VITE_SHOP_DOMAIN || "demo-shop.myshopify.com";
 // Sanitize shop name: only alphanumeric and underscores for maximum backend compatibility
 const DEFAULT_SHOP = RAW_SHOP.replace(/[^a-zA-Z0-9]/g, "_");
