@@ -68,7 +68,8 @@ const AutomationsOverview = () => {
 
     // Merge API stats with local automation definitions
     const displayAutomations = automations.map(flow => {
-        const apiStat = statsData?.find((s: any) => s.id === flow.id);
+        const statsArray = Array.isArray(statsData) ? statsData : [];
+        const apiStat = statsArray.find((s: any) => s.id === flow.id);
         const isEnabled = apiStat?.enabled ?? flow.enabled;
 
         return {
