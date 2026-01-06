@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Zap, ShoppingCart, MessageSquare, Truck, XCircle } from "lucide-react";
+import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,14 @@ import { fetchAutomationsStats, toggleAutomation } from "@/lib/api";
 import { toast } from "sonner";
 
 const automations = [
+    {
+        id: "admin-order-alert",
+        title: "Admin Order Alert",
+        description: "Notify the admin immediately when a new order is received.",
+        icon: Bell,
+        stats: { sent: 0, recovered: null, revenue: null },
+        enabled: true,
+    },
     {
         id: "abandoned-cart",
         title: "Abandoned Cart Recovery",
@@ -18,8 +26,8 @@ const automations = [
     },
     {
         id: "order-confirmation",
-        title: "Order Confirmation",
-        description: "Send a WhatsApp message as soon as an order is placed.",
+        title: "Customer confirmation",
+        description: "Ask customers to confirm their order details via WhatsApp.",
         icon: MessageSquare,
         stats: { sent: 450, recovered: null, revenue: null },
         enabled: true,

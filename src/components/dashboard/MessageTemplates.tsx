@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit2, Trash2, MessageSquare, ShoppingCart, Truck, XCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, MessageSquare, ShoppingCart, Truck, XCircle, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { fetchTemplates, createTemplate, updateTemplate, deleteTemplate } from "
 
 const iconMap = {
   "orders/create": MessageSquare,
+  "admin-order-alert": Bell,
   "checkouts/abandoned": ShoppingCart,
   "fulfillments/update": Truck,
   "orders/cancelled": XCircle,
@@ -124,74 +125,70 @@ const MessageTemplates = () => {
         {!isLoading && templates.map((template: any, index: number) => {
           const Icon = iconMap[template.event as EventKey] ?? MessageSquare;
           return (
-          <motion.div
-            key={template._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`p-6 bg-card rounded-xl border shadow-card transition-all duration-300 ${
-              template.enabled ? "border-primary/30" : "border-border opacity-70"
-            }`}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                  template.enabled ? "gradient-primary" : "bg-muted"
-                }`}>
-                  <Icon className={`w-6 h-6 ${
-                    template.enabled ? "text-primary-foreground" : "text-muted-foreground"
-                  }`} />
+            <motion.div
+              key={template._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`p-6 bg-card rounded-xl border shadow-card transition-all duration-300 ${template.enabled ? "border-primary/30" : "border-border opacity-70"
+                }`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${template.enabled ? "gradient-primary" : "bg-muted"
+                    }`}>
+                    <Icon className={`w-6 h-6 ${template.enabled ? "text-primary-foreground" : "text-muted-foreground"
+                      }`} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">{template.name}</h3>
+                    <p className="text-xs text-muted-foreground font-mono">{template.event}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">{template.name}</h3>
-                  <p className="text-xs text-muted-foreground font-mono">{template.event}</p>
-                </div>
+
+                {/* Toggle Switch */}
+                <button
+                  onClick={() => toggleTemplate(template)}
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${template.enabled ? "bg-primary" : "bg-muted"
+                    }`}
+                >
+                  <span
+                    className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-card shadow-sm transition-transform duration-200 ${template.enabled ? "translate-x-5" : "translate-x-0"
+                      }`}
+                  />
+                </button>
               </div>
 
-              {/* Toggle Switch */}
-              <button
-                onClick={() => toggleTemplate(template)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                  template.enabled ? "bg-primary" : "bg-muted"
-                }`}
-              >
-                <span
-                  className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-card shadow-sm transition-transform duration-200 ${
-                    template.enabled ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
+              {/* Message Preview */}
+              <div className="p-4 bg-muted/50 rounded-lg mb-4">
+                <pre className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">
+                  {template.message}
+                </pre>
+              </div>
 
-            {/* Message Preview */}
-            <div className="p-4 bg-muted/50 rounded-lg mb-4">
-              <pre className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">
-                {template.message}
-              </pre>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={() => openEditDialog(template)}
-              >
-                <Edit2 className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={() => deleteMut.mutate(template._id)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </motion.div>
-        );})}
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => openEditDialog(template)}
+                >
+                  <Edit2 className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => deleteMut.mutate(template._id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Variables Reference */}
@@ -245,7 +242,8 @@ const MessageTemplates = () => {
                 value={form.event}
                 onChange={(e) => setForm({ ...form, event: e.target.value as EventKey })}
               >
-                <option value="orders/create">Order created</option>
+                <option value="orders/create">Customer Order Confirmation</option>
+                <option value="admin-order-alert">Admin New Order Alert</option>
                 <option value="checkouts/abandoned">Abandoned checkout</option>
                 <option value="fulfillments/update">Fulfillment update</option>
                 <option value="orders/cancelled">Order cancelled</option>

@@ -14,6 +14,7 @@ const MerchantSettings = () => {
   const [language, setLanguage] = useState("");
   const [orderConfirmTag, setOrderConfirmTag] = useState("");
   const [orderCancelTag, setOrderCancelTag] = useState("");
+  const [adminPhoneNumber, setAdminPhoneNumber] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
 
   const { data, isLoading } = useQuery({
@@ -29,6 +30,7 @@ const MerchantSettings = () => {
       setLanguage(data.language || "English");
       setOrderConfirmTag(data.orderConfirmTag || "Confirmed");
       setOrderCancelTag(data.orderCancelTag || "Cancelled");
+      setAdminPhoneNumber(data.adminPhoneNumber || "");
     } else {
       setStoreName("My Shopify Store");
       setWhatsappNumber("+1 555 123 4567");
@@ -36,6 +38,7 @@ const MerchantSettings = () => {
       setLanguage("English");
       setOrderConfirmTag("Confirmed");
       setOrderCancelTag("Cancelled");
+      setAdminPhoneNumber("");
     }
 
     setWebhookUrl(`${API_BASE_URL.replace(/\/api$/, "")}/api/webhooks/shopify/orders/create`);
@@ -54,6 +57,7 @@ const MerchantSettings = () => {
       language,
       orderConfirmTag,
       orderCancelTag,
+      adminPhoneNumber,
     });
   };
 
@@ -95,6 +99,19 @@ const MerchantSettings = () => {
             />
             <p className="text-xs text-muted-foreground">
               This number will be used for all outgoing customer messages.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="adminPhone">Admin Phone Number (for alerts)</Label>
+            <Input
+              id="adminPhone"
+              value={adminPhoneNumber}
+              onChange={(e) => setAdminPhoneNumber(e.target.value)}
+              placeholder="+1 555 999 0000"
+            />
+            <p className="text-xs text-muted-foreground">
+              New order alerts will be sent to this number.
             </p>
           </div>
 

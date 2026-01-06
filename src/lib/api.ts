@@ -20,6 +20,7 @@ export interface MerchantSettingsPayload {
   whatsappNumber?: string;
   defaultCountry?: string;
   language?: string;
+  adminPhoneNumber?: string;
   orderConfirmTag?: string;
   orderCancelTag?: string;
 }
