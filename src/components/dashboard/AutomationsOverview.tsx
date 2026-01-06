@@ -3,6 +3,8 @@ import { Zap, ShoppingCart, MessageSquare, Truck, XCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAutomationsStats } from "@/lib/api";
 
 const automations = [
     {
@@ -40,6 +42,25 @@ const automations = [
 ];
 
 const AutomationsOverview = () => {
+    const { data: statsData, isLoading } = useQuery({
+        queryKey: ["automations-stats"],
+        queryFn: fetchAutomationsStats,
+        refetchInterval: 10000, // Refresh every 10 seconds
+    });
+
+    // Merge API stats with local automation definitions
+    const displayAutomations = automations.map(flow => {
+        const apiStat = statsData?.find((s: any) => s.id === flow.id);
+        return {
+            ...flow,
+            stats: apiStat ? {
+                sent: apiStat.sent || 0,
+                recovered: apiStat.recovered || 0,
+                revenue: apiStat.revenue ? `$${apiStat.revenue.toLocaleString()}` : (flow.stats.revenue || "$0")
+            } : flow.stats
+        };
+    });
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -52,7 +73,9 @@ const AutomationsOverview = () => {
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-                {automations.map((flow, index) => (
+                {isLoading ? (
+                    <div className="py-20 text-center text-muted-foreground">Loading automation stats...</div>
+                ) : displayAutomations.map((flow, index) => (
                     <motion.div
                         key={flow.id}
                         initial={{ opacity: 0, x: -20 }}

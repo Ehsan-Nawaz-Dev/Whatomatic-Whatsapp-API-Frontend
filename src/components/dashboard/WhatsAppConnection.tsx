@@ -44,26 +44,16 @@ const WhatsAppConnection = () => {
     },
   });
 
-  // WhatsApp Cloud API connection mutation
+  // Pairing code mutation
   const pairingCodeMutation = useMutation({
-    mutationFn: async (phone: string) => {
-      // Send a welcome message via WhatsApp Cloud API
-      const response = await sendCloudMessage({
-        to: phone,
-        message: "Welcome to WhatFlow! Your WhatsApp account has been successfully connected to our system. You can now receive automated notifications and updates.",
-        type: "text"
-      });
-      return response;
-    },
+    mutationFn: (phone: string) => getWhatsAppPairingCode(phone),
     onSuccess: (data) => {
-      toast.success("Connection message sent! Check your WhatsApp.");
-      // Simulate successful connection after message is sent
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ["whatsapp-status"] });
-      }, 2000);
+      setPairingCode(data.pairingCode);
+      setPollingInterval(3000);
+      toast.success("Pairing code received! Enter it on your phone.");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to connect via WhatsApp Cloud API. Please check the number and try again.");
+      toast.error(error.message || "Failed to get pairing code. Please check the number and try again.");
     },
   });
 
@@ -296,7 +286,7 @@ const WhatsAppConnection = () => {
                       onClick={() => phoneNumber && pairingCodeMutation.mutate(phoneNumber)}
                       disabled={pairingCodeMutation.isPending || !phoneNumber}
                     >
-                      {pairingCodeMutation.isPending ? "Connecting..." : "Connect via WhatsApp Cloud"}
+                      {pairingCodeMutation.isPending ? "Getting code..." : "Get Pairing Code"}
                     </Button>
                     <Button
                       variant="ghost"
@@ -311,33 +301,36 @@ const WhatsAppConnection = () => {
                 </>
               ) : (
                 <div className="space-y-6">
-                  <div className="bg-success/5 border-2 border-success/20 rounded-2xl p-6 text-center animate-in zoom-in duration-300">
-                    <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-3" />
-                    <p className="text-sm font-medium text-success uppercase tracking-wider mb-2">Connection Successful!</p>
-                    <p className="text-xs text-muted-foreground">
-                      A confirmation message has been sent to your WhatsApp number.
-                    </p>
+                  <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 text-center animate-in zoom-in duration-300">
+                    <p className="text-xs font-medium text-primary uppercase tracking-wider mb-2">Your Pairing Code</p>
+                    <div className="text-4xl font-mono font-bold text-foreground tracking-[0.2em] py-2">
+                      {pairingCode}
+                    </div>
                   </div>
 
-                  <div className="space-y-4 text-left bg-accent/30 rounded-lg p-4">
+                  <div className="space-y-4 text-left">
                     <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Smartphone className="w-4 h-4 text-primary" />
-                      What's next?
+                      How to use this code:
                     </h3>
-                    <ul className="text-xs text-muted-foreground space-y-2">
+                    <ol className="text-xs text-muted-foreground space-y-3">
                       <li className="flex gap-2">
-                        <span className="font-bold text-primary">✓</span>
-                        Check your WhatsApp for the confirmation message
+                        <span className="font-bold text-primary">1.</span>
+                        Open WhatsApp → Settings → Linked Devices
                       </li>
                       <li className="flex gap-2">
-                        <span className="font-bold text-primary">✓</span>
-                        Your number is now connected to WhatFlow
+                        <span className="font-bold text-primary">2.</span>
+                        Tap <span className="text-foreground font-medium">Link a Device</span>
                       </li>
                       <li className="flex gap-2">
-                        <span className="font-bold text-primary">✓</span>
-                        You'll receive automated notifications and updates
+                        <span className="font-bold text-primary">3.</span>
+                        Tap <span className="text-foreground font-medium">Link with phone number instead</span> at the bottom
                       </li>
-                    </ul>
+                      <li className="flex gap-2">
+                        <span className="font-bold text-primary">4.</span>
+                        Enter the 8-character code shown above
+                      </li>
+                    </ol>
                   </div>
 
                   <div className="pt-2 flex flex-col gap-2">
@@ -347,7 +340,7 @@ const WhatsAppConnection = () => {
                       className="w-full"
                       onClick={() => setPairingCode(null)}
                     >
-                      Connect another number
+                      Use different number
                     </Button>
                     <Button
                       variant="ghost"

@@ -22,7 +22,7 @@ const menuItems = [
   { id: "chat-button", label: "Chat Button", icon: MessageCircle },
   { id: "contacts", label: "Contacts", icon: Users },
   { id: "templates", label: "Templates", icon: MessageSquare },
-  { id: "whatsapp-cloud", label: "Cloud API", icon: Cloud },
+  { id: "whatsapp-cloud", label: "Direct API", icon: Cloud },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
 ];
