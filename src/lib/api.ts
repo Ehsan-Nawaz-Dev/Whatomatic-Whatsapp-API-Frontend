@@ -456,3 +456,13 @@ export const fetchAutomationsStats = async () => {
   if (!res.ok) throw new Error("Failed to fetch automations stats");
   return res.json();
 };
+// Automations Toggle API
+export const toggleAutomation = async (id: string, enabled: boolean) => {
+  const res = await fetch(withShopParam("/automations/toggle"), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, enabled }),
+  });
+  if (!res.ok) throw new Error("Failed to toggle automation");
+  return res.json();
+};

@@ -3,8 +3,9 @@ import { Zap, ShoppingCart, MessageSquare, Truck, XCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
-import { fetchAutomationsStats } from "@/lib/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchAutomationsStats, toggleAutomation } from "@/lib/api";
+import { toast } from "sonner";
 
 const automations = [
     {
@@ -42,17 +43,37 @@ const automations = [
 ];
 
 const AutomationsOverview = () => {
+    const queryClient = useQueryClient();
     const { data: statsData, isLoading } = useQuery({
         queryKey: ["automations-stats"],
         queryFn: fetchAutomationsStats,
         refetchInterval: 10000, // Refresh every 10 seconds
     });
 
+    const toggleMut = useMutation({
+        mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => toggleAutomation(id, enabled),
+        onSuccess: (_, variables) => {
+            const status = variables.enabled ? "enabled" : "disabled";
+            toast.success(`Automation ${status} successfully!`);
+            queryClient.invalidateQueries({ queryKey: ["automations-stats"] });
+        },
+        onError: () => {
+            toast.error("Failed to update automation status");
+        }
+    });
+
+    const handleToggle = (id: string, currentStatus: boolean) => {
+        toggleMut.mutate({ id, enabled: !currentStatus });
+    };
+
     // Merge API stats with local automation definitions
     const displayAutomations = automations.map(flow => {
         const apiStat = statsData?.find((s: any) => s.id === flow.id);
+        const isEnabled = apiStat?.enabled ?? flow.enabled;
+
         return {
             ...flow,
+            enabled: isEnabled,
             stats: apiStat ? {
                 sent: apiStat.sent || 0,
                 recovered: apiStat.recovered || 0,
@@ -125,7 +146,11 @@ const AutomationsOverview = () => {
 
                         <div className="flex items-center gap-4">
                             <Button variant="outline" size="sm">Edit Template</Button>
-                            <Switch checked={flow.enabled} />
+                            <Switch
+                                checked={flow.enabled}
+                                onCheckedChange={() => handleToggle(flow.id, flow.enabled)}
+                                disabled={toggleMut.isPending}
+                            />
                         </div>
                     </motion.div>
                 ))}

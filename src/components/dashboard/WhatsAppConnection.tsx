@@ -395,23 +395,26 @@ const WhatsAppConnection = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-accent/50 rounded-xl">
-            <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
+        <div className="space-y-6">
+          <div className="bg-success/5 border-2 border-success/20 rounded-2xl p-6 text-center animate-in zoom-in duration-500">
+            <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-success" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-1">Already Connected</h3>
+            <p className="text-sm text-muted-foreground">Your WhatsApp account is active and ready.</p>
+          </div>
+
+          <div className="flex items-center gap-4 p-4 bg-accent/30 rounded-xl border border-border/50">
+            <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center shrink-0">
               <Smartphone className="w-6 h-6 text-primary-foreground" />
             </div>
-            <div className="flex-1">
-              <p className="font-medium text-foreground">
-                {status.phoneNumber || "+1 (555) 123-4567"}
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground truncate">
+                {status.phoneNumber || "Linked Business Number"}
               </p>
-              <p className="text-sm text-muted-foreground">
-                {status.deviceName || "Business WhatsApp"}
+              <p className="text-xs text-muted-foreground truncate">
+                {status.deviceName || "WhatsApp Session"}
               </p>
-              {status.lastConnected && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Last connected: {new Date(status.lastConnected).toLocaleString()}
-                </p>
-              )}
             </div>
           </div>
 
