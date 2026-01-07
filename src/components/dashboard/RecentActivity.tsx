@@ -44,17 +44,25 @@ const RecentActivity = () => {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+              className={`flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors ${activity.type === 'pending' ? 'animate-pulse' : ''}`}
             >
-              <div className={`w-10 h-10 rounded-full ${cfg.bgColor} flex items-center justify-center flex-shrink-0`}>
+              <div className={`w-10 h-10 rounded-full ${cfg.bgColor} flex items-center justify-center flex-shrink-0 relative`}>
                 <Icon className={`w-5 h-5 ${cfg.iconColor}`} />
+                {activity.type === 'pending' && (
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border-2 border-card" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {activity.message || `Shopify event: ${activity.type}`}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {activity.message || `Order Notification`}
+                  </p>
+                  {activity.type === 'pending' && (
+                    <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded-full font-bold">PROCESSING</span>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  {activity.customerName || "Unknown customer"} • {new Date(activity.createdAt).toLocaleString()}
+                  {activity.customerName || "Customer Data Missing"} • {new Date(activity.createdAt).toLocaleString()}
                 </p>
               </div>
             </motion.div>
