@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Clock, ShoppingCart } from "lucide-react";
 import { fetchActivity } from "@/lib/api";
 
@@ -8,9 +8,11 @@ const typeConfig: Record<string, { icon: any; iconColor: string; bgColor: string
   cancelled: { icon: XCircle, iconColor: "text-destructive", bgColor: "bg-destructive/10" },
   recovered: { icon: ShoppingCart, iconColor: "text-primary", bgColor: "bg-primary/10" },
   pending: { icon: Clock, iconColor: "text-warning", bgColor: "bg-warning/10" },
+  failed: { icon: XCircle, iconColor: "text-destructive", bgColor: "bg-destructive/10" },
 };
 
 const RecentActivity = () => {
+  const queryClient = useQueryClient();
   const { data: activities = [], isLoading } = useQuery({
     queryKey: ["activity"],
     queryFn: fetchActivity,
@@ -25,7 +27,15 @@ const RecentActivity = () => {
     >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
-        <button className="text-sm text-primary hover:underline">View All</button>
+        <div className="flex items-center gap-2">
+          {isLoading && <Clock className="w-4 h-4 text-muted-foreground animate-spin" />}
+          <button
+            onClick={() => queryClient.invalidateQueries({ queryKey: ["activity"] })}
+            className="text-xs text-primary hover:underline"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -62,7 +72,7 @@ const RecentActivity = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {activity.customerName || "Customer Data Missing"} • {new Date(activity.createdAt).toLocaleString()}
+                  {activity.customerName || "No Name Provided"} • {new Date(activity.createdAt).toLocaleString()}
                 </p>
               </div>
             </motion.div>
