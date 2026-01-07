@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { fetchSettings, updateSettings, API_BASE_URL } from "@/lib/api";
 
 const MerchantSettings = () => {
@@ -167,14 +168,19 @@ const MerchantSettings = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="webhook">Shopify webhook URL (read-only)</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="webhook">Shopify webhook URL</Label>
+              <Badge variant="outline" className="text-success border-success/30 bg-success/5">
+                Status: Automatic
+              </Badge>
+            </div>
             <Input
               id="webhook"
               value={webhookUrl}
               readOnly
             />
             <p className="text-xs text-muted-foreground">
-              Configure this URL in your Shopify admin to enable webhook-driven automation.
+              Automatic registration is enabled. Your store is synced with the backend.
             </p>
           </div>
 
