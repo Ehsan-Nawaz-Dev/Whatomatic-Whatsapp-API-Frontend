@@ -38,7 +38,7 @@ const RecentActivity = () => {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
         {isLoading && (
           <p className="text-sm text-muted-foreground">Loading activity...</p>
         )}
@@ -69,6 +69,9 @@ const RecentActivity = () => {
                   </p>
                   {activity.type === 'pending' && (
                     <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded-full font-bold">PROCESSING</span>
+                  )}
+                  {activity.type === 'failed' && (
+                    <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded-full font-bold">FAILED</span>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
