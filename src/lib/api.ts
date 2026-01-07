@@ -1,12 +1,22 @@
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://backend-wfmy.onrender.com/api").replace(/\/$/, "");
-const RAW_SHOP = import.meta.env.VITE_SHOP_DOMAIN || "demo-shop.myshopify.com";
-// Sanitize shop name: only alphanumeric and underscores for maximum backend compatibility
-const DEFAULT_SHOP = RAW_SHOP.replace(/[^a-zA-Z0-9]/g, "_");
+const getShopFromUrl = () => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("shop") || params.get("shop_domain") || null;
+  } catch (e) {
+    return null;
+  }
+};
 
-const withShopParam = (path: string) => {
+const RAW_SHOP = getShopFromUrl() || import.meta.env.VITE_SHOP_DOMAIN || "demo-shop.myshopify.com";
+// Sanitize shop name: only alphanumeric and underscores for maximum backend compatibility
+// We keep the original for webhooks but the sanitized one for general API grouping if needed
+const DEFAULT_SHOP = RAW_SHOP.replace(/[^a-zA-Z0-9\.]/g, "_");
+
+export const withShopParam = (path: string) => {
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   const url = new URL(`${API_BASE_URL}/${cleanPath}`);
-  url.searchParams.set("shop", DEFAULT_SHOP);
+  url.searchParams.set("shop", RAW_SHOP); // Use the real raw shop for backend matching
   return url.toString();
 };
 

@@ -42,7 +42,7 @@ const MerchantSettings = () => {
       setAdminPhoneNumber("");
     }
 
-    setWebhookUrl(`${API_BASE_URL.replace(/\/api$/, "")}/api/webhooks/shopify/orders/create`);
+    setWebhookUrl(`${API_BASE_URL.replace(/\/api$/, "")}/api/webhooks/shopify`);
   }, [data]);
 
   const mutation = useMutation({
