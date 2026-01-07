@@ -21,6 +21,7 @@ const menuItems = [
   { id: "contacts", label: "Contacts", icon: Users },
   { id: "templates", label: "Templates", icon: MessageSquare },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 const Sidebar = ({ activeTab, setActiveTab }: SidebarProps) => {

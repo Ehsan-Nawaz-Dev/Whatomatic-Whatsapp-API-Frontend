@@ -50,6 +50,12 @@ const Dashboard = () => {
           {activeTab === "notifications" && (
             <NotificationsList />
           )}
+
+          {activeTab === "settings" && (
+            <div className="space-y-6 max-w-5xl">
+              <MerchantSettings />
+            </div>
+          )}
         </main>
       </div>
     </div>
