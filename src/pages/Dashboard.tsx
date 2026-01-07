@@ -41,12 +41,6 @@ const Dashboard = () => {
 
           {activeTab === "automations" && <AutomationsOverview />}
 
-          {activeTab === "campaigns" && <BulkMessenger />}
-
-          {activeTab === "chat-button" && <ChatButtonConfig />}
-
-          {activeTab === "whatsapp-cloud" && <WhatsAppCloudSettings />}
-
           {activeTab === "analytics" && (
             <div className="space-y-6">
               <AnalyticsOverview />
@@ -55,12 +49,6 @@ const Dashboard = () => {
 
           {activeTab === "notifications" && (
             <NotificationsList />
-          )}
-
-          {activeTab === "settings" && (
-            <div className="space-y-6 max-w-5xl">
-              <MerchantSettings />
-            </div>
           )}
         </main>
       </div>
