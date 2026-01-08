@@ -229,7 +229,7 @@ const MessageTemplates = () => {
           {[
             "{{customer_name}}",
             "{{order_id}}",
-            "#{{order_number}}",
+            "{{order_number}}",
             "{{total_price}}",
             "{{subtotal}}",
             "{{items_list}}",
@@ -301,14 +301,14 @@ const MessageTemplates = () => {
                       if (form.event === "orders/create") {
                         setForm({
                           ...form,
-                          message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: #{{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`,
+                          message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: {{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`,
                           isPoll: true,
                           pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"]
                         });
                       } else {
                         setForm({
                           ...form,
-                          message: `🔔 Alert!\n\nA new order has been placed at {{store_name}}!\n\nOrder number: #{{order_number}}\nCustomer: {{customer_name}}\nShipping to:\n{{shipping_address}}\n{{city}}\n\nOrder details include:\n{{items_list}}\n\nSubtotal: {{total_price}}\nShipping: {{shipping_price}}\nPayment status: {{payment_status}}`,
+                          message: `🔔 Alert!\n\nA new order has been placed at {{store_name}}!\n\nOrder number: {{order_number}}\nCustomer: {{customer_name}}\nShipping to:\n{{shipping_address}}\n{{city}}\n\nOrder details include:\n{{items_list}}\n\nSubtotal: {{total_price}}\nShipping: {{shipping_price}}\nPayment status: {{payment_status}}`,
                           isPoll: false
                         });
                       }
