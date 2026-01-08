@@ -220,6 +220,8 @@ const MessageTemplates = () => {
             "{{items_list}}",
             "{{shipping_address}}",
             "{{city}}",
+            "{{shipping_price}}",
+            "{{payment_status}}",
             "{{cart_total}}",
             "{{cart_link}}",
             "{{tracking_link}}",
@@ -268,17 +270,27 @@ const MessageTemplates = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="tmpl-message">Message</Label>
-                {form.event === "orders/create" && (
+                {(form.event === "orders/create" || form.event === "admin-order-alert") && (
                   <Button
                     variant="link"
                     size="sm"
                     className="h-auto p-0 text-xs text-primary"
-                    onClick={() => setForm({
-                      ...form,
-                      message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: {{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`,
-                      isPoll: true,
-                      pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"]
-                    })}
+                    onClick={() => {
+                      if (form.event === "orders/create") {
+                        setForm({
+                          ...form,
+                          message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: {{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`,
+                          isPoll: true,
+                          pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"]
+                        });
+                      } else {
+                        setForm({
+                          ...form,
+                          message: `🔔 Alert!\n\nA new order has been placed at {{store_name}}!\n\nOrder number: {{order_number}}\nCustomer: {{customer_name}}\nShipping to:\n{{shipping_address}}\n{{city}}\n\nOrder details include:\n{{items_list}}\n\nSubtotal: {{total_price}}\nShipping: {{shipping_price}}\nPayment status: {{payment_status}}`,
+                          isPoll: false
+                        });
+                      }
+                    }}
                   >
                     Load Recommended template
                   </Button>
