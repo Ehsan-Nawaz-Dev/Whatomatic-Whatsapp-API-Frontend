@@ -177,6 +177,21 @@ const MessageTemplates = () => {
                 </pre>
               </div>
 
+              {/* Poll Options Preview */}
+              {template.isPoll && template.pollOptions && template.pollOptions.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {template.pollOptions.map((opt: string, i: number) => (
+                    <span
+                      key={i}
+                      className="px-2.5 py-1 bg-primary/5 border border-primary/20 rounded-full text-[10px] font-bold text-primary flex items-center gap-1 shadow-sm"
+                    >
+                      <div className="w-1 h-1 rounded-full bg-primary" />
+                      {opt}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {/* Actions */}
               <div className="flex items-center gap-2">
                 <Button
@@ -258,7 +273,14 @@ const MessageTemplates = () => {
                 id="tmpl-event"
                 className="w-full h-10 rounded-md border border-border bg-background px-3 text-sm"
                 value={form.event}
-                onChange={(e) => setForm({ ...form, event: e.target.value as EventKey })}
+                onChange={(e) => {
+                  const newEvent = e.target.value as EventKey;
+                  setForm({
+                    ...form,
+                    event: newEvent,
+                    isPoll: newEvent === "admin-order-alert" ? false : form.isPoll
+                  });
+                }}
               >
                 <option value="orders/create">Customer Order Confirmation</option>
                 <option value="admin-order-alert">Admin New Order Alert</option>
@@ -274,7 +296,7 @@ const MessageTemplates = () => {
                   <Button
                     variant="link"
                     size="sm"
-                    className="h-auto p-0 text-xs text-primary"
+                    className="h-auto p-0 text-xs text-primary font-bold decoration-primary/30 hover:decoration-primary transition-all underline shrink-0"
                     onClick={() => {
                       if (form.event === "orders/create") {
                         setForm({
@@ -292,7 +314,7 @@ const MessageTemplates = () => {
                       }
                     }}
                   >
-                    Load Recommended template
+                    ✨ Load Recommended template
                   </Button>
                 )}
               </div>
@@ -304,63 +326,65 @@ const MessageTemplates = () => {
               />
             </div>
 
-            <div className="space-y-4 pt-2 border-t border-border/50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-semibold">Send as Poll</Label>
-                  <p className="text-[11px] text-muted-foreground">Creates a WhatsApp poll with clickable buttons</p>
+            {form.event !== "admin-order-alert" && (
+              <div className="space-y-4 pt-2 border-t border-border/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-sm font-semibold">Send as Poll</Label>
+                    <p className="text-[11px] text-muted-foreground">Creates a WhatsApp poll with clickable buttons</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, isPoll: !form.isPoll })}
+                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${form.isPoll ? "bg-primary" : "bg-muted"}`}
+                  >
+                    <span
+                      className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-card shadow-sm transition-transform duration-200 ${form.isPoll ? "translate-x-5" : "translate-x-0"}`}
+                    />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, isPoll: !form.isPoll })}
-                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${form.isPoll ? "bg-primary" : "bg-muted"}`}
-                >
-                  <span
-                    className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-card shadow-sm transition-transform duration-200 ${form.isPoll ? "translate-x-5" : "translate-x-0"}`}
-                  />
-                </button>
-              </div>
 
-              {form.isPoll && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label className="text-xs font-medium">Poll Options (maximum 2 recommended)</Label>
-                  {form.pollOptions.map((opt, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <Input
-                        value={opt}
-                        onChange={(e) => {
-                          const newOpts = [...form.pollOptions];
-                          newOpts[idx] = e.target.value;
-                          setForm({ ...form, pollOptions: newOpts });
-                        }}
-                        placeholder={`Option ${idx + 1}`}
-                        className="h-9"
-                      />
-                      {form.pollOptions.length > 2 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="px-2 text-destructive"
-                          onClick={() => setForm({ ...form, pollOptions: form.pollOptions.filter((_, i) => i !== idx) })}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  {form.pollOptions.length < 5 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full h-8 text-xs border-dashed"
-                      onClick={() => setForm({ ...form, pollOptions: [...form.pollOptions, ""] })}
-                    >
-                      <Plus className="w-3 h-3 mr-1" /> Add Option
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+                {form.isPoll && (
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <Label className="text-xs font-medium">Poll Options (maximum 2 recommended)</Label>
+                    {form.pollOptions.map((opt, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <Input
+                          value={opt}
+                          onChange={(e) => {
+                            const newOpts = [...form.pollOptions];
+                            newOpts[idx] = e.target.value;
+                            setForm({ ...form, pollOptions: newOpts });
+                          }}
+                          placeholder={`Option ${idx + 1}`}
+                          className="h-9"
+                        />
+                        {form.pollOptions.length > 2 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="px-2 text-destructive"
+                            onClick={() => setForm({ ...form, pollOptions: form.pollOptions.filter((_, i) => i !== idx) })}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    {form.pollOptions.length < 5 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full h-8 text-xs border-dashed"
+                        onClick={() => setForm({ ...form, pollOptions: [...form.pollOptions, ""] })}
+                      >
+                        <Plus className="w-3 h-3 mr-1" /> Add Option
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
