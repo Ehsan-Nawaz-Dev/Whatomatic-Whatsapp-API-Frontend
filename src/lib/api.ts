@@ -57,6 +57,8 @@ export interface TemplatePayload {
   event: string;
   message: string;
   enabled: boolean;
+  isPoll?: boolean;
+  pollOptions?: string[];
 }
 
 export const fetchTemplates = async () => {

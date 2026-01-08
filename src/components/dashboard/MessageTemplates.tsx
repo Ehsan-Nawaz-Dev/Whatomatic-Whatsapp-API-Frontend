@@ -25,6 +25,8 @@ interface TemplateFormState {
   event: EventKey;
   message: string;
   enabled: boolean;
+  isPoll: boolean;
+  pollOptions: string[];
 }
 
 const emptyForm: TemplateFormState = {
@@ -32,6 +34,8 @@ const emptyForm: TemplateFormState = {
   event: "orders/create",
   message: "",
   enabled: true,
+  isPoll: false,
+  pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
 };
 
 const MessageTemplates = () => {
@@ -86,6 +90,8 @@ const MessageTemplates = () => {
       event: template.event,
       message: template.message,
       enabled: template.enabled,
+      isPoll: template.isPoll || false,
+      pollOptions: template.pollOptions || ["✅Yes, Confirm✅", "❌No, Cancel❌"],
     });
     setDialogOpen(true);
   };
@@ -141,7 +147,12 @@ const MessageTemplates = () => {
                       }`} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">{template.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground">{template.name}</h3>
+                      {template.isPoll && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-md font-bold uppercase">Poll</span>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground font-mono">{template.event}</p>
                   </div>
                 </div>
@@ -264,7 +275,9 @@ const MessageTemplates = () => {
                     className="h-auto p-0 text-xs text-primary"
                     onClick={() => setForm({
                       ...form,
-                      message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: {{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`
+                      message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: {{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`,
+                      isPoll: true,
+                      pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"]
                     })}
                   >
                     Load Recommended template
@@ -277,6 +290,64 @@ const MessageTemplates = () => {
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 className="min-h-[200px]"
               />
+            </div>
+
+            <div className="space-y-4 pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm font-semibold">Send as Poll</Label>
+                  <p className="text-[11px] text-muted-foreground">Creates a WhatsApp poll with clickable buttons</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, isPoll: !form.isPoll })}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${form.isPoll ? "bg-primary" : "bg-muted"}`}
+                >
+                  <span
+                    className={`absolute top-1 left-1 w-3 h-3 rounded-full bg-card shadow-sm transition-transform duration-200 ${form.isPoll ? "translate-x-5" : "translate-x-0"}`}
+                  />
+                </button>
+              </div>
+
+              {form.isPoll && (
+                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Label className="text-xs font-medium">Poll Options (maximum 2 recommended)</Label>
+                  {form.pollOptions.map((opt, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <Input
+                        value={opt}
+                        onChange={(e) => {
+                          const newOpts = [...form.pollOptions];
+                          newOpts[idx] = e.target.value;
+                          setForm({ ...form, pollOptions: newOpts });
+                        }}
+                        placeholder={`Option ${idx + 1}`}
+                        className="h-9"
+                      />
+                      {form.pollOptions.length > 2 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="px-2 text-destructive"
+                          onClick={() => setForm({ ...form, pollOptions: form.pollOptions.filter((_, i) => i !== idx) })}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  {form.pollOptions.length < 5 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full h-8 text-xs border-dashed"
+                      onClick={() => setForm({ ...form, pollOptions: [...form.pollOptions, ""] })}
+                    >
+                      <Plus className="w-3 h-3 mr-1" /> Add Option
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
