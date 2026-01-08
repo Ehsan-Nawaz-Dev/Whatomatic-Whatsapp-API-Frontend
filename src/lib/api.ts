@@ -33,6 +33,7 @@ export interface MerchantSettingsPayload {
   adminPhoneNumber?: string;
   orderConfirmTag?: string;
   orderCancelTag?: string;
+  pendingConfirmTag?: string;
 }
 
 export const fetchSettings = async () => {

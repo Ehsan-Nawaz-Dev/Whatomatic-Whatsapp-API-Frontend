@@ -15,6 +15,7 @@ const MerchantSettings = () => {
   const [language, setLanguage] = useState("");
   const [orderConfirmTag, setOrderConfirmTag] = useState("");
   const [orderCancelTag, setOrderCancelTag] = useState("");
+  const [pendingConfirmTag, setPendingConfirmTag] = useState("");
   const [adminPhoneNumber, setAdminPhoneNumber] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
 
@@ -31,6 +32,7 @@ const MerchantSettings = () => {
       setLanguage(data.language || "English");
       setOrderConfirmTag(data.orderConfirmTag || "Confirmed");
       setOrderCancelTag(data.orderCancelTag || "Cancelled");
+      setPendingConfirmTag(data.pendingConfirmTag || "Pending Confirmation");
       setAdminPhoneNumber(data.adminPhoneNumber || "");
     } else {
       setStoreName("My Shopify Store");
@@ -39,6 +41,7 @@ const MerchantSettings = () => {
       setLanguage("English");
       setOrderConfirmTag("Confirmed");
       setOrderCancelTag("Cancelled");
+      setPendingConfirmTag("Pending Confirmation");
       setAdminPhoneNumber("");
     }
 
@@ -58,6 +61,7 @@ const MerchantSettings = () => {
       language,
       orderConfirmTag,
       orderCancelTag,
+      pendingConfirmTag,
       adminPhoneNumber,
     });
   };
@@ -141,9 +145,18 @@ const MerchantSettings = () => {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Order response tags</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="confirmTag">CONFIRM response tag</Label>
+                <Label htmlFor="pendingTag" className="text-[10px] uppercase font-bold text-muted-foreground">Pending tag</Label>
+                <Input
+                  id="pendingTag"
+                  value={pendingConfirmTag}
+                  onChange={(e) => setPendingConfirmTag(e.target.value)}
+                  placeholder="Pending Confirmation"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmTag" className="text-[10px] uppercase font-bold text-muted-foreground">Confirm tag</Label>
                 <Input
                   id="confirmTag"
                   value={orderConfirmTag}
@@ -152,7 +165,7 @@ const MerchantSettings = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="cancelTag">CANCEL response tag</Label>
+                <Label htmlFor="cancelTag" className="text-[10px] uppercase font-bold text-muted-foreground">Cancel tag</Label>
                 <Input
                   id="cancelTag"
                   value={orderCancelTag}
@@ -162,8 +175,7 @@ const MerchantSettings = () => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              These Shopify order tags will be applied when customers reply CONFIRM or CANCEL in
-              WhatsApp.
+              These Shopify order tags will be applied automatically based on the message status and customer replies.
             </p>
           </div>
 
