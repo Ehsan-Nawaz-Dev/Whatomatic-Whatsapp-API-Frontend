@@ -203,7 +203,12 @@ const MessageTemplates = () => {
           {[
             "{{customer_name}}",
             "{{order_id}}",
+            "{{order_number}}",
             "{{total_price}}",
+            "{{subtotal}}",
+            "{{items_list}}",
+            "{{shipping_address}}",
+            "{{city}}",
             "{{cart_total}}",
             "{{cart_link}}",
             "{{tracking_link}}",
@@ -250,12 +255,27 @@ const MessageTemplates = () => {
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tmpl-message">Message</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="tmpl-message">Message</Label>
+                {form.event === "orders/create" && (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="h-auto p-0 text-xs text-primary"
+                    onClick={() => setForm({
+                      ...form,
+                      message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: {{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`
+                    })}
+                  >
+                    Load Recommended template
+                  </Button>
+                )}
+              </div>
               <Textarea
                 id="tmpl-message"
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="min-h-[120px]"
+                className="min-h-[200px]"
               />
             </div>
           </div>
