@@ -34,6 +34,8 @@ export interface MerchantSettingsPayload {
   orderConfirmTag?: string;
   orderCancelTag?: string;
   pendingConfirmTag?: string;
+  orderConfirmReply?: string;
+  orderCancelReply?: string;
 }
 
 export const fetchSettings = async () => {

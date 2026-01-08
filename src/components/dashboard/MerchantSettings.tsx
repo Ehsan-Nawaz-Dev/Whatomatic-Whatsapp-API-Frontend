@@ -16,6 +16,8 @@ const MerchantSettings = () => {
   const [orderConfirmTag, setOrderConfirmTag] = useState("");
   const [orderCancelTag, setOrderCancelTag] = useState("");
   const [pendingConfirmTag, setPendingConfirmTag] = useState("");
+  const [orderConfirmReply, setOrderConfirmReply] = useState("");
+  const [orderCancelReply, setOrderCancelReply] = useState("");
   const [adminPhoneNumber, setAdminPhoneNumber] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
 
@@ -33,6 +35,8 @@ const MerchantSettings = () => {
       setOrderConfirmTag(data.orderConfirmTag || "Confirmed");
       setOrderCancelTag(data.orderCancelTag || "Cancelled");
       setPendingConfirmTag(data.pendingConfirmTag || "Pending Confirmation");
+      setOrderConfirmReply(data.orderConfirmReply || "Your order is confirmed, thank you! ✅");
+      setOrderCancelReply(data.orderCancelReply || "Your order has been cancelled as requested. ❌");
       setAdminPhoneNumber(data.adminPhoneNumber || "");
     } else {
       setStoreName("My Shopify Store");
@@ -42,6 +46,8 @@ const MerchantSettings = () => {
       setOrderConfirmTag("Confirmed");
       setOrderCancelTag("Cancelled");
       setPendingConfirmTag("Pending Confirmation");
+      setOrderConfirmReply("Your order is confirmed, thank you! ✅");
+      setOrderCancelReply("Your order has been cancelled as requested. ❌");
       setAdminPhoneNumber("");
     }
 
@@ -62,6 +68,8 @@ const MerchantSettings = () => {
       orderConfirmTag,
       orderCancelTag,
       pendingConfirmTag,
+      orderConfirmReply,
+      orderCancelReply,
       adminPhoneNumber,
     });
   };
@@ -142,9 +150,38 @@ const MerchantSettings = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Order response tags</Label>
+        <div className="space-y-6">
+          <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+            <Label className="text-sm font-medium">Auto-reply messages</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="confirmReply" className="text-[10px] uppercase font-bold text-muted-foreground">Confirmation Reply</Label>
+                <Textarea
+                  id="confirmReply"
+                  value={orderConfirmReply}
+                  onChange={(e) => setOrderConfirmReply(e.target.value)}
+                  placeholder="Your order is confirmed, thank you! ✅"
+                  className="min-h-[80px]"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cancelReply" className="text-[10px] uppercase font-bold text-muted-foreground">Cancellation Reply</Label>
+                <Textarea
+                  id="cancelReply"
+                  value={orderCancelReply}
+                  onChange={(e) => setOrderCancelReply(e.target.value)}
+                  placeholder="Your order has been cancelled as requested. ❌"
+                  className="min-h-[80px]"
+                />
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground italic">
+              These messages are sent automatically when a customer clicks a button in the WhatsApp poll.
+            </p>
+          </div>
+
+          <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+            <Label className="text-sm font-medium">Order Tagging</Label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="pendingTag" className="text-[10px] uppercase font-bold text-muted-foreground">Pending tag</Label>
@@ -174,10 +211,11 @@ const MerchantSettings = () => {
                 />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              These Shopify order tags will be applied automatically based on the message status and customer replies.
+            <p className="text-[11px] text-muted-foreground">
+              Shopify order tags will be applied automatically based on the message status and customer replies.
             </p>
           </div>
+
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -218,7 +256,7 @@ const MerchantSettings = () => {
           </div>
         </div>
       </form>
-    </motion.div>
+    </motion.div >
   );
 };
 
