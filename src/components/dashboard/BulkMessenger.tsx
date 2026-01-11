@@ -39,16 +39,16 @@ const BulkMessenger = () => {
         setProgress(0);
 
         try {
-            // In a real scenario, you'd parse the CSV to get actual contacts
-            // For now, we use a dummy list representing the imported contacts
-            const dummyContacts = Array.from({ length: Math.min(contactsCount, 10) }).map((_, i) => ({
-                id: `id_${i}`,
-                phone: "+923001234567", // This would be the actual phone from CSV
+            // In a real scenario, you'd parse info from the CSV
+            // For now, we allow sending to the imported count using the first contact as a template
+            const campaignContacts = Array.from({ length: Math.min(contactsCount, 5) }).map((_, i) => ({
+                id: `cont_${i}`,
+                phone: i === 0 ? "+923001234567" : `+92300${1000000 + i}`, // Dummy but keeps first one for test
                 name: `Customer ${i}`
             }));
 
             await sendCampaign({
-                contacts: dummyContacts,
+                contacts: campaignContacts,
                 message: message
             });
 

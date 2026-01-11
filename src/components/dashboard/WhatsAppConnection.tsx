@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { QrCode, CheckCircle2, Smartphone, RefreshCw, AlertCircle } from "lucide-react";
+import { QrCode, CheckCircle2, Smartphone, RefreshCw, AlertCircle, MessageSquare, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
@@ -10,6 +10,7 @@ import {
   connectWhatsApp,
   disconnectWhatsApp,
   getWhatsAppPairingCode,
+  sendWhatsAppMessage,
   sendCloudMessage,
   WhatsAppQRCodeResponse,
   WhatsAppStatusResponse,
@@ -20,7 +21,7 @@ const WhatsAppConnection = () => {
   const queryClient = useQueryClient();
   const [qrData, setQrData] = useState<WhatsAppQRCodeResponse | null>(null);
   const [pollingInterval, setPollingInterval] = useState<number | null>(null);
-  const [connectionMethod, setConnectionMethod] = useState<"qr" | "phone" | null>(null);
+  const [connectionMethod, setConnectionMethod] = useState<"qr" | "phone">("qr");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [pairingCode, setPairingCode] = useState<string | null>(null);
 
@@ -49,6 +50,18 @@ const WhatsAppConnection = () => {
     onError: (err: any) => {
       console.error("[WhatsApp] Connection error:", err);
       toast.error(`Failed to start server: ${err.message}`);
+    }
+  });
+
+  // Pairing code mutation
+  const pairMutation = useMutation({
+    mutationFn: getWhatsAppPairingCode,
+    onSuccess: (data) => {
+      setPairingCode(data.pairingCode);
+      toast.success("Pairing code generated!");
+    },
+    onError: (err: any) => {
+      toast.error(err.message || "Failed to get pairing code");
     }
   });
 
@@ -101,45 +114,140 @@ const WhatsAppConnection = () => {
       </div>
 
       {!status?.connected ? (
-        <div className="text-center py-8">
-          <div className="space-y-4 max-w-xs mx-auto">
-            {/* QR Code Display */}
-            <div className="w-64 h-64 mx-auto mb-6 bg-white rounded-2xl flex items-center justify-center border-2 border-border p-4 overflow-hidden relative group">
-              {currentQr ? (
-                <img
-                  src={currentQr}
-                  alt="WhatsApp QR Code"
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <div className="text-center px-4">
-                  <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
-                  <p className="text-xs text-muted-foreground">
-                    {qrError ? qrError.message : (connectMutation.isPending ? "Starting server..." : "Loading QR code...")}
-                  </p>
-                </div>
-              )}
-            </div>
+        <div className="text-center py-4">
+          {/* Method Selector */}
+          <div className="flex p-1 bg-muted/50 rounded-lg max-w-[320px] mx-auto mb-8 border border-border">
+            <button
+              onClick={() => setConnectionMethod("qr")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${connectionMethod === "qr"
+                ? "bg-background text-primary shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              <QrCode className="w-4 h-4" />
+              QR Code
+            </button>
+            <button
+              onClick={() => setConnectionMethod("phone")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${connectionMethod === "phone"
+                ? "bg-background text-primary shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              <Smartphone className="w-4 h-4" />
+              Pairing Code
+            </button>
+          </div>
 
-            <div className="space-y-4 mb-6">
-              <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
-                <Smartphone className="w-4 h-4" />
-                <span>Link via QR Code</span>
+          <div className="space-y-4 max-w-xs mx-auto">
+            {connectionMethod === "qr" ? (
+              <>
+                {/* QR Code Display */}
+                <div className="w-64 h-64 mx-auto mb-6 bg-white rounded-2xl flex items-center justify-center border-2 border-border p-4 overflow-hidden relative group">
+                  {currentQr ? (
+                    <img
+                      src={currentQr}
+                      alt="WhatsApp QR Code"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-center px-4">
+                      <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+                      <p className="text-xs text-muted-foreground">
+                        {qrError ? qrError.message : (connectMutation.isPending ? "Starting server..." : "Loading QR code...")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                    <QrCode className="w-4 h-4" />
+                    <span>Link via QR Code</span>
+                  </div>
+                  <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
+                    <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded text-[10px] mb-2">
+                      Scanning... polling QR every 2s
+                    </p>
+                    <li className="flex gap-2">
+                      <span className="font-semibold text-primary">1.</span>
+                      Open WhatsApp → Settings → Linked Devices
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-semibold text-primary">2.</span>
+                      Tap "Link a Device" and scan this code
+                    </li>
+                  </ol>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-6">
+                <div className="bg-muted/30 p-4 rounded-xl border border-dashed border-border">
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Enter your phone number with country code to receive a link code on your WhatsApp.
+                  </p>
+                  <div className="space-y-3">
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+1234567890"
+                      className="w-full px-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                    <Button
+                      className="w-full"
+                      onClick={() => pairMutation.mutate(phoneNumber)}
+                      disabled={!phoneNumber || pairMutation.isPending}
+                    >
+                      {pairMutation.isPending ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          Requesting...
+                        </>
+                      ) : "Get Pairing Code"}
+                    </Button>
+                  </div>
+                </div>
+
+                {pairingCode && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-6 bg-primary/5 border-2 border-primary/20 rounded-2xl text-center"
+                  >
+                    <p className="text-xs font-semibold text-primary uppercase tracking-tight mb-2">Your Pairing Code</p>
+                    <div className="flex justify-center gap-2">
+                      {pairingCode.split('').map((char, i) => (
+                        <span key={i} className="w-8 h-10 flex items-center justify-center bg-background border-2 border-primary/30 rounded text-xl font-bold text-foreground">
+                          {char}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                    <Key className="w-4 h-4" />
+                    <span>Link with Phone Number</span>
+                  </div>
+                  <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
+                    <li className="flex gap-2">
+                      <span className="font-semibold text-primary">1.</span>
+                      Open WhatsApp → Settings → Linked Devices
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-semibold text-primary">2.</span>
+                      Tap "Link a Device" → "Link with phone number instead"
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-semibold text-primary">3.</span>
+                      Enter the 8-character code shown above
+                    </li>
+                  </ol>
+                </div>
               </div>
-              <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
-                <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded text-[10px] mb-2">
-                  Scanning... polling QR every 2s
-                </p>
-                <li className="flex gap-2">
-                  <span className="font-semibold text-primary">1.</span>
-                  Open WhatsApp → Settings → Linked Devices
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-semibold text-primary">2.</span>
-                  Tap "Link a Device" and scan this code
-                </li>
-              </ol>
-            </div>
+            )}
           </div>
         </div>
       ) : (
@@ -164,6 +272,45 @@ const WhatsAppConnection = () => {
                 {status.deviceName || "WhatsApp Session"}
               </p>
             </div>
+          </div>
+
+          {/* Test Message Feature */}
+          <div className="p-4 bg-muted/30 rounded-xl border border-border space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold mb-1">
+              <MessageSquare className="w-4 h-4 text-primary" />
+              <span>Send Test Message</span>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                placeholder="Phone (e.g. +923...)"
+                className="flex-1 px-3 py-1.5 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+                id="test-phone"
+              />
+              <Button
+                size="sm"
+                variant="hero"
+                className="h-8 text-xs h-[30px]"
+                onClick={async () => {
+                  const phone = (document.getElementById("test-phone") as HTMLInputElement).value;
+                  if (!phone) return toast.error("Enter a phone number");
+                  try {
+                    const res = await sendWhatsAppMessage({
+                      to: phone,
+                      message: "Hello from WhatFlow! Your connection is working. 🚀"
+                    });
+                    toast.success("Test message sent!");
+                  } catch (err: any) {
+                    toast.error(err.message || "Failed to send message");
+                  }
+                }}
+              >
+                Send
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground italic">
+              Verify your connection by sending a message to your own number.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
