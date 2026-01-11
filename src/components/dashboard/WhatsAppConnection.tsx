@@ -30,15 +30,17 @@ const WhatsAppConnection = () => {
     queryKey: ["whatsapp-status"],
     queryFn: fetchWhatsAppStatus,
     refetchInterval: (query) => (query.state.data?.connected ? false : 3000), // Poll every 3 seconds if not connected
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   // Fetch QR code
   const { data: qrResponse, isLoading: isQrLoading, error: qrError } = useQuery<WhatsAppQRCodeResponse, Error>({
     queryKey: ["whatsapp-qr"],
     queryFn: generateWhatsAppQR,
-    enabled: !status?.connected, // Fetch QR if not connected (even if status is loading/error)
-    refetchInterval: (query) => (status?.connected ? false : 2000), // Poll every 2 seconds if not connected
-    retry: true,
+    enabled: !status?.connected && !isStatusLoading, // Fetch QR if not connected
+    refetchInterval: (query) => (status?.connected ? false : 5000), // Increase interval slightly to avoid congestion
+    retry: 1, // Only retry once per interval
   });
 
   // Connect mutation
@@ -161,13 +163,27 @@ const WhatsAppConnection = () => {
                 </div>
 
                 <div className="space-y-4 mb-6">
-                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
-                    <QrCode className="w-4 h-4" />
-                    <span>Link via QR Code</span>
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                      <QrCode className="w-4 h-4" />
+                      <span>Link via QR Code</span>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status"] })}
+                      disabled={isStatusLoading}
+                      className="text-[10px] h-7 px-3"
+                    >
+                      <RefreshCw className={`w-3 h-3 mr-1 ${isStatusLoading ? "animate-spin" : ""}`} />
+                      Check Connection Status
+                    </Button>
                   </div>
+
                   <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
                     <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded text-[10px] mb-2">
-                      Scanning... polling QR every 2s
+                      {isStatusLoading ? "Checking status..." : "Waiting for scan..."}
                     </p>
                     <li className="flex gap-2">
                       <span className="font-semibold text-primary">1.</span>
@@ -227,10 +243,26 @@ const WhatsAppConnection = () => {
                 )}
 
                 <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
-                    <Key className="w-4 h-4" />
-                    <span>Link with Phone Number</span>
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                      <Key className="w-4 h-4" />
+                      <span>Link with Phone Number</span>
+                    </div>
+
+                    {pairingCode && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status"] })}
+                        disabled={isStatusLoading}
+                        className="text-[10px] h-7 px-3"
+                      >
+                        <RefreshCw className={`w-3 h-3 mr-1 ${isStatusLoading ? "animate-spin" : ""}`} />
+                        Check Connection Status
+                      </Button>
+                    )}
                   </div>
+
                   <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
                     <li className="flex gap-2">
                       <span className="font-semibold text-primary">1.</span>
@@ -244,6 +276,11 @@ const WhatsAppConnection = () => {
                       <span className="font-semibold text-primary">3.</span>
                       Enter the 8-character code shown above
                     </li>
+                    {pairingCode && (
+                      <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded text-[10px] mt-2 italic">
+                        Once entered, wait 10-20 seconds then click Check Status.
+                      </p>
+                    )}
                   </ol>
                 </div>
               </div>
