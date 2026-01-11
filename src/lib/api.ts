@@ -178,14 +178,29 @@ export interface WhatsAppMessagePayload {
 }
 
 export const generateWhatsAppQR = async (): Promise<WhatsAppQRCodeResponse> => {
-  const res = await fetch(withShopParam("/whatsapp/qr"));
-  if (!res.ok) throw new Error("Failed to fetch current QR code from backend");
+  const url = withShopParam("/whatsapp/qr");
+  console.log(`[WhatsApp] Fetching QR from: ${url}`);
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "Unknown error");
+    console.error(`[WhatsApp] QR fetch failed: ${res.status} ${res.statusText}`, errorText);
+    throw new Error(`Server error: ${res.status}. Maybe server is still starting?`);
+  }
 
   const data = await res.json();
-  if (!data.qrCode) throw new Error("No active QR code found on backend");
+  console.log("[WhatsApp] QR response data:", data);
+
+  // Handle various response formats
+  const qrCode = data.qrCode || data.qr || (typeof data === "string" ? data : null);
+
+  if (!qrCode) {
+    console.warn("[WhatsApp] No QR code in response");
+    throw new Error("QR not ready. Waiting for server...");
+  }
 
   return {
-    qrCode: data.qrCode,
+    qrCode,
     sessionId: data.sessionId || `session_${DEFAULT_SHOP}`,
     expiresAt: data.expiresAt || new Date(Date.now() + 60000).toISOString()
   };
