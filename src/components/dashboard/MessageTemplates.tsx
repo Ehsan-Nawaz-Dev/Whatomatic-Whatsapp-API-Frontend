@@ -301,14 +301,14 @@ const MessageTemplates = () => {
                       if (form.event === "orders/create") {
                         setForm({
                           ...form,
-                          message: `Thank you for your order from {{store_name}}. This is a confirmation message.\n\nOrder Details:\n\nOrder ID: {{order_id}}\nOrder Number: {{order_number}}\n\nItems: {{items_list}}\nSubtotal: {{total_price}}\n\nAddress: {{shipping_address}}\nCity: {{city}}\n\nPlease confirm your order.`,
+                          message: `Hi {{customer_name}}, thank you for your order from {{store_name}}! 🛍️\n\n*Order Details:*\nOrder: {{order_number}}\nItems: {{items_list}}\n\n*Total Price:* {{total_price}}\n\n*Shipping Address:*\n{{shipping_address}}\n{{city}}\n\nPlease confirm if these details are correct.`,
                           isPoll: true,
-                          pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"]
+                          pollOptions: ["✅ Yes, Confirm ✅", "❌ No, Cancel ❌"]
                         });
                       } else {
                         setForm({
                           ...form,
-                          message: `🔔 Alert!\n\nA new order has been placed at {{store_name}}!\n\nOrder number: {{order_number}}\nCustomer: {{customer_name}}\nShipping to:\n{{shipping_address}}\n{{city}}\n\nOrder details include:\n{{items_list}}\n\nSubtotal: {{total_price}}\nShipping: {{shipping_price}}\nPayment status: {{payment_status}}`,
+                          message: `🔔 *New Order Alert!*\n\nA new order {{order_number}} has been received at {{store_name}}.\n\n*Customer:* {{customer_name}}\n*Amount:* {{total_price}}\n\n*Items:*\n{{items_list}}\n\n*Shipping to:*\n{{shipping_address}}\n{{city}}\n\nPayment status: {{payment_status}}`,
                           isPoll: false
                         });
                       }
