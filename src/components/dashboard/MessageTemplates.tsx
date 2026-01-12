@@ -230,6 +230,8 @@ const MessageTemplates = () => {
             "{{customer_name}}",
             "{{order_id}}",
             "{{order_number}}",
+            "{{grand_total}}",
+            "{{price}}",
             "{{total_price}}",
             "{{subtotal}}",
             "{{items_list}}",
@@ -301,14 +303,14 @@ const MessageTemplates = () => {
                       if (form.event === "orders/create") {
                         setForm({
                           ...form,
-                          message: `Hi {{customer_name}}, thank you for your order from {{store_name}}! 🛍️\n\n*Order Details:*\nOrder: {{order_number}}\nItems: {{items_list}}\n\n*Total Price:* {{total_price}}\n\n*Shipping Address:*\n{{shipping_address}}\n{{city}}\n\nPlease confirm if these details are correct.`,
+                          message: `Hi {{customer_name}}, thank you for your order from {{store_name}}! 🛍️\n\n*Order Details:*\nOrder: {{order_number}}\nItems: {{items_list}}\n\n*Product Price:* {{price}}\n*Grand Total:* {{grand_total}}\n\n*Shipping Address:*\n{{shipping_address}}\n{{city}}\n\nPlease confirm if these details are correct.`,
                           isPoll: true,
                           pollOptions: ["✅ Yes, Confirm ✅", "❌ No, Cancel ❌"]
                         });
                       } else {
                         setForm({
                           ...form,
-                          message: `🔔 *New Order Alert!*\n\nA new order {{order_number}} has been received at {{store_name}}.\n\n*Customer:* {{customer_name}}\n*Amount:* {{total_price}}\n\n*Items:*\n{{items_list}}\n\n*Shipping to:*\n{{shipping_address}}\n{{city}}\n\nPayment status: {{payment_status}}`,
+                          message: `🔔 *New Order Alert!*\n\nA new order {{order_number}} has been received at {{store_name}}.\n\n*Customer:* {{customer_name}}\n*Product Price:* {{price}}\n*Grand Total:* {{grand_total}}\n\n*Items:*\n{{items_list}}\n\n*Shipping to:*\n{{shipping_address}}\n{{city}}\n\nPayment status: {{payment_status}}`,
                           isPoll: false
                         });
                       }
