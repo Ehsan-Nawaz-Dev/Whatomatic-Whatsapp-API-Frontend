@@ -13,6 +13,7 @@ import WhatsAppCloudSettings from "@/components/dashboard/WhatsAppCloudSettings"
 import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
 import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
+import BillingPlan from "@/components/dashboard/BillingPlan";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -49,6 +50,12 @@ const Dashboard = () => {
 
           {activeTab === "notifications" && (
             <NotificationsList />
+          )}
+
+          {activeTab === "billing" && (
+            <div className="space-y-6">
+              <BillingPlan />
+            </div>
           )}
 
           {activeTab === "settings" && (

@@ -8,17 +8,18 @@ embedded = true
 [webhooks]
 api_version = "2024-01"
 
-[[webhooks.subscriptions]]
-topics = [ "orders/create", "orders/cancelled" ]
-uri = "https://backend-wfmy.onrender.com/api/webhooks/shopify"
-
-[[webhooks.subscriptions]]
-topics = [ "checkouts/create", "fulfillments/update" ]
-uri = "https://backend-wfmy.onrender.com/api/webhooks/shopify"
+  [[webhooks.subscriptions]]
+  topics = [
+  "checkouts/create",
+  "fulfillments/update",
+  "orders/cancelled",
+  "orders/create"
+]
+  uri = "https://backend-wfmy.onrender.com/api/webhooks/shopify"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_orders,write_orders,read_checkouts,read_fulfillments,read_customers"
+scopes = "read_checkouts,read_customers,read_fulfillments,read_orders,write_orders"
 optional_scopes = [ ]
 use_legacy_install_flow = false
 
