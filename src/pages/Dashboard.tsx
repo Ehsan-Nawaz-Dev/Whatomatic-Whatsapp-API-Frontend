@@ -14,19 +14,54 @@ import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
 import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
+import { useQuery } from "@tanstack/react-query";
+import { withShopParam } from "@/lib/api";
+import { Loader2 } from "lucide-react";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Fetch billing status
+  const { data: billing, isLoading: isBillingLoading } = useQuery({
+    queryKey: ["billing-status"],
+    queryFn: async () => {
+      const res = await fetch(withShopParam("/billing/status"));
+      if (!res.ok) return { plan: "free", status: "none" };
+      return res.json();
+    },
+    // Keep it fresh
+    staleTime: 60000,
+  });
+
+  const isActive = billing?.status === "active";
+
+  // Force billing tab for new/unpaid users, but allow settings for setup
+  const effectiveTab = (!isActive && activeTab !== "settings") ? "billing" : activeTab;
+
+  if (isBillingLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto" />
+          <p className="text-sm text-muted-foreground animate-pulse">Checking subscription...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar
+        activeTab={effectiveTab}
+        setActiveTab={setActiveTab}
+        isSubscribed={isActive}
+      />
 
       <div className="flex-1 flex flex-col">
         <DashboardHeader />
 
         <main className="flex-1 p-6 overflow-auto">
-          {activeTab === "overview" && (
+          {effectiveTab === "overview" && (
             <div className="space-y-6">
               <StatsCards />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -36,29 +71,29 @@ const Dashboard = () => {
             </div>
           )}
 
-          {activeTab === "templates" && <MessageTemplates />}
+          {effectiveTab === "templates" && <MessageTemplates />}
 
-          {activeTab === "contacts" && <ContactsManagement />}
+          {effectiveTab === "contacts" && <ContactsManagement />}
 
-          {activeTab === "automations" && <AutomationsOverview />}
+          {effectiveTab === "automations" && <AutomationsOverview />}
 
-          {activeTab === "analytics" && (
+          {effectiveTab === "analytics" && (
             <div className="space-y-6">
               <AnalyticsOverview />
             </div>
           )}
 
-          {activeTab === "notifications" && (
+          {effectiveTab === "notifications" && (
             <NotificationsList />
           )}
 
-          {activeTab === "billing" && (
+          {effectiveTab === "billing" && (
             <div className="space-y-6">
               <BillingPlan />
             </div>
           )}
 
-          {activeTab === "settings" && (
+          {effectiveTab === "settings" && (
             <div className="space-y-6 max-w-5xl">
               <MerchantSettings />
             </div>
