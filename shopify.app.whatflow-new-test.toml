@@ -18,5 +18,5 @@ use_legacy_install_flow = false
 redirect_urls = [
   "https://whatflow-alpha.vercel.app/api/auth/callback",
   "https://whatflow-alpha.vercel.app/api/auth/tokens",
-  "https://backend-wfmy.onrender.com/api/auth/shopify/callback"
+  "https://backend-239646477661.europe-west1.run.app/api/auth/shopify/callback"
 ]
