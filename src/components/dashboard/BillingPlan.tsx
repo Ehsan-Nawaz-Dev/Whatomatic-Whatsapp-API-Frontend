@@ -1,13 +1,23 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Star, Zap, Crown } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { Check, Star, Zap, Crown, Info, Gift } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL, withShopParam } from "@/lib/api";
+import { API_BASE_URL, withShopParam, activateTrial } from "@/lib/api";
 import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-// Temporary mock plans for frontend development
-// These should ideally come from the backend API `/billing/plans`
+// Product plans
 const PLANS = [
     {
         id: "beginner",
@@ -47,16 +57,53 @@ const PLANS = [
 
 const BillingPlan = () => {
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+    const [showTrialDialog, setShowTrialDialog] = useState(false);
+    const [trialDetails, setTrialDetails] = useState({ name: "", email: "", phone: "" });
+    const [isActivatingTrial, setIsActivatingTrial] = useState(false);
+    const queryClient = useQueryClient();
 
     // Fetch current subscription status
-    const { data: status } = useQuery({
+    const { data: status, isLoading: isStatusLoading } = useQuery({
         queryKey: ["billing-status"],
         queryFn: async () => {
             const res = await fetch(withShopParam("/billing/status"));
-            if (!res.ok) return null; // Assume free if error or 404
-            return res.json();
+            if (!res.ok) return null;
+            const data = await res.json();
+
+            // If they are trial, we fetch detailed trial status
+            if (data.plan === 'trial') {
+                const trialRes = await fetch(withShopParam("/trial/status"));
+                if (trialRes.ok) return trialRes.json();
+            }
+            return data;
         }
     });
+
+    const handleActivateTrial = async () => {
+        if (!trialDetails.name || !trialDetails.email) {
+            toast.error("Please provide your name and email");
+            return;
+        }
+
+        try {
+            setIsActivatingTrial(true);
+            const params = new URLSearchParams(window.location.search);
+            const shop = params.get("shop") || "";
+
+            await activateTrial({
+                ...trialDetails,
+                shop
+            } as any);
+
+            toast.success("Trial activated! You have 10 free order messages.");
+            setShowTrialDialog(false);
+            queryClient.invalidateQueries({ queryKey: ["billing-status"] });
+        } catch (err: any) {
+            toast.error(err.message);
+        } finally {
+            setIsActivatingTrial(false);
+        }
+    };
 
     const createCharge = async (planId: string) => {
         try {
@@ -84,9 +131,63 @@ const BillingPlan = () => {
     };
 
     const currentPlanId = status?.plan || "free";
+    const isTrial = currentPlanId === 'trial';
+    const trialUsage = status?.trialUsage || 0;
+    const trialLimit = status?.trialLimit || 10;
+    const trialActivated = status?.trialActivated || false;
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
+            {!trialActivated && currentPlanId === 'free' && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4"
+                >
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                            <Gift className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold">Start Your Free Trial</h2>
+                            <p className="text-muted-foreground">Get 10 automated order messages for free to test the app!</p>
+                        </div>
+                    </div>
+                    <Button size="lg" onClick={() => setShowTrialDialog(true)}>
+                        Activate Free Trial
+                    </Button>
+                </motion.div>
+            )}
+
+            {isTrial && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-2xl"
+                >
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600">
+                                <Zap className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold">Trial Subscription Active</h2>
+                                <p className="text-muted-foreground">You are currently using the trial. Upgrade to a paid plan for unlimited messages.</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-sm font-semibold mb-1">Messages Sent: {trialUsage} / {trialLimit}</div>
+                            <div className="w-full md:w-48 bg-muted rounded-full h-2">
+                                <div
+                                    className="bg-amber-500 h-2 rounded-full transition-all duration-500"
+                                    style={{ width: `${Math.min((trialUsage / trialLimit) * 100, 100)}%` }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
             <div className="text-center space-y-2">
                 <h1 className="text-3xl font-bold text-foreground">Choose Your Plan</h1>
                 <p className="text-muted-foreground">Select the package that fits your business needs</p>
@@ -142,6 +243,62 @@ const BillingPlan = () => {
                     );
                 })}
             </div>
+
+            <Dialog open={showTrialDialog} onOpenChange={setShowTrialDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Activate Your Free Trial</DialogTitle>
+                        <DialogDescription>
+                            Please confirm your details to start your 10-message free trial.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="name">Full Name</Label>
+                            <Input
+                                id="name"
+                                value={trialDetails.name}
+                                onChange={(e) => setTrialDetails({ ...trialDetails, name: e.target.value })}
+                                placeholder="John Doe"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">Email Address</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={trialDetails.email}
+                                onChange={(e) => setTrialDetails({ ...trialDetails, email: e.target.value })}
+                                placeholder="john@example.com"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone">WhatsApp Number (Optional)</Label>
+                            <Input
+                                id="phone"
+                                value={trialDetails.phone}
+                                onChange={(e) => setTrialDetails({ ...trialDetails, phone: e.target.value })}
+                                placeholder="+923001234567"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowTrialDialog(false)}
+                            disabled={isActivatingTrial}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleActivateTrial}
+                            disabled={isActivatingTrial}
+                        >
+                            {isActivatingTrial ? "Activating..." : "Activate Now"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <div className="mt-8 p-4 bg-muted/30 rounded-lg text-center text-xs text-muted-foreground max-w-2xl mx-auto">
                 Charges are billed in USD. You can cancel at any time. By clicking Upgrade, you agree to our Terms of Service.

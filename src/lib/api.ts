@@ -487,7 +487,32 @@ export const fetchAutomationsStats = async () => {
   if (!res.ok) throw new Error("Failed to fetch automations stats");
   return res.json();
 };
-// Automations Toggle API
+// Trial API
+export interface TrialActivationPayload {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export const activateTrial = async (payload: TrialActivationPayload) => {
+  const res = await fetch(withShopParam("/trial/activate"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to activate trial");
+  }
+  return res.json();
+};
+
+export const fetchTrialStatus = async () => {
+  const res = await fetch(withShopParam("/trial/status"));
+  if (!res.ok) throw new Error("Failed to fetch trial status");
+  return res.json();
+};
+
 export const toggleAutomation = async (id: string, enabled: boolean) => {
   const res = await fetch(withShopParam("/automations/toggle"), {
     method: "PUT",
