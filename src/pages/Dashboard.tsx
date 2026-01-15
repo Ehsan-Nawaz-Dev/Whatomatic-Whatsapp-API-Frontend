@@ -25,9 +25,22 @@ const Dashboard = () => {
   const { data: billing, isLoading: isBillingLoading } = useQuery({
     queryKey: ["billing-status"],
     queryFn: async () => {
-      const res = await fetch(withShopParam("/billing/status"));
-      if (!res.ok) return { plan: "free", status: "none" };
-      return res.json();
+      try {
+        const res = await fetch(withShopParam("/billing/status"));
+        if (!res.ok) return { plan: "free", status: "none" };
+        const data = await res.json();
+
+        // If trial plan, ensure we get the full trial status
+        if (data.plan === 'trial') {
+          const trialRes = await fetch(withShopParam("/trial/status"));
+          if (trialRes.ok) return trialRes.json();
+        }
+
+        return data;
+      } catch (err) {
+        console.error("Billing status check failed:", err);
+        return { plan: "free", status: "none" };
+      }
     },
     // Keep it fresh
     staleTime: 60000,
