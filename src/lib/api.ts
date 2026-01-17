@@ -149,6 +149,7 @@ export interface AnalyticsSummary {
   recoveryRate: number;
   cancelled: number;
   periodDays: number;
+  dailyStats?: { date: string; count: number }[];
 }
 
 export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
