@@ -1,4 +1,4 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://backend-wfmy.onrender.com/api").replace(/\/$/, "");
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://api.whatomatic.com/Api").replace(/\/$/, "");
 const getShopFromUrl = () => {
   try {
     const params = new URLSearchParams(window.location.search);

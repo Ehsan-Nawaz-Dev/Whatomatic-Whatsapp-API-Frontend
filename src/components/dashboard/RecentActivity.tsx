@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Clock, ShoppingCart } from "lucide-react";
-import { fetchActivity } from "@/lib/api";
+import { fetchActivity, fetchSettings } from "@/lib/api";
 
 const typeConfig: Record<string, { icon: any; iconColor: string; bgColor: string }> = {
   confirmed: { icon: CheckCircle2, iconColor: "text-success", bgColor: "bg-success/10" },
@@ -17,6 +17,13 @@ const RecentActivity = () => {
     queryKey: ["activity"],
     queryFn: fetchActivity,
   });
+
+  const { data: settings } = useQuery({
+    queryKey: ["merchant-settings"],
+    queryFn: fetchSettings,
+  });
+
+  const pendingLabel = settings?.pendingConfirmTag || "Pending Confirmation";
 
   return (
     <motion.div
@@ -68,7 +75,7 @@ const RecentActivity = () => {
                     {activity.message || `Order Notification`}
                   </p>
                   {activity.type === 'pending' && (
-                    <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded-full font-bold">PROCESSING</span>
+                    <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">{pendingLabel}</span>
                   )}
                   {activity.type === 'failed' && (
                     <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded-full font-bold">FAILED</span>

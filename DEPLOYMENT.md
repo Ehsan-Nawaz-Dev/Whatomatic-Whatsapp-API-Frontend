@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for deploying the WhatFlow React frontend application as a standalone web app. The app is configured to connect to the backend API at `https://what-flow-backend.vercel.app/api`.
+This guide provides step-by-step instructions for deploying the WhatFlow React frontend application as a standalone web app. The app is configured to connect to the backend API at `https://api.whatomatic.com/Api`.
 
 ---
 
@@ -19,7 +19,7 @@ This guide provides step-by-step instructions for deploying the WhatFlow React f
 Before deployment, ensure the following environment variables are configured:
 
 ```env
-VITE_API_BASE_URL=https://what-flow-backend.vercel.app/api
+VITE_API_BASE_URL=https://api.whatomatic.com/Api
 VITE_SHOP_DOMAIN=demo-shop.myshopify.com
 ```
 
@@ -57,7 +57,7 @@ These are already set in the `.env` file for local development. You'll need to c
    ```bash
    vercel env add VITE_API_BASE_URL
    ```
-   Enter: `https://what-flow-backend.vercel.app/api`
+   Enter: `https://api.whatomatic.com/Api`
    
    ```bash
    vercel env add VITE_SHOP_DOMAIN
@@ -80,7 +80,7 @@ These are already set in the `.env` file for local development. You'll need to c
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
 5. Add Environment Variables:
-   - `VITE_API_BASE_URL` = `https://what-flow-backend.vercel.app/api`
+   - `VITE_API_BASE_URL` = `https://api.whatomatic.com/Api`
    - `VITE_SHOP_DOMAIN` = `demo-shop.myshopify.com`
 6. Click **Deploy**
 
@@ -116,7 +116,7 @@ Your app will be live at `https://your-project.vercel.app`
 
 4. **Set Environment Variables**:
    ```bash
-   netlify env:set VITE_API_BASE_URL "https://what-flow-backend.vercel.app/api"
+   netlify env:set VITE_API_BASE_URL "https://api.whatomatic.com/Api"
    netlify env:set VITE_SHOP_DOMAIN "demo-shop.myshopify.com"
    ```
 
@@ -134,7 +134,7 @@ Your app will be live at `https://your-project.vercel.app`
    - **Build command**: `npm run build`
    - **Publish directory**: `dist`
 5. Add Environment Variables (Site settings → Build & deploy → Environment):
-   - `VITE_API_BASE_URL` = `https://what-flow-backend.vercel.app/api`
+   - `VITE_API_BASE_URL` = `https://api.whatomatic.com/Api`
    - `VITE_SHOP_DOMAIN` = `demo-shop.myshopify.com`
 6. Click **Deploy site**
 
@@ -195,7 +195,7 @@ Your app will be live at `https://your-site.netlify.app`
    
    Create a `.env.production` file in your project root before building:
    ```env
-   VITE_API_BASE_URL=https://what-flow-backend.vercel.app/api
+   VITE_API_BASE_URL=https://api.whatomatic.com/Api
    VITE_SHOP_DOMAIN=demo-shop.myshopify.com
    ```
 
@@ -238,7 +238,7 @@ After deployment, verify:
    - `/privacy` - Privacy policy
    - `/terms` - Terms of service
 3. **API Connection**: Open browser DevTools → Network tab
-   - Verify API requests go to `https://what-flow-backend.vercel.app/api`
+   - Verify API requests go to `https://api.whatomatic.com/Api`
    - Check for successful responses (200 status)
 4. **Mobile Responsive**: Test on mobile devices
 5. **Browser Compatibility**: Test on Chrome, Firefox, Safari, Edge

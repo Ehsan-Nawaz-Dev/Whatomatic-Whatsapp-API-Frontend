@@ -2,7 +2,7 @@
 
 ## ✅ Your App is Ready to Deploy!
 
-The WhatFlow frontend has been configured to connect to your production backend at `https://what-flow-backend.vercel.app/api`.
+The WhatFlow frontend has been configured to connect to your production backend at `https://api.whatomatic.com/Api`.
 
 ---
 
@@ -22,7 +22,7 @@ vercel
 
 # 4. Add environment variables
 vercel env add VITE_API_BASE_URL
-# When prompted, enter: https://what-flow-backend.vercel.app/api
+# When prompted, enter: https://api.whatomatic.com/Api
 
 vercel env add VITE_SHOP_DOMAIN
 # When prompted, enter: demo-shop.myshopify.com
@@ -43,7 +43,7 @@ vercel --prod
    - Build Command: `npm run build`
    - Output Directory: `dist`
 5. Add Environment Variables:
-   - `VITE_API_BASE_URL` = `https://what-flow-backend.vercel.app/api`
+   - `VITE_API_BASE_URL` = `https://api.whatomatic.com/Api`
    - `VITE_SHOP_DOMAIN` = `demo-shop.myshopify.com`
 6. Click **Deploy**
 
@@ -62,7 +62,7 @@ netlify login
 netlify init
 
 # 4. Set environment variables
-netlify env:set VITE_API_BASE_URL "https://what-flow-backend.vercel.app/api"
+netlify env:set VITE_API_BASE_URL "https://api.whatomatic.com/Api"
 netlify env:set VITE_SHOP_DOMAIN "demo-shop.myshopify.com"
 
 # 5. Deploy
@@ -86,7 +86,7 @@ Visit `http://localhost:4173` to verify everything works.
 
 ## ✅ What's Configured
 
-- ✅ API connected to `https://what-flow-backend.vercel.app/api`
+- ✅ API connected to `https://api.whatomatic.com/Api`
 - ✅ Production build tested (6.64s, 2134 modules)
 - ✅ SPA routing configured (Netlify)
 - ✅ Deployment optimizations in place

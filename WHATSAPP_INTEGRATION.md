@@ -118,7 +118,7 @@ QR codes automatically expire after 60 seconds:
 
 ## Backend API Requirements
 
-Your backend at `https://what-flow-backend.vercel.app/api` needs to implement these endpoints:
+Your backend at `https://api.whatomatic.com/Api` needs to implement these endpoints:
 
 ### 1. Generate QR Code
 ```http
@@ -390,7 +390,7 @@ expiresAt: new Date(Date.now() + 60000).toISOString()
 - Wrong API URL in `.env`
 
 **Solution**: 
-1. Verify backend is running at `https://what-flow-backend.vercel.app`
+1. Verify backend is running at `https://api.whatomatic.com/Api`
 2. Check `.env` file has correct `VITE_API_BASE_URL`
 
 ---
