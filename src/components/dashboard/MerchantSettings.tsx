@@ -35,7 +35,7 @@ const MerchantSettings = () => {
       setOrderConfirmTag(data.orderConfirmTag || "Confirmed");
       setOrderCancelTag(data.orderCancelTag || "Cancelled");
       setPendingConfirmTag(data.pendingConfirmTag || "Pending Confirmation");
-      setOrderConfirmReply(data.orderConfirmReply || "Your order is confirmed, thank you! ✅");
+      setOrderConfirmReply(data.orderConfirmReply || "✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
       setOrderCancelReply(data.orderCancelReply || "Your order has been cancelled as requested. ❌");
       setAdminPhoneNumber(data.adminPhoneNumber || "");
     } else {
@@ -46,7 +46,7 @@ const MerchantSettings = () => {
       setOrderConfirmTag("Confirmed");
       setOrderCancelTag("Cancelled");
       setPendingConfirmTag("Pending Confirmation");
-      setOrderConfirmReply("Your order is confirmed, thank you! ✅");
+      setOrderConfirmReply("✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
       setOrderCancelReply("Your order has been cancelled as requested. ❌");
       setAdminPhoneNumber("");
     }
@@ -160,7 +160,7 @@ const MerchantSettings = () => {
                   id="confirmReply"
                   value={orderConfirmReply}
                   onChange={(e) => setOrderConfirmReply(e.target.value)}
-                  placeholder="Your order is confirmed, thank you! ✅"
+                  placeholder="✅ *Order Confirmed!* ..."
                   className="min-h-[80px]"
                 />
               </div>

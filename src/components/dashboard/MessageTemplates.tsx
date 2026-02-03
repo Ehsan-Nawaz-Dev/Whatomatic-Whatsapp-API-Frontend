@@ -303,7 +303,7 @@ const MessageTemplates = () => {
                       if (form.event === "orders/create") {
                         setForm({
                           ...form,
-                          message: `Hi {{customer_name}}, thank you for your order from {{store_name}}! 🛍️\n\n*Order Details:*\nOrder: {{order_number}}\nItems: {{items_list}}\n\n*Product Price:* {{price}}\n*Grand Total:* {{grand_total}}\n\n*Shipping Address:*\n{{shipping_address}}\n{{city}}\n\nPlease confirm if these details are correct.`,
+                          message: `✅ *Order Confirmed!*\n\nHi {{customer_name}},\n\nGreat news! Your order *{{order_number}}* has been officially confirmed by {{store_name}}. 🛍️\n\n---\n📦 *Order Summary:*\n{{items_list}}\n\n💰 *Grand Total:* {{grand_total}}\n---\n\n📍 *Shipping to:*\n{{shipping_address}}\n{{city}}\n\nWe are getting your package ready for shipping. We'll send you another message with the tracking details as soon as it's on the way! 🚚\n\nThank you for shopping with us!\n- {{store_name}} Team`,
                           isPoll: true,
                           pollOptions: ["✅ Yes, Confirm ✅", "❌ No, Cancel ❌"]
                         });
