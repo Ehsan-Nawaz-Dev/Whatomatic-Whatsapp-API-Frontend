@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell } from "lucide-react";
+import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchAutomationsStats, toggleAutomation } from "@/lib/api";
@@ -51,6 +53,9 @@ const automations = [
 ];
 
 const AutomationsOverview = () => {
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [selectedFlow, setSelectedFlow] = useState<any>(null);
+
     const queryClient = useQueryClient();
     const { data: statsData, isLoading } = useQuery({
         queryKey: ["automations-stats"],
@@ -154,7 +159,17 @@ const AutomationsOverview = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button variant="outline" size="sm">Edit Template</Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    setSelectedFlow(flow);
+                                    setPreviewOpen(true);
+                                }}
+                            >
+                                <Eye className="w-4 h-4 mr-2" />
+                                Preview
+                            </Button>
                             <Switch
                                 checked={flow.enabled}
                                 onCheckedChange={() => handleToggle(flow.id, flow.enabled)}
@@ -165,16 +180,82 @@ const AutomationsOverview = () => {
                 ))}
             </div>
 
-            <div className="p-6 bg-accent/30 rounded-2xl border border-border flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <Zap className="text-primary w-6 h-6" />
-                    <div>
-                        <p className="font-bold">Missing an automation?</p>
-                        <p className="text-sm text-muted-foreground">Request a custom flow for your shop.</p>
-                    </div>
-                </div>
-                <Button variant="hero">Contact Support</Button>
-            </div>
+            {/* Preview Dialog */}
+            <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-transparent border-none">
+                    {selectedFlow && (
+                        <div className="bg-[#f0f2f5] dark:bg-[#0b141a] rounded-3xl overflow-hidden shadow-2xl border border-border/50">
+                            {/* WhatsApp Header */}
+                            <div className="bg-[#008069] p-4 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                    <selectedFlow.icon className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-white font-bold">{selectedFlow.title}</h3>
+                                    <p className="text-white/70 text-xs">Automation Service</p>
+                                </div>
+                            </div>
+
+                            {/* Chat Body */}
+                            <div className="p-6 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat bg-contain min-h-[400px]">
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="bg-white dark:bg-[#1f2c33] p-4 rounded-xl rounded-tl-none shadow-sm max-w-[90%] border border-black/5 dark:border-white/5"
+                                >
+                                    <div className="whitespace-pre-wrap text-[14.5px] leading-relaxed text-[#111b21] dark:text-[#e9edef]">
+                                        {selectedFlow.id === 'order-confirmation' ? (
+                                            <>
+                                                ✅ *Order Confirmed!*<br /><br />
+                                                Hi Ehsan,<br /><br />
+                                                Great news! Your order *#1001* has been officially confirmed by *WhatFlow Store*. 🛍️<br /><br />
+                                                ---<br />
+                                                📦 *Order Summary:*<br />
+                                                1x Wireless Headphones - $199.99<br /><br />
+                                                💰 *Grand Total:* $214.99<br />
+                                                ---<br /><br />
+                                                📍 *Shipping to:*<br />
+                                                123 Demo St, New York<br /><br />
+                                                We are getting your package ready for shipping. We'll send you another message with the tracking details as soon as it's on the way! 🚚<br /><br />
+                                                Thank you for shopping with us!<br />
+                                                - WhatFlow Store Team
+                                            </>
+                                        ) : selectedFlow.id === 'admin-order-alert' ? (
+                                            <>
+                                                🔔 *New Order Alert!*<br /><br />
+                                                A new order *#2045* has been received at *Your Store*.<br /><br />
+                                                *Customer:* John Doe<br />
+                                                *Grand Total:* $85.50<br /><br />
+                                                *Items:*<br />
+                                                1x Cotton T-Shirt (M)<br /><br />
+                                                Payment status: *Paid*
+                                            </>
+                                        ) : (
+                                            "Sample automation message content would appear here with dynamic placeholders like {{customer_name}} filled in with real data."
+                                        )}
+                                    </div>
+                                    <div className="text-[11px] text-[#667781] dark:text-[#8696a0] text-right mt-1">
+                                        12:45 PM
+                                    </div>
+                                </motion.div>
+
+                                {selectedFlow.id === 'order-confirmation' && (
+                                    <div className="space-y-2 mt-4">
+                                        <div className="flex flex-col gap-2">
+                                            <div className="px-6 py-2 bg-white dark:bg-[#1f2c33] rounded-full text-[#008069] dark:text-[#53bdeb] text-sm font-bold shadow-sm border border-black/5 dark:border-white/5 text-center">
+                                                ✅ Yes, Confirm ✅
+                                            </div>
+                                            <div className="px-6 py-2 bg-white dark:bg-[#1f2c33] rounded-full text-[#008069] dark:text-[#53bdeb] text-sm font-bold shadow-sm border border-black/5 dark:border-white/5 text-center">
+                                                ❌ No, Cancel ❌
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
