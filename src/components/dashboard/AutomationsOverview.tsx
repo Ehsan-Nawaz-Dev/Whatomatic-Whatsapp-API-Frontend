@@ -35,6 +35,14 @@ const automations = [
         enabled: true,
     },
     {
+        id: "order-confirmed-reply",
+        title: "Post-Confirmation Reply",
+        description: "Send a beautiful thank you message after confirmation.",
+        icon: Zap,
+        stats: { sent: 432, recovered: null, revenue: null },
+        enabled: true,
+    },
+    {
         id: "shipping-update",
         title: "Shipping Alerts",
         description: "Notify customers when their order is shipped or out for delivery.",
@@ -97,6 +105,7 @@ const AutomationsOverview = () => {
             "admin-order-alert": "admin-order-alert",
             "abandoned-cart": "checkouts/abandoned",
             "order-confirmation": "orders/create",
+            "order-confirmed-reply": "orders/confirmed",
             "shipping-update": "fulfillments/update",
             "cancellation": "orders/cancelled",
         };

@@ -15,6 +15,7 @@ const iconMap = {
   "checkouts/abandoned": ShoppingCart,
   "fulfillments/update": Truck,
   "orders/cancelled": XCircle,
+  "orders/confirmed": Bell,
 } as const;
 
 type EventKey = keyof typeof iconMap;
@@ -284,7 +285,8 @@ const MessageTemplates = () => {
                   });
                 }}
               >
-                <option value="orders/create">Customer Order Confirmation</option>
+                <option value="orders/create">Customer Order Confirmation (Poll)</option>
+                <option value="orders/confirmed">Post-Confirmation Thank You</option>
                 <option value="admin-order-alert">Admin New Order Alert</option>
                 <option value="checkouts/abandoned">Abandoned checkout</option>
                 <option value="fulfillments/update">Fulfillment update</option>
@@ -294,10 +296,9 @@ const MessageTemplates = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="tmpl-message">Message</Label>
-                {(form.event === "orders/create" || form.event === "admin-order-alert") && (
-                  <Button
-                    variant="link"
-                    size="sm"
+                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert") && (
+                  <button
+                    type="button"
                     className="h-auto p-0 text-xs text-primary font-bold decoration-primary/30 hover:decoration-primary transition-all underline shrink-0"
                     onClick={() => {
                       if (form.event === "orders/create") {
@@ -306,6 +307,13 @@ const MessageTemplates = () => {
                           message: `✅ *Order Confirmed!*\n\nHi {{customer_name}},\n\nGreat news! Your order *{{order_number}}* has been officially confirmed by {{store_name}}. 🛍️\n\n---\n📦 *Order Summary:*\n{{items_list}}\n\n💰 *Grand Total:* {{grand_total}}\n---\n\n📍 *Shipping to:*\n{{shipping_address}}\n{{city}}\n\nWe are getting your package ready for shipping. We'll send you another message with the tracking details as soon as it's on the way! 🚚\n\nThank you for shopping with us!\n- {{store_name}} Team`,
                           isPoll: true,
                           pollOptions: ["✅ Yes, Confirm ✅", "❌ No, Cancel ❌"]
+                        });
+                      } else if (form.event === "orders/confirmed") {
+                        setForm({
+                          ...form,
+                          name: "Thank You Message",
+                          message: `🎉 *Thank You, {{customer_name}}!*\n\nYour order *{{order_number}}* is now being processed by *{{store_name}}*! 🚀\n\n✨ *What's next?*\n1. Our team is hand-picking your items. 📦\n2. We'll pack them with care. 🎀\n3. You'll get a tracking link via WhatsApp as soon as it ships! 🚚\n\nWe appreciate your business! If you have any questions, just reply to this message. 💬`,
+                          isPoll: false
                         });
                       } else {
                         setForm({
@@ -317,7 +325,7 @@ const MessageTemplates = () => {
                     }}
                   >
                     ✨ Load Recommended template
-                  </Button>
+                  </button>
                 )}
               </div>
               <Textarea
