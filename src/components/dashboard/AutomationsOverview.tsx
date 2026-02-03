@@ -28,7 +28,7 @@ const automations = [
     },
     {
         id: "order-confirmation",
-        title: "Customer confirmation",
+        title: "Order Confirmation",
         description: "Ask customers to confirm their order details via WhatsApp.",
         icon: MessageSquare,
         stats: { sent: 450, recovered: null, revenue: null },
