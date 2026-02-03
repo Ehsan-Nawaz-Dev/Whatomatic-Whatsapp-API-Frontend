@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAutomationsStats, toggleAutomation } from "@/lib/api";
+import { fetchAutomationsStats, toggleAutomation, fetchTemplates } from "@/lib/api";
 import { toast } from "sonner";
 
 const automations = [
@@ -57,11 +57,18 @@ const AutomationsOverview = () => {
     const [selectedFlow, setSelectedFlow] = useState<any>(null);
 
     const queryClient = useQueryClient();
-    const { data: statsData, isLoading } = useQuery({
+    const { data: statsData, isLoading: isStatsLoading } = useQuery({
         queryKey: ["automations-stats"],
         queryFn: fetchAutomationsStats,
         refetchInterval: 10000, // Refresh every 10 seconds
     });
+
+    const { data: templates = [], isLoading: isTemplatesLoading } = useQuery({
+        queryKey: ["templates"],
+        queryFn: fetchTemplates,
+    });
+
+    const isLoading = isStatsLoading || isTemplatesLoading;
 
     const toggleMut = useMutation({
         mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => toggleAutomation(id, enabled),
@@ -79,15 +86,28 @@ const AutomationsOverview = () => {
         toggleMut.mutate({ id, enabled: !currentStatus });
     };
 
-    // Merge API stats with local automation definitions
+    // Merge API stats and actual template content with local automation definitions
     const displayAutomations = automations.map(flow => {
         const statsArray = Array.isArray(statsData) ? statsData : [];
         const apiStat = statsArray.find((s: any) => s.id === flow.id);
+
+        // Find the actual template for this flow
+        // Mapping flow.id to event keys
+        const eventMap: Record<string, string> = {
+            "admin-order-alert": "admin-order-alert",
+            "abandoned-cart": "checkouts/abandoned",
+            "order-confirmation": "orders/create",
+            "shipping-update": "fulfillments/update",
+            "cancellation": "orders/cancelled",
+        };
+
+        const template = templates.find((t: any) => t.event === eventMap[flow.id]);
         const isEnabled = apiStat?.enabled ?? flow.enabled;
 
         return {
             ...flow,
             enabled: isEnabled,
+            template: template, // Include the real template data
             stats: apiStat ? {
                 sent: apiStat.sent || 0,
                 recovered: apiStat.recovered || 0,
@@ -204,34 +224,21 @@ const AutomationsOverview = () => {
                                     className="bg-white dark:bg-[#1f2c33] p-4 rounded-xl rounded-tl-none shadow-sm max-w-[90%] border border-black/5 dark:border-white/5"
                                 >
                                     <div className="whitespace-pre-wrap text-[14.5px] leading-relaxed text-[#111b21] dark:text-[#e9edef]">
-                                        {selectedFlow.id === 'order-confirmation' ? (
-                                            <>
-                                                ✅ *Order Confirmed!*<br /><br />
-                                                Hi Ehsan,<br /><br />
-                                                Great news! Your order *#1001* has been officially confirmed by *WhatFlow Store*. 🛍️<br /><br />
-                                                ---<br />
-                                                📦 *Order Summary:*<br />
-                                                1x Wireless Headphones - $199.99<br /><br />
-                                                💰 *Grand Total:* $214.99<br />
-                                                ---<br /><br />
-                                                📍 *Shipping to:*<br />
-                                                123 Demo St, New York<br /><br />
-                                                We are getting your package ready for shipping. We'll send you another message with the tracking details as soon as it's on the way! 🚚<br /><br />
-                                                Thank you for shopping with us!<br />
-                                                - WhatFlow Store Team
-                                            </>
-                                        ) : selectedFlow.id === 'admin-order-alert' ? (
-                                            <>
-                                                🔔 *New Order Alert!*<br /><br />
-                                                A new order *#2045* has been received at *Your Store*.<br /><br />
-                                                *Customer:* John Doe<br />
-                                                *Grand Total:* $85.50<br /><br />
-                                                *Items:*<br />
-                                                1x Cotton T-Shirt (M)<br /><br />
-                                                Payment status: *Paid*
-                                            </>
+                                        {selectedFlow.template ? (
+                                            // Show the actual user-created template
+                                            selectedFlow.template.message
+                                                .replace(/{{customer_name}}/g, "Ehsan")
+                                                .replace(/{{order_number}}/g, "#1001")
+                                                .replace(/{{store_name}}/g, "WhatFlow Store")
+                                                .replace(/{{items_list}}/g, "1x Wireless Headphones - $199.99")
+                                                .replace(/{{grand_total}}/g, "$214.99")
+                                                .replace(/{{shipping_address}}/g, "123 Demo St")
+                                                .replace(/{{city}}/g, "New York")
+                                                .replace(/{{price}}/g, "$199.99")
+                                                .replace(/{{payment_status}}/g, "Paid")
                                         ) : (
-                                            "Sample automation message content would appear here with dynamic placeholders like {{customer_name}} filled in with real data."
+                                            // Fallback if no template is found
+                                            "No template created yet for this automation. Please go to the Templates tab to create one."
                                         )}
                                     </div>
                                     <div className="text-[11px] text-[#667781] dark:text-[#8696a0] text-right mt-1">
@@ -239,15 +246,17 @@ const AutomationsOverview = () => {
                                     </div>
                                 </motion.div>
 
-                                {selectedFlow.id === 'order-confirmation' && (
+                                {selectedFlow.template?.isPoll && selectedFlow.template?.pollOptions && (
                                     <div className="space-y-2 mt-4">
                                         <div className="flex flex-col gap-2">
-                                            <div className="px-6 py-2 bg-white dark:bg-[#1f2c33] rounded-full text-[#008069] dark:text-[#53bdeb] text-sm font-bold shadow-sm border border-black/5 dark:border-white/5 text-center">
-                                                ✅ Yes, Confirm ✅
-                                            </div>
-                                            <div className="px-6 py-2 bg-white dark:bg-[#1f2c33] rounded-full text-[#008069] dark:text-[#53bdeb] text-sm font-bold shadow-sm border border-black/5 dark:border-white/5 text-center">
-                                                ❌ No, Cancel ❌
-                                            </div>
+                                            {selectedFlow.template.pollOptions.map((option: string, i: number) => (
+                                                <div
+                                                    key={i}
+                                                    className="px-6 py-2 bg-white dark:bg-[#1f2c33] rounded-full text-[#008069] dark:text-[#53bdeb] text-sm font-bold shadow-sm border border-black/5 dark:border-white/5 text-center"
+                                                >
+                                                    {option}
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 )}
