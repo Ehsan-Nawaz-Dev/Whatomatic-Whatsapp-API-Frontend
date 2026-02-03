@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchTemplates, createTemplate, updateTemplate, deleteTemplate } from "@/lib/api";
+import { toast } from "sonner";
 
 const iconMap = {
   "orders/create": MessageSquare,
@@ -56,7 +57,11 @@ const MessageTemplates = () => {
       queryClient.invalidateQueries({ queryKey: ["templates"] });
       setDialogOpen(false);
       setForm(emptyForm);
+      toast.success("Template created successfully!");
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to create template");
+    }
   });
 
   const updateMut = useMutation({
@@ -67,14 +72,22 @@ const MessageTemplates = () => {
       setDialogOpen(false);
       setForm(emptyForm);
       setIsEdit(false);
+      toast.success("Template updated successfully!");
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update template");
+    }
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteTemplate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["templates"] });
+      toast.success("Template deleted successfully!");
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to delete template");
+    }
   });
 
   const openNewDialog = () => {
@@ -98,6 +111,15 @@ const MessageTemplates = () => {
   };
 
   const handleSave = () => {
+    if (!form.name.trim()) {
+      toast.error("Template name is required");
+      return;
+    }
+    if (!form.message.trim()) {
+      toast.error("Message content is required");
+      return;
+    }
+
     if (isEdit && form.id) {
       updateMut.mutate({ id: form.id, data: form });
     } else {
