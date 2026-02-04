@@ -34,6 +34,14 @@ const WhatsAppConnection = () => {
     refetchOnWindowFocus: true,
   });
 
+  // Watch for connection status changes and refresh merchant settings
+  useEffect(() => {
+    if (status?.connected) {
+      // Invalidate merchant settings to reload the WhatsApp number
+      queryClient.invalidateQueries({ queryKey: ["merchant-settings"] });
+    }
+  }, [status?.connected, queryClient]);
+
   // Fetch QR code
   const { data: qrResponse, isLoading: isQrLoading, error: qrError } = useQuery<WhatsAppQRCodeResponse, Error>({
     queryKey: ["whatsapp-qr"],
