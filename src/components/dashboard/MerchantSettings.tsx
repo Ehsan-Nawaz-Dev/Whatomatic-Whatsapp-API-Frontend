@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { fetchSettings, updateSettings, API_BASE_URL } from "@/lib/api";
+import { fetchSettings, updateSettings, fetchWhatsAppStatus, API_BASE_URL } from "@/lib/api";
 
 const MerchantSettings = () => {
   const [storeName, setStoreName] = useState("");
@@ -26,14 +26,28 @@ const MerchantSettings = () => {
     queryFn: fetchSettings,
   });
 
+  // Fetch WhatsApp connection status
+  const { data: whatsappStatus } = useQuery({
+    queryKey: ["whatsapp-status"],
+    queryFn: fetchWhatsAppStatus,
+  });
+
   useEffect(() => {
     if (data) {
+      // Store name from Shopify (fetched by backend)
       setStoreName(data.storeName || data.shopDomain || "My Store");
-      setWhatsappNumber(data.whatsappNumber || data.phone || "");
+
+      // WhatsApp number - show only if connected, otherwise show from saved settings
+      if (whatsappStatus?.connected && whatsappStatus?.phoneNumber) {
+        setWhatsappNumber(whatsappStatus.phoneNumber);
+      } else {
+        setWhatsappNumber(data.whatsappNumber || "");
+      }
+
       setDefaultCountry(data.defaultCountry || data.country || "US");
       setLanguage(data.language || "English");
-      setOrderConfirmTag(data.orderConfirmTag || "Confirmed");
-      setOrderCancelTag(data.orderCancelTag || "Cancelled");
+      setOrderConfirmTag(data.orderConfirmTag || "Order Confirmed");
+      setOrderCancelTag(data.orderCancelTag || "Order Cancel By customer");
       setPendingConfirmTag(data.pendingConfirmTag || "Pending Confirmation");
       setOrderConfirmReply(data.orderConfirmReply || "✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
       setOrderCancelReply(data.orderCancelReply || "Your order has been cancelled as requested. ❌");
@@ -43,8 +57,8 @@ const MerchantSettings = () => {
       setWhatsappNumber("");
       setDefaultCountry("US");
       setLanguage("English");
-      setOrderConfirmTag("Confirmed");
-      setOrderCancelTag("Cancelled");
+      setOrderConfirmTag("Order Confirmed");
+      setOrderCancelTag("Order Cancel By customer");
       setPendingConfirmTag("Pending Confirmation");
       setOrderConfirmReply("✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
       setOrderCancelReply("Your order has been cancelled as requested. ❌");
@@ -52,7 +66,7 @@ const MerchantSettings = () => {
     }
 
     setWebhookUrl(`${API_BASE_URL.replace(/\/api$/, "")}/api/webhooks/shopify`);
-  }, [data]);
+  }, [data, whatsappStatus]);
 
   const mutation = useMutation({
     mutationFn: updateSettings,
@@ -94,24 +108,47 @@ const MerchantSettings = () => {
       >
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="storeName">Store name</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="storeName">Store name</Label>
+              {data?.storeName && (
+                <Badge variant="outline" className="text-[10px] font-normal text-green-600 border-green-200 bg-green-50">
+                  From Shopify
+                </Badge>
+              )}
+            </div>
             <Input
               id="storeName"
               value={storeName}
               onChange={(e) => setStoreName(e.target.value)}
+              placeholder="Your store name"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="whatsappNumber">Business WhatsApp number</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="whatsappNumber">Business WhatsApp number</Label>
+              {whatsappStatus?.connected ? (
+                <Badge variant="outline" className="text-[10px] font-normal text-green-600 border-green-200 bg-green-50">
+                  Connected ✓
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-[10px] font-normal text-amber-600 border-amber-200 bg-amber-50">
+                  Not Connected
+                </Badge>
+              )}
+            </div>
             <Input
               id="whatsappNumber"
               value={whatsappNumber}
               onChange={(e) => setWhatsappNumber(e.target.value)}
-              placeholder="+1 555 123 4567"
+              placeholder={whatsappStatus?.connected ? "" : "Connect WhatsApp first"}
+              disabled={!whatsappStatus?.connected}
+              className={!whatsappStatus?.connected ? "bg-muted" : ""}
             />
             <p className="text-xs text-muted-foreground">
-              This number will be used for all outgoing customer messages.
+              {whatsappStatus?.connected
+                ? "This number will be used for all outgoing customer messages."
+                : "Please connect WhatsApp in the 'WhatsApp Connection' tab first."}
             </p>
           </div>
 
