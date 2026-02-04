@@ -28,19 +28,19 @@ const MerchantSettings = () => {
 
   useEffect(() => {
     if (data) {
-      setStoreName(data.storeName || "My Shopify Store");
-      setWhatsappNumber(data.whatsappNumber || "+1 555 123 4567");
-      setDefaultCountry(data.defaultCountry || "US");
+      setStoreName(data.storeName || data.shopDomain || "My Store");
+      setWhatsappNumber(data.whatsappNumber || data.phone || "");
+      setDefaultCountry(data.defaultCountry || data.country || "US");
       setLanguage(data.language || "English");
       setOrderConfirmTag(data.orderConfirmTag || "Confirmed");
       setOrderCancelTag(data.orderCancelTag || "Cancelled");
       setPendingConfirmTag(data.pendingConfirmTag || "Pending Confirmation");
       setOrderConfirmReply(data.orderConfirmReply || "✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
       setOrderCancelReply(data.orderCancelReply || "Your order has been cancelled as requested. ❌");
-      setAdminPhoneNumber(data.adminPhoneNumber || "");
+      setAdminPhoneNumber(data.adminPhoneNumber || data.phone || "");
     } else {
-      setStoreName("My Shopify Store");
-      setWhatsappNumber("+1 555 123 4567");
+      setStoreName("My Store");
+      setWhatsappNumber("");
       setDefaultCountry("US");
       setLanguage("English");
       setOrderConfirmTag("Confirmed");
