@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAutomationsStats, toggleAutomation, fetchTemplates } from "@/lib/api";
+import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings } from "@/lib/api";
 import { toast } from "sonner";
 
 const automations = [
@@ -76,7 +76,13 @@ const AutomationsOverview = () => {
         queryFn: fetchTemplates,
     });
 
+    const { data: settings } = useQuery({
+        queryKey: ["merchant-settings"],
+        queryFn: fetchSettings,
+    });
+
     const isLoading = isStatsLoading || isTemplatesLoading;
+    const storeName = settings?.storeName || "Your Store";
 
     const toggleMut = useMutation({
         mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => toggleAutomation(id, enabled),
@@ -236,9 +242,9 @@ const AutomationsOverview = () => {
                                         {selectedFlow.template ? (
                                             // Show the actual user-created template
                                             selectedFlow.template.message
-                                                .replace(/{{customer_name}}/g, "Ehsan")
+                                                .replace(/{{customer_name}}/g, "John Doe")
                                                 .replace(/{{order_number}}/g, "#1001")
-                                                .replace(/{{store_name}}/g, "WhatFlow Store")
+                                                .replace(/{{store_name}}/g, storeName)
                                                 .replace(/{{items_list}}/g, "1x Wireless Headphones - $199.99")
                                                 .replace(/{{grand_total}}/g, "$214.99")
                                                 .replace(/{{shipping_address}}/g, "123 Demo St")
