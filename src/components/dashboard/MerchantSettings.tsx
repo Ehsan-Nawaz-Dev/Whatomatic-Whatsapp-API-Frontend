@@ -37,11 +37,12 @@ const MerchantSettings = () => {
       // Store name from Shopify (fetched by backend)
       setStoreName(data.storeName || data.shopDomain || "My Store");
 
-      // WhatsApp number - show only if connected, otherwise show from saved settings
+      // WhatsApp number - show only if connected, otherwise clear it
       if (whatsappStatus?.connected && whatsappStatus?.phoneNumber) {
         setWhatsappNumber(whatsappStatus.phoneNumber);
       } else {
-        setWhatsappNumber(data.whatsappNumber || "");
+        // When disconnected, show empty - user must connect WhatsApp to get number
+        setWhatsappNumber("");
       }
 
       setDefaultCountry(data.defaultCountry || data.country || "US");
