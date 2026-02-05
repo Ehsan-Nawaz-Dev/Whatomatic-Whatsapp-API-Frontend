@@ -17,13 +17,43 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Product plans
 const PLANS = [
     {
-        id: "beginner",
-        name: "Beginner",
-        price: "9.99",
-        features: ["100 Orders/mo", "Basic WhatsApp Templates", "Email Support", "3-Day History"],
+        id: "free",
+        name: "Free",
+        price: "0",
+        features: [
+            "Up to 50 messages/month",
+            "Automated WhatsApp Order Confirmations",
+            "Abandoned Checkout Recovery",
+            "Order Fulfillment Notifications",
+            "Order Cancellation Notifications",
+            "Customizable Message Templates",
+            "Connect WhatsApp using Link a Device",
+            "Real-Time Analytics & Reporting"
+        ],
+        icon: Gift,
+        color: "text-gray-500",
+        bgColor: "bg-gray-500/10",
+        borderColor: "border-gray-500/20",
+        btnVariant: "outline" as const
+    },
+    {
+        id: "starter",
+        name: "Starter",
+        price: "4.99",
+        features: [
+            "Up to 1,250 messages/month",
+            "Automated WhatsApp Order Confirmations",
+            "Abandoned Checkout Recovery",
+            "Order Fulfillment Notifications",
+            "Order Cancellation Notifications",
+            "Customizable Message Templates",
+            "Automated Order Tag Updates",
+            "Connect WhatsApp using Link a Device",
+            "Real-Time Analytics & Reporting",
+            "3-Day Free Trial"
+        ],
         icon: Star,
         color: "text-blue-500",
         bgColor: "bg-blue-500/10",
@@ -31,10 +61,20 @@ const PLANS = [
         btnVariant: "outline" as const
     },
     {
-        id: "intermediate",
-        name: "Intermediate",
-        price: "29.99",
-        features: ["1,000 Orders/mo", "Advanced Templates", "Priority Support", "Unlimited History", "Manual Campaigns"],
+        id: "growth",
+        name: "Growth",
+        price: "9.99",
+        features: [
+            "Up to 2,500 messages/month",
+            "Automated WhatsApp Order Confirmations",
+            "Abandoned Checkout Recovery",
+            "Order Fulfillment Notifications",
+            "Order Cancellation Notifications",
+            "Customizable Message Templates",
+            "Automated Order Tag Updates",
+            "Connect WhatsApp using Link a Device",
+            "Real-Time Analytics & Reporting"
+        ],
         icon: Zap,
         color: "text-amber-500",
         bgColor: "bg-amber-500/10",
@@ -44,9 +84,19 @@ const PLANS = [
     },
     {
         id: "pro",
-        name: "Pro",
-        price: "59.99",
-        features: ["Unlimited Orders", "Custom Branding", "Dedicated Account Manager", "API Access", "Automated Campaigns"],
+        name: "Professional",
+        price: "14.99",
+        features: [
+            "Up to 4,250 messages/month",
+            "Automated WhatsApp Order Confirmations",
+            "Abandoned Checkout Recovery",
+            "Order Fulfillment Notifications",
+            "Order Cancellation Notifications",
+            "Automated Order Tag Updates",
+            "Customizable Message Templates",
+            "Connect WhatsApp using Link a Device",
+            "Real-Time Analytics & Reporting"
+        ],
         icon: Crown,
         color: "text-purple-500",
         bgColor: "bg-purple-500/10",

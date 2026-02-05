@@ -255,22 +255,7 @@ const MerchantSettings = () => {
           </div>
 
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="webhook">Shopify webhook URL</Label>
-              <Badge variant="outline" className="text-success border-success/30 bg-success/5">
-                Status: Automatic
-              </Badge>
-            </div>
-            <Input
-              id="webhook"
-              value={webhookUrl}
-              readOnly
-            />
-            <p className="text-xs text-muted-foreground">
-              Automatic registration is enabled. Your store is synced with the backend.
-            </p>
-          </div>
+
 
           <div className="space-y-2">
             <Label htmlFor="notes">Internal notes</Label>
