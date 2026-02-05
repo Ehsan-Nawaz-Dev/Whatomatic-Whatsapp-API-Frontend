@@ -27,6 +27,19 @@ const Dashboard = () => {
     queryFn: async () => {
       try {
         const res = await fetch(withShopParam("/billing/status"));
+
+        // --- LAZY AUTH CHECK ---
+        // If 401/403 or network error with 'shop' param, we might need to install
+        if (res.status === 401 || res.status === 403) {
+          const params = new URLSearchParams(window.location.search);
+          const shop = params.get("shop");
+          if (shop) {
+            console.log("Redirecting to Install...", shop);
+            window.location.href = `https://api.whatomatic.com/auth?shop=${shop}`;
+            return { plan: "loading", status: "redirecting" };
+          }
+        }
+
         if (!res.ok) return { plan: "free", status: "none" };
         const data = await res.json();
 
