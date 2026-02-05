@@ -38,7 +38,8 @@ const BillingPlan = () => {
                 if (trialRes.ok) return trialRes.json();
             }
             return data;
-        }
+        },
+        staleTime: 0 // Always fetch fresh
     });
 
     // Fetch Plans from Backend
@@ -52,26 +53,25 @@ const BillingPlan = () => {
     });
 
     const handleActivateTrial = async () => {
-        if (!trialDetails.name || !trialDetails.email) {
-            toast.error("Please provide your name and email");
+        if (!trialDetails.name || !trialDetails.email || !trialDetails.phone) {
+            toast.error("Please fill in all fields");
             return;
         }
 
+        setIsActivatingTrial(true);
         try {
-            setIsActivatingTrial(true);
+            // Get shop from URL
             const params = new URLSearchParams(window.location.search);
-            const shop = params.get("shop") || "";
+            const shop = params.get("shop");
 
-            await activateTrial({
-                ...trialDetails,
-                shop
-            } as any);
+            // We use our API helper
+            const res = await activateTrial(trialDetails);
 
-            toast.success("Trial activated! You have 10 free order messages.");
+            toast.success("Trial Activated Successfully!");
             setShowTrialDialog(false);
             queryClient.invalidateQueries({ queryKey: ["billing-status"] });
-        } catch (err: any) {
-            toast.error(err.message);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to activate trial");
         } finally {
             setIsActivatingTrial(false);
         }
@@ -83,21 +83,19 @@ const BillingPlan = () => {
             const res = await fetch(withShopParam("/billing/create"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan: planId })
+                body: JSON.stringify({ plan: planId }),
             });
 
             const data = await res.json();
-
-            if (!res.ok) throw new Error(data.message || "Failed to initiate charge");
-
-            // Redirect to Shopify confirmation URL (or Backend redirect URL provided)
             if (data.confirmationUrl) {
                 window.location.href = data.confirmationUrl;
             } else {
-                toast.error("Invalid server response");
+                toast.error("Failed to initiate charge");
+                setLoadingPlan(null);
             }
-        } catch (err: any) {
-            toast.error(err.message);
+        } catch (err) {
+            console.error(err);
+            toast.error("An error occurred");
             setLoadingPlan(null);
         }
     };
@@ -114,173 +112,187 @@ const BillingPlan = () => {
         const uiProps = {
             free: { icon: Gift, color: "text-gray-500", bgColor: "bg-gray-500/10", borderColor: "border-gray-500/20", btnVariant: "outline" },
             starter: { icon: Star, color: "text-blue-500", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", btnVariant: "outline" },
-            growth: { icon: Zap, color: "text-amber-500", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", popular: true, btnVariant: "hero" },
+            growth: { icon: Zap, color: "text-amber-500", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", popular: true, btnVariant: "default" },
             pro: { icon: Crown, color: "text-purple-500", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20", btnVariant: "outline" }
         }[plan.id] || { icon: Star, color: "text-gray-500", bgColor: "bg-gray-100", borderColor: "border-gray-200", btnVariant: "outline" };
 
-        return { ...plan, ...uiProps };
+        // Fix mapping for specific fields
+        return { ...plan, popular: plan.isPopular, ...uiProps };
     });
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
+            {/* Trial Offer Banner (Only for Free users who haven't used trial) */}
             {!trialActivated && currentPlanId === 'free' && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4"
-                >
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                            <Gift className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold">Start Your Free Trial</h2>
-                            <p className="text-muted-foreground">Get 10 automated order messages for free to test the app!</p>
-                        </div>
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                        <Gift size={120} />
                     </div>
-                    <Button size="lg" onClick={() => setShowTrialDialog(true)}>
-                        Activate Free Trial
-                    </Button>
-                </motion.div>
-            )}
-
-            {isTrial && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-2xl"
-                >
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600">
-                                <Zap className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-bold">Trial Subscription Active</h2>
-                                <p className="text-muted-foreground">You are currently using the trial. Upgrade to a paid plan for unlimited messages.</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <div className="text-sm font-semibold mb-1">Messages Sent: {trialUsage} / {trialLimit}</div>
-                            <div className="w-full md:w-48 bg-muted rounded-full h-2">
-                                <div
-                                    className="bg-amber-500 h-2 rounded-full transition-all duration-500"
-                                    style={{ width: `${Math.min((trialUsage / trialLimit) * 100, 100)}%` }}
-                                />
-                            </div>
-                        </div>
+                    <div className="relative z-10 max-w-2xl">
+                        <h2 className="text-3xl font-bold mb-4">Start Your Free Trial Today!</h2>
+                        <p className="text-blue-100 mb-6 text-lg">
+                            Experience the full power of WhatFlow with {trialLimit} free messages. No credit card required.
+                            See how automated WhatsApp notifications can recover lost sales instantly.
+                        </p>
+                        <Button
+                            onClick={() => setShowTrialDialog(true)}
+                            size="lg"
+                            className="bg-white text-blue-600 hover:bg-blue-50 font-bold border-none shadow-lg"
+                        >
+                            <Gift className="mr-2 h-5 w-5" /> Claim Free {trialLimit} Messages
+                        </Button>
                     </div>
-                </motion.div>
-            )}
-
-            <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold text-foreground">Choose Your Plan</h1>
-                <p className="text-muted-foreground">Select the package that fits your business needs</p>
-            </div>
-
-            {isPlansLoading ? (
-                <div className="text-center py-10">Loading plans...</div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {displayPlans.map((plan: any, index: number) => {
-                        const Icon = plan.icon;
-                        const isCurrent = currentPlanId === plan.id;
-
-                        return (
-                            <motion.div
-                                key={plan.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className={`relative p-6 rounded-2xl border-2 flex flex-col ${plan.borderColor} bg-card shadow-card ${plan.popular ? 'ring-2 ring-primary/20 scale-105 md:scale-105 z-10' : ''}`}
-                            >
-                                {plan.popular && (
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg">
-                                        MOST POPULAR
-                                    </div>
-                                )}
-
-                                <div className={`w-12 h-12 rounded-xl mb-4 flex items-center justify-center ${plan.bgColor}`}>
-                                    <Icon className={`w-6 h-6 ${plan.color}`} />
-                                </div>
-
-                                <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
-                                <div className="mt-2 mb-6 flex items-baseline">
-                                    <span className="text-3xl font-bold text-foreground">${plan.price}</span>
-                                    <span className="text-sm text-muted-foreground">/mo</span>
-                                </div>
-
-                                <div className="flex-1 space-y-3 mb-8">
-                                    {plan.features.map((feat: string, i: number) => (
-                                        <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-                                            <Check className="w-4 h-4 text-success" />
-                                            <span>{feat}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <Button
-                                    variant={isCurrent ? "secondary" : (plan.btnVariant as any)}
-                                    disabled={isCurrent || !!loadingPlan}
-                                    onClick={() => createCharge(plan.id)}
-                                    className={`w-full ${isCurrent ? 'opacity-100 cursor-default' : ''}`}
-                                >
-                                    {loadingPlan === plan.id ? "Processing..." : (isCurrent ? "Current Plan" : "Upgrade")}
-                                </Button>
-                            </motion.div>
-                        );
-                    })}
                 </div>
             )}
 
+            {/* Trial Status Banner (When Trial Active) */}
+            {isTrial && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-6 relative overflow-hidden"
+                >
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                        <div>
+                            <h3 className="text-xl font-bold text-purple-400 flex items-center gap-2">
+                                <Crown size={24} /> Trial Subscription Active
+                            </h3>
+                            <p className="text-purple-200/60 mt-1">You are currently on the free trial plan.</p>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-sm uppercase tracking-widest text-purple-400/60 font-bold mb-1">Messages Sent</div>
+                            <div className="text-3xl font-bold text-white font-mono">{trialUsage} <span className="text-lg text-purple-500/50">/ {trialLimit}</span></div>
+                        </div>
+                    </div>
+                    <div className="mt-4 w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div
+                            className="bg-purple-500 h-full transition-all duration-1000 ease-out"
+                            style={{ width: `${Math.min((trialUsage / trialLimit) * 100, 100)}%` }}
+                        />
+                    </div>
+                </motion.div>
+            )}
+
+            {/* Plans Grid */}
+            <div>
+                <div className="text-center mb-10">
+                    <h2 className="text-3xl font-bold text-slate-100 mb-2">Choose Your Plan</h2>
+                    <p className="text-slate-400">Scale your business with the power of WhatsApp automation</p>
+                </div>
+
+                {isPlansLoading ? (
+                    <div className="text-center py-20 text-slate-500">Loading plans...</div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {displayPlans.map((plan: any) => {
+                            const isCurrent = plan.id === currentPlanId || (isTrial && plan.id === 'trial'); // Wait, trial is special handling
+                            const Icon = plan.icon;
+
+                            return (
+                                <motion.div
+                                    key={plan.id}
+                                    whileHover={{ y: -5 }}
+                                    className={`relative bg-card text-card-foreground rounded-2xl border ${plan.popular ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border'} p-6 flex flex-col`}
+                                >
+                                    {plan.popular && (
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                                            <Star size={12} fill="currentColor" /> MOST POPULAR
+                                        </div>
+                                    )}
+
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${plan.bgColor} ${plan.color}`}>
+                                        <Icon size={24} />
+                                    </div>
+
+                                    <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                                    <div className="flex items-baseline gap-1 mb-6">
+                                        <span className="text-3xl font-bold">${plan.price}</span>
+                                        <span className="text-muted-foreground text-sm">/mo</span>
+                                    </div>
+
+                                    <ul className="space-y-3 mb-8 flex-1">
+                                        <li className="flex items-center gap-3 text-sm">
+                                            <div className={`p-1 rounded-full ${plan.bgColor} ${plan.color}`}>
+                                                <Check size={12} />
+                                            </div>
+                                            <span className="font-bold">{plan.messageLimit} Messages</span>
+                                        </li>
+                                        {plan.features.map((feature: string, i: number) => (
+                                            <li key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
+                                                <Check size={16} className="text-green-500 shrink-0" />
+                                                <span>{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <Button
+                                        onClick={() => createCharge(plan.id)}
+                                        disabled={plan.id === currentPlanId || !!loadingPlan}
+                                        className="w-full"
+                                        variant={plan.btnVariant as any}
+                                    >
+                                        {loadingPlan === plan.id ? (
+                                            "Processing..."
+                                        ) : plan.id === currentPlanId ? (
+                                            "Current Plan"
+                                        ) : (
+                                            "Upgrade Now"
+                                        )}
+                                    </Button>
+                                </motion.div>
+                            )
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Trial Dialog */}
             <Dialog open={showTrialDialog} onOpenChange={setShowTrialDialog}>
-                {/* ... Dialog Content ... (truncated for brevity, but I should include it) */}
-                <DialogContent>
+                <DialogContent className="bg-[#0f172a] text-white border-slate-700">
                     <DialogHeader>
-                        <DialogTitle>Activate Your Free Trial</DialogTitle>
-                        <DialogDescription>
-                            Please confirm your details to start your 10-message free trial.
+                        <DialogTitle className="flex items-center gap-2 text-xl">
+                            <Gift className="text-blue-500" /> Activate Free Trial
+                        </DialogTitle>
+                        <DialogDescription className="text-slate-400">
+                            Get started instantly with {trialLimit} free messages. No payment info needed.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Full Name</Label>
+
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Full Name</Label>
                             <Input
-                                id="name"
+                                placeholder="John Doe"
+                                className="bg-[#1e293b] border-slate-700 text-white"
                                 value={trialDetails.name}
                                 onChange={(e) => setTrialDetails({ ...trialDetails, name: e.target.value })}
-                                placeholder="John Doe"
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email Address</Label>
+                        <div className="space-y-2">
+                            <Label>Email Address</Label>
                             <Input
-                                id="email"
                                 type="email"
+                                placeholder="john@example.com"
+                                className="bg-[#1e293b] border-slate-700 text-white"
                                 value={trialDetails.email}
                                 onChange={(e) => setTrialDetails({ ...trialDetails, email: e.target.value })}
-                                placeholder="john@example.com"
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="phone">WhatsApp Number (Optional)</Label>
+                        <div className="space-y-2">
+                            <Label>Phone Number (WhatsApp)</Label>
                             <Input
-                                id="phone"
+                                placeholder="+1234567890"
+                                className="bg-[#1e293b] border-slate-700 text-white"
                                 value={trialDetails.phone}
                                 onChange={(e) => setTrialDetails({ ...trialDetails, phone: e.target.value })}
-                                placeholder="+923001234567"
                             />
                         </div>
                     </div>
+
                     <DialogFooter>
+                        <Button variant="ghost" onClick={() => setShowTrialDialog(false)}>Cancel</Button>
                         <Button
-                            variant="outline"
-                            onClick={() => setShowTrialDialog(false)}
-                            disabled={isActivatingTrial}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
+                            className="bg-blue-600 hover:bg-blue-500 text-white"
                             onClick={handleActivateTrial}
                             disabled={isActivatingTrial}
                         >
@@ -289,10 +301,6 @@ const BillingPlan = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
-            <div className="mt-8 p-4 bg-muted/30 rounded-lg text-center text-xs text-muted-foreground max-w-2xl mx-auto">
-                Charges are billed in USD. You can cancel at any time. By clicking Upgrade, you agree to our Terms of Service.
-            </div>
         </div>
     );
 };
