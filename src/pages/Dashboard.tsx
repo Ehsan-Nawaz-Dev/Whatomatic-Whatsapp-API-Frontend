@@ -113,6 +113,10 @@ const Dashboard = () => {
             <NotificationsList />
           )}
 
+          {effectiveTab === "chat-button" && (
+            <ChatButtonConfig />
+          )}
+
           {effectiveTab === "billing" && (
             <div className="space-y-6">
               <BillingPlan />

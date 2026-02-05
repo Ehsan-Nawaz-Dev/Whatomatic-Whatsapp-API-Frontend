@@ -465,7 +465,7 @@ export interface ChatButtonSettings {
   phoneNumber: string;
   buttonText: string;
   position: string;
-  themeColor: string;
+  color: string;
 }
 
 export const fetchChatButtonSettings = async (): Promise<ChatButtonSettings> => {

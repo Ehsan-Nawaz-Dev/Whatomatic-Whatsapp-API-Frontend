@@ -1,22 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MessageCircle, Settings, Eye, Smartphone, Save } from "lucide-react";
+import { MessageCircle, Settings, Eye, Smartphone, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { fetchChatButtonSettings, updateChatButtonSettings } from "@/lib/api";
 
 const ChatButtonConfig = () => {
-    const [phoneNumber, setPhoneNumber] = useState("+1234567890");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [buttonText, setButtonText] = useState("Chat with us");
-    const [position, setPosition] = useState("bottom-right");
+    const [position, setPosition] = useState("right");
     const [themeColor, setThemeColor] = useState("#25D366");
     const [enabled, setEnabled] = useState(true);
 
+    const { data, isLoading } = useQuery({
+        queryKey: ["chat-button-settings"],
+        queryFn: fetchChatButtonSettings,
+    });
+
+    useEffect(() => {
+        if (data) {
+            setPhoneNumber(data.phoneNumber || "");
+            setButtonText(data.buttonText || "Chat with us");
+            setPosition(data.position || "right");
+            setThemeColor(data.color || "#25D366");
+            setEnabled(data.enabled !== undefined ? data.enabled : true);
+        }
+    }, [data]);
+
+    const mutation = useMutation({
+        mutationFn: updateChatButtonSettings,
+        onSuccess: () => {
+            toast.success("Chat button settings saved!");
+        },
+        onError: () => {
+            toast.error("Failed to save settings");
+        }
+    });
+
     const handleSave = () => {
-        toast.success("Chat button settings saved!");
+        mutation.mutate({
+            phoneNumber,
+            buttonText,
+            position,
+            color: themeColor,
+            enabled
+        });
     };
+
+    if (isLoading) {
+        return (
+            <div className="h-[400px] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -27,8 +68,8 @@ const ChatButtonConfig = () => {
                         Let customers start a conversation directly from your website.
                     </p>
                 </div>
-                <Button variant="hero" onClick={handleSave}>
-                    <Save className="w-4 h-4 mr-2" />
+                <Button variant="hero" onClick={handleSave} disabled={mutation.isPending}>
+                    {mutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                     Save Settings
                 </Button>
             </div>
@@ -61,6 +102,7 @@ const ChatButtonConfig = () => {
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                     placeholder="+1234567890"
                                 />
+                                <p className="text-xs text-muted-foreground">Include country code (e.g., +1 for USA)</p>
                             </div>
 
                             <div className="space-y-2">
@@ -81,8 +123,8 @@ const ChatButtonConfig = () => {
                                         value={position}
                                         onChange={(e) => setPosition(e.target.value)}
                                     >
-                                        <option value="bottom-right">Bottom Right</option>
-                                        <option value="bottom-left">Bottom Left</option>
+                                        <option value="right">Bottom Right</option>
+                                        <option value="left">Bottom Left</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -133,7 +175,7 @@ const ChatButtonConfig = () => {
                                     <motion.div
                                         initial={false}
                                         animate={{
-                                            x: position === "bottom-right" ? 0 : -160,
+                                            x: position === "right" ? 0 : -160,
                                             scale: [1, 1.05, 1],
                                         }}
                                         transition={{ scale: { repeat: Infinity, duration: 3 } }}
@@ -158,3 +200,4 @@ const ChatButtonConfig = () => {
 };
 
 export default ChatButtonConfig;
+
