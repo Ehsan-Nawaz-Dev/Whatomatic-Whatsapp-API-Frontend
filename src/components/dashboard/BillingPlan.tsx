@@ -227,16 +227,16 @@ const BillingPlan = () => {
 
                                     <Button
                                         onClick={() => createCharge(plan.id)}
-                                        disabled={plan.id === currentPlanId || !!loadingPlan}
+                                        disabled={(plan.id === currentPlanId && status?.status === 'active') || !!loadingPlan}
                                         className="w-full"
                                         variant={plan.btnVariant as any}
                                     >
                                         {loadingPlan === plan.id ? (
                                             "Processing..."
-                                        ) : plan.id === currentPlanId ? (
+                                        ) : (plan.id === currentPlanId && status?.status === 'active') ? (
                                             "Current Plan"
                                         ) : (
-                                            "Upgrade Now"
+                                            "Activate Plan"
                                         )}
                                     </Button>
                                 </motion.div>
