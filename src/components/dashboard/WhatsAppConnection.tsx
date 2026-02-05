@@ -203,6 +203,25 @@ const WhatsAppConnection = () => {
                     </li>
                   </ol>
                 </div>
+
+                {/* Safety Warning */}
+                <div className="mt-8 p-4 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl text-left">
+                  <div className="flex items-center gap-2 text-red-600 dark:text-red-400 mb-2">
+                    <AlertCircle className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase">Safety Warning</span>
+                  </div>
+                  <p className="text-[10px] text-red-700/80 dark:text-red-300/80 leading-relaxed">
+                    You are using a <strong>Device (Unofficial)</strong> connection. WhatsApp may block your number if you send too many messages quickly or receive spam reports.
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    <li className="text-[10px] text-red-700/60 dark:text-red-300/60 flex items-start gap-1">
+                      • Avoid bulk sending to new contacts.
+                    </li>
+                    <li className="text-[10px] text-red-700/60 dark:text-red-300/60 flex items-start gap-1">
+                      • Use the <strong>Cloud API</strong> for 100% safety.
+                    </li>
+                  </ul>
+                </div>
               </>
             ) : (
               <div className="space-y-6">
@@ -317,6 +336,34 @@ const WhatsAppConnection = () => {
                 {status.deviceName || "WhatsApp Session"}
               </p>
             </div>
+          </div>
+
+          {/* Daily Limit Safety Monitor */}
+          <div className="p-5 bg-card border border-border rounded-xl shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-primary" />
+                <span className="text-xs font-bold uppercase tracking-wider text-foreground">Daily Safety Limit</span>
+              </div>
+              <span className="text-xs font-medium text-muted-foreground">
+                {status.dailyUsage || 0} / {status.dailyLimit || 250}
+              </span>
+            </div>
+
+            <div className="w-full h-2 bg-muted rounded-full overflow-hidden mb-3">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(((status.dailyUsage || 0) / (status.dailyLimit || 250)) * 100, 100)}%` }}
+                className={`h-full rounded-full ${((status.dailyUsage || 0) / (status.dailyLimit || 250)) > 0.8
+                    ? "bg-destructive"
+                    : "bg-primary"
+                  }`}
+              />
+            </div>
+
+            <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+              * To avoid being blocked by WhatsApp, we limit "Device" connections to 250 messages/day. Upgrade to <strong className="text-primary">Cloud API</strong> for unlimited, 100% safe sending.
+            </p>
           </div>
 
           {/* Test Message Feature */}

@@ -170,6 +170,8 @@ export interface WhatsAppStatusResponse {
   phoneNumber?: string;
   deviceName?: string;
   lastConnected?: string;
+  dailyUsage?: number;
+  dailyLimit?: number;
 }
 
 export interface WhatsAppMessagePayload {
