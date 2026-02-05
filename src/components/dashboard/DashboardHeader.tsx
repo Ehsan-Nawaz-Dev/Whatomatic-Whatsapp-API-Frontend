@@ -4,15 +4,19 @@ import { Button } from "@/components/ui/button";
 interface DashboardHeaderProps {
   billing?: {
     plan: string;
-    trialLimit?: number;
-    trialUsage?: number;
+    status: string;
+    usage?: number;
+    limit?: number;
     shopName?: string;
   };
 }
 
 const DashboardHeader = ({ billing }: DashboardHeaderProps) => {
   const isTrial = billing?.plan === 'trial';
-  const remaining = (billing?.trialLimit || 10) - (billing?.trialUsage || 0);
+  const isActive = billing?.status === 'active';
+  const usage = billing?.usage || 0;
+  const limit = billing?.limit || 10;
+  const remaining = limit - usage;
 
   return (
     <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between">
@@ -30,10 +34,10 @@ const DashboardHeader = ({ billing }: DashboardHeaderProps) => {
 
       {/* Actions */}
       <div className="flex items-center gap-4">
-        {isTrial && (
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 text-amber-600 rounded-full border border-amber-500/20 text-xs font-medium">
+        {isActive && (
+          <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 ${isTrial ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-blue-500/10 text-blue-600 border-blue-500/20'} rounded-full border text-xs font-medium`}>
             <Zap className="w-3.5 h-3.5" />
-            <span>Trial: {remaining} messages left</span>
+            <span>{isTrial ? 'Trial:' : 'Plan:'} {remaining} messages left</span>
           </div>
         )}
 
