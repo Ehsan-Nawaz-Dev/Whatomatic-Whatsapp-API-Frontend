@@ -17,94 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const PLANS = [
-    {
-        id: "free",
-        name: "Free",
-        price: "0",
-        features: [
-            "Up to 50 messages/month",
-            "Automated WhatsApp Order Confirmations",
-            "Abandoned Checkout Recovery",
-            "Order Fulfillment Notifications",
-            "Order Cancellation Notifications",
-            "Customizable Message Templates",
-            "Connect WhatsApp using Link a Device",
-            "Real-Time Analytics & Reporting"
-        ],
-        icon: Gift,
-        color: "text-gray-500",
-        bgColor: "bg-gray-500/10",
-        borderColor: "border-gray-500/20",
-        btnVariant: "outline" as const
-    },
-    {
-        id: "starter",
-        name: "Starter",
-        price: "4.99",
-        features: [
-            "Up to 1,250 messages/month",
-            "Automated WhatsApp Order Confirmations",
-            "Abandoned Checkout Recovery",
-            "Order Fulfillment Notifications",
-            "Order Cancellation Notifications",
-            "Customizable Message Templates",
-            "Automated Order Tag Updates",
-            "Connect WhatsApp using Link a Device",
-            "Real-Time Analytics & Reporting",
-            "3-Day Free Trial"
-        ],
-        icon: Star,
-        color: "text-blue-500",
-        bgColor: "bg-blue-500/10",
-        borderColor: "border-blue-500/20",
-        btnVariant: "outline" as const
-    },
-    {
-        id: "growth",
-        name: "Growth",
-        price: "9.99",
-        features: [
-            "Up to 2,500 messages/month",
-            "Automated WhatsApp Order Confirmations",
-            "Abandoned Checkout Recovery",
-            "Order Fulfillment Notifications",
-            "Order Cancellation Notifications",
-            "Customizable Message Templates",
-            "Automated Order Tag Updates",
-            "Connect WhatsApp using Link a Device",
-            "Real-Time Analytics & Reporting"
-        ],
-        icon: Zap,
-        color: "text-amber-500",
-        bgColor: "bg-amber-500/10",
-        borderColor: "border-amber-500/20",
-        popular: true,
-        btnVariant: "hero" as const
-    },
-    {
-        id: "pro",
-        name: "Professional",
-        price: "14.99",
-        features: [
-            "Up to 4,250 messages/month",
-            "Automated WhatsApp Order Confirmations",
-            "Abandoned Checkout Recovery",
-            "Order Fulfillment Notifications",
-            "Order Cancellation Notifications",
-            "Automated Order Tag Updates",
-            "Customizable Message Templates",
-            "Connect WhatsApp using Link a Device",
-            "Real-Time Analytics & Reporting"
-        ],
-        icon: Crown,
-        color: "text-purple-500",
-        bgColor: "bg-purple-500/10",
-        borderColor: "border-purple-500/20",
-        btnVariant: "outline" as const
-    }
-];
-
 const BillingPlan = () => {
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
     const [showTrialDialog, setShowTrialDialog] = useState(false);
@@ -126,6 +38,16 @@ const BillingPlan = () => {
                 if (trialRes.ok) return trialRes.json();
             }
             return data;
+        }
+    });
+
+    // Fetch Plans from Backend
+    const { data: plansData, isLoading: isPlansLoading } = useQuery({
+        queryKey: ["plans"],
+        queryFn: async () => {
+            const res = await fetch(`${API_BASE_URL}/plans`);
+            if (!res.ok) throw new Error("Failed to fetch plans");
+            return res.json();
         }
     });
 
@@ -168,9 +90,9 @@ const BillingPlan = () => {
 
             if (!res.ok) throw new Error(data.message || "Failed to initiate charge");
 
-            // Redirect to Shopify confirmation URL
+            // Redirect to Shopify confirmation URL (or Backend redirect URL provided)
             if (data.confirmationUrl) {
-                window.top!.location.href = data.confirmationUrl;
+                window.location.href = data.confirmationUrl;
             } else {
                 toast.error("Invalid server response");
             }
@@ -185,6 +107,19 @@ const BillingPlan = () => {
     const trialUsage = status?.trialUsage || 0;
     const trialLimit = status?.trialLimit || 10;
     const trialActivated = status?.trialActivated || false;
+
+    // Merge API plans with UI metadata (icons, colors)
+    const displayPlans = (plansData || []).map((plan: any) => {
+        // Map ID to UI props
+        const uiProps = {
+            free: { icon: Gift, color: "text-gray-500", bgColor: "bg-gray-500/10", borderColor: "border-gray-500/20", btnVariant: "outline" },
+            starter: { icon: Star, color: "text-blue-500", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", btnVariant: "outline" },
+            growth: { icon: Zap, color: "text-amber-500", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", popular: true, btnVariant: "hero" },
+            pro: { icon: Crown, color: "text-purple-500", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20", btnVariant: "outline" }
+        }[plan.id] || { icon: Star, color: "text-gray-500", bgColor: "bg-gray-100", borderColor: "border-gray-200", btnVariant: "outline" };
+
+        return { ...plan, ...uiProps };
+    });
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
@@ -243,58 +178,63 @@ const BillingPlan = () => {
                 <p className="text-muted-foreground">Select the package that fits your business needs</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {PLANS.map((plan, index) => {
-                    const Icon = plan.icon;
-                    const isCurrent = currentPlanId === plan.id;
+            {isPlansLoading ? (
+                <div className="text-center py-10">Loading plans...</div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {displayPlans.map((plan: any, index: number) => {
+                        const Icon = plan.icon;
+                        const isCurrent = currentPlanId === plan.id;
 
-                    return (
-                        <motion.div
-                            key={plan.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className={`relative p-6 rounded-2xl border-2 flex flex-col ${plan.borderColor} bg-card shadow-card ${plan.popular ? 'ring-2 ring-primary/20 scale-105 md:scale-105 z-10' : ''}`}
-                        >
-                            {plan.popular && (
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg">
-                                    MOST POPULAR
-                                </div>
-                            )}
-
-                            <div className={`w-12 h-12 rounded-xl mb-4 flex items-center justify-center ${plan.bgColor}`}>
-                                <Icon className={`w-6 h-6 ${plan.color}`} />
-                            </div>
-
-                            <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
-                            <div className="mt-2 mb-6 flex items-baseline">
-                                <span className="text-3xl font-bold text-foreground">${plan.price}</span>
-                                <span className="text-sm text-muted-foreground">/mo</span>
-                            </div>
-
-                            <div className="flex-1 space-y-3 mb-8">
-                                {plan.features.map((feat, i) => (
-                                    <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-                                        <Check className="w-4 h-4 text-success" />
-                                        <span>{feat}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <Button
-                                variant={isCurrent ? "secondary" : (plan.btnVariant as any)}
-                                disabled={isCurrent || !!loadingPlan}
-                                onClick={() => createCharge(plan.id)}
-                                className={`w-full ${isCurrent ? 'opacity-100 cursor-default' : ''}`}
+                        return (
+                            <motion.div
+                                key={plan.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className={`relative p-6 rounded-2xl border-2 flex flex-col ${plan.borderColor} bg-card shadow-card ${plan.popular ? 'ring-2 ring-primary/20 scale-105 md:scale-105 z-10' : ''}`}
                             >
-                                {loadingPlan === plan.id ? "Processing..." : (isCurrent ? "Current Plan" : "Upgrade")}
-                            </Button>
-                        </motion.div>
-                    );
-                })}
-            </div>
+                                {plan.popular && (
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg">
+                                        MOST POPULAR
+                                    </div>
+                                )}
+
+                                <div className={`w-12 h-12 rounded-xl mb-4 flex items-center justify-center ${plan.bgColor}`}>
+                                    <Icon className={`w-6 h-6 ${plan.color}`} />
+                                </div>
+
+                                <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
+                                <div className="mt-2 mb-6 flex items-baseline">
+                                    <span className="text-3xl font-bold text-foreground">${plan.price}</span>
+                                    <span className="text-sm text-muted-foreground">/mo</span>
+                                </div>
+
+                                <div className="flex-1 space-y-3 mb-8">
+                                    {plan.features.map((feat: string, i: number) => (
+                                        <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
+                                            <Check className="w-4 h-4 text-success" />
+                                            <span>{feat}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <Button
+                                    variant={isCurrent ? "secondary" : (plan.btnVariant as any)}
+                                    disabled={isCurrent || !!loadingPlan}
+                                    onClick={() => createCharge(plan.id)}
+                                    className={`w-full ${isCurrent ? 'opacity-100 cursor-default' : ''}`}
+                                >
+                                    {loadingPlan === plan.id ? "Processing..." : (isCurrent ? "Current Plan" : "Upgrade")}
+                                </Button>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            )}
 
             <Dialog open={showTrialDialog} onOpenChange={setShowTrialDialog}>
+                {/* ... Dialog Content ... (truncated for brevity, but I should include it) */}
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Activate Your Free Trial</DialogTitle>
