@@ -84,7 +84,7 @@ const Dashboard = () => {
       />
 
       <div className="flex-1 flex flex-col">
-        <DashboardHeader />
+        <DashboardHeader billing={billing} />
 
         <main className="flex-1 p-6 overflow-auto">
           {effectiveTab === "overview" && (
