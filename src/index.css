@@ -4,10 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hide Shopify App Bridge custom elements from rendering in iframe */
+/* Hide Shopify App Bridge custom elements from visual rendering, but keep parseable */
 ui-nav-menu,
 ui-title-bar {
-  display: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
 @layer base {
@@ -145,19 +149,19 @@ ui-title-bar {
   .gradient-primary {
     background: var(--gradient-primary);
   }
-  
+
   .gradient-hero {
     background: var(--gradient-hero);
   }
-  
+
   .gradient-card {
     background: var(--gradient-card);
   }
-  
+
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
-  
+
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
@@ -172,13 +176,16 @@ ui-title-bar {
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: hsl(var(--border));
     border-radius: 10px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground) / 0.3);
   }
