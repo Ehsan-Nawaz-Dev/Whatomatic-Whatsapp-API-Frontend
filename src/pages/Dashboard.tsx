@@ -94,8 +94,8 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* Shopify Navigation Menu API */}
-      <ui-nav-menu>
+      {/* Shopify Navigation Menu API - Hidden from iframe, read by Shopify Admin */}
+      <ui-nav-menu style={{ display: 'none' }}>
         <a href="/dashboard?tab=overview">App Home</a>
         <a href="/dashboard?tab=billing">Plans & Usage</a>
         <a href="/dashboard?tab=automations">Automations</a>
