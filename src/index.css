@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide Shopify App Bridge custom elements from rendering in iframe */
+ui-nav-menu,
+ui-title-bar {
+  display: none !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 99%;
