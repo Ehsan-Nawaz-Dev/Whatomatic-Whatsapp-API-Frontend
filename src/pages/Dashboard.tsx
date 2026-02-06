@@ -14,6 +14,7 @@ import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
 import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
+import AppNavigation from "@/components/AppNavigation";
 import { useQuery } from "@tanstack/react-query";
 import { withShopParam } from "@/lib/api";
 import { Loader2 } from "lucide-react";
@@ -94,6 +95,9 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* Shopify App Bridge Navigation Menu */}
+      <AppNavigation activeTab={effectiveTab} />
+
       <Sidebar
         activeTab={effectiveTab}
         setActiveTab={setActiveTab}
