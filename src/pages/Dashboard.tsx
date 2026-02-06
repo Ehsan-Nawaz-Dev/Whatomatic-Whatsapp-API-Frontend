@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import StatsCards from "@/components/dashboard/StatsCards";
@@ -17,9 +17,26 @@ import BillingPlan from "@/components/dashboard/BillingPlan";
 import { useQuery } from "@tanstack/react-query";
 import { withShopParam } from "@/lib/api";
 import { Loader2 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab") || "overview";
+  const [activeTab, setActiveTabState] = useState(tabParam);
+
+  // Sync state with URL params
+  useEffect(() => {
+    setActiveTabState(tabParam);
+  }, [tabParam]);
+
+  const setActiveTab = (tab: string) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("tab", tab);
+      return newParams;
+    });
+    setActiveTabState(tab);
+  };
 
   // Fetch billing status
   const { data: billing, isLoading: isBillingLoading } = useQuery({
@@ -76,7 +93,19 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* Shopify Navigation Menu API */}
+      <ui-nav-menu>
+        <a href="/dashboard?tab=overview">Overview</a>
+        <a href="/dashboard?tab=automations">Automations</a>
+        <a href="/dashboard?tab=contacts">Contacts</a>
+        <a href="/dashboard?tab=templates">Templates</a>
+        <a href="/dashboard?tab=analytics">Analytics</a>
+        <a href="/dashboard?tab=chat-button">Chat Button</a>
+        <a href="/dashboard?tab=settings">Settings</a>
+        <a href="/dashboard?tab=billing">Billing</a>
+      </ui-nav-menu>
+
       <Sidebar
         activeTab={effectiveTab}
         setActiveTab={setActiveTab}

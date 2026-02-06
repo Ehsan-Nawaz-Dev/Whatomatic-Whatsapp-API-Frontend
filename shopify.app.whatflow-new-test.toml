@@ -20,3 +20,15 @@ redirect_urls = [
   "https://whatflow-alpha.vercel.app/api/auth/tokens",
   "https://api.whatomatic.com/Api/auth/shopify/callback"
 ]
+
+[navigation_menu]
+items = [
+  { label = "Overview", destination = "/dashboard" },
+  { label = "Automations", destination = "/dashboard?tab=automations" },
+  { label = "Contacts", destination = "/dashboard?tab=contacts" },
+  { label = "Templates", destination = "/dashboard?tab=templates" },
+  { label = "Analytics", destination = "/dashboard?tab=analytics" },
+  { label = "Chat Button", destination = "/dashboard?tab=chat-button" },
+  { label = "Settings", destination = "/dashboard?tab=settings" },
+  { label = "Billing", destination = "/dashboard?tab=billing" }
+]
