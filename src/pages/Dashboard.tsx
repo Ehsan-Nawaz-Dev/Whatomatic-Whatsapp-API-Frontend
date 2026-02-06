@@ -96,13 +96,10 @@ const Dashboard = () => {
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Shopify Navigation Menu API - Hidden from iframe, read by Shopify Admin */}
       <ui-nav-menu style={{ display: 'none' }}>
-        <a href="/dashboard?tab=overview">App Home</a>
-        <a href="/dashboard?tab=billing">Plans & Usage</a>
-        <a href="/dashboard?tab=automations">Automations</a>
-        <a href="/dashboard?tab=contacts">Contacts</a>
-        <a href="/dashboard?tab=templates">Templates</a>
-        <a href="/dashboard?tab=analytics">Analytics</a>
-        <a href="/dashboard?tab=chat-button">Chat Button</a>
+        <a href="/dashboard?tab=overview">Home</a>
+        <a href="/dashboard?tab=automations">Versions</a>
+        <a href="/dashboard?tab=analytics">Monitoring</a>
+        <a href="/dashboard?tab=contacts">Logs</a>
         <a href="/dashboard?tab=settings">Settings</a>
       </ui-nav-menu>
 
