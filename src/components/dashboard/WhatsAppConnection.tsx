@@ -204,24 +204,7 @@ const WhatsAppConnection = () => {
                   </ol>
                 </div>
 
-                {/* Safety Warning */}
-                <div className="mt-8 p-4 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl text-left">
-                  <div className="flex items-center gap-2 text-red-600 dark:text-red-400 mb-2">
-                    <AlertCircle className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase">Safety Warning</span>
-                  </div>
-                  <p className="text-[10px] text-red-700/80 dark:text-red-300/80 leading-relaxed">
-                    You are using a <strong>Device (Unofficial)</strong> connection. WhatsApp may block your number if you send too many messages quickly or receive spam reports.
-                  </p>
-                  <ul className="mt-2 space-y-1">
-                    <li className="text-[10px] text-red-700/60 dark:text-red-300/60 flex items-start gap-1">
-                      • Avoid bulk sending to new contacts.
-                    </li>
-                    <li className="text-[10px] text-red-700/60 dark:text-red-300/60 flex items-start gap-1">
-                      • Use the <strong>Cloud API</strong> for 100% safety.
-                    </li>
-                  </ul>
-                </div>
+
               </>
             ) : (
               <div className="space-y-6">
@@ -355,8 +338,8 @@ const WhatsAppConnection = () => {
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(((status.dailyUsage || 0) / (status.dailyLimit || 250)) * 100, 100)}%` }}
                 className={`h-full rounded-full ${((status.dailyUsage || 0) / (status.dailyLimit || 250)) > 0.8
-                    ? "bg-destructive"
-                    : "bg-primary"
+                  ? "bg-destructive"
+                  : "bg-primary"
                   }`}
               />
             </div>
