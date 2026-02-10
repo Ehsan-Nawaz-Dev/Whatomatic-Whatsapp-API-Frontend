@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import ReAuthBanner from "@/components/dashboard/ReAuthBanner";
 import StatsCards from "@/components/dashboard/StatsCards";
 import WhatsAppConnection from "@/components/dashboard/WhatsAppConnection";
 import MessageTemplates from "@/components/dashboard/MessageTemplates";
@@ -102,9 +101,6 @@ const Dashboard = () => {
       />
 
       <div className="flex-1 flex flex-col">
-        {/* Dynamic Re-Authorization Banner (shows for any merchant with expired token) */}
-        <ReAuthBanner />
-
         <DashboardHeader billing={billing} />
 
         <main className="flex-1 p-6 overflow-auto">
