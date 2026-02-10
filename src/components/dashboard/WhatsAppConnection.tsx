@@ -364,7 +364,7 @@ const WhatsAppConnection = () => {
               />
               <Button
                 size="sm"
-                variant="hero"
+                variant="default"
                 className="h-8 text-xs h-[30px]"
                 onClick={async () => {
                   const phone = (document.getElementById("test-phone") as HTMLInputElement).value;
