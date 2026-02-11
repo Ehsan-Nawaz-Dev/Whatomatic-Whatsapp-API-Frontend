@@ -320,7 +320,7 @@ const MessageTemplates = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="tmpl-message">Message</Label>
-                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert") && (
+                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert" || form.event === "orders/cancel_verify" || form.event === "orders/cancelled") && (
                   <button
                     type="button"
                     className="h-auto p-0 text-xs text-primary font-bold decoration-primary/30 hover:decoration-primary transition-all underline shrink-0"
@@ -337,6 +337,19 @@ const MessageTemplates = () => {
                           ...form,
                           name: "Thank You Message",
                           message: `🎉 *Thank You, {{customer_name}}!*\n\nYour order *{{order_number}}* is now being processed by *{{store_name}}*! 🚀\n\n✨ *What's next?*\n1. Our team is hand-picking your items. 📦\n2. We'll pack them with care. 🎀\n3. You'll get a tracking link via WhatsApp as soon as it ships! 🚚\n\nWe appreciate your business! If you have any questions, just reply to this message. 💬`,
+                          isPoll: false
+                        });
+                      } else if (form.event === "orders/cancel_verify") {
+                        setForm({
+                          ...form,
+                          message: `Are you sure you want to cancel your order? ❌\n\nThis will stop your order from being processed immediately.`,
+                          isPoll: true,
+                          pollOptions: ["🗑️ Yes, Cancel Order", "✅ No, Keep Order"]
+                        });
+                      } else if (form.event === "orders/cancelled") {
+                        setForm({
+                          ...form,
+                          message: `Your order *{{order_number}}* has been cancelled as requested. ❌\n\nIf you have any questions or would like to place a new order, we're here to help!`,
                           isPoll: false
                         });
                       } else {
