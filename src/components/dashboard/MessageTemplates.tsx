@@ -17,6 +17,7 @@ const iconMap = {
   "fulfillments/update": Truck,
   "orders/cancelled": XCircle,
   "orders/confirmed": Bell,
+  "orders/cancel_verify": XCircle,
 } as const;
 
 type EventKey = keyof typeof iconMap;
@@ -313,6 +314,7 @@ const MessageTemplates = () => {
                 <option value="checkouts/abandoned">Abandoned checkout</option>
                 <option value="fulfillments/update">Fulfillment update</option>
                 <option value="orders/cancelled">Order cancelled</option>
+                <option value="orders/cancel_verify">Order Cancellation Verification (Poll)</option>
               </select>
             </div>
             <div className="space-y-2">
