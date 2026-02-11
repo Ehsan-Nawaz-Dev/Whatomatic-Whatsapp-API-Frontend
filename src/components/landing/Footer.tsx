@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="w-9 h-9 gradient-primary rounded-lg flex items-center justify-center shadow-md">
                 <MessageCircle className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">WhatFlow</span>
+              <span className="text-xl font-bold text-foreground">Whatomatic</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Automate your Shopify store's WhatsApp communication and boost customer engagement.
@@ -89,7 +89,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2024 WhatFlow. All rights reserved.
+            © 2026 Whatomatic. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Built for Shopify merchants worldwide
