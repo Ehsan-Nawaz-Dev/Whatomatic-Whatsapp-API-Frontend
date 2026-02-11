@@ -38,12 +38,14 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
   return (
     <aside className="w-64 bg-card border-r border-border flex flex-col">
       {/* Logo */}
-      <div className="p-4 border-b border-border">
-        <img
-          src="/whatomatic-logo.svg"
-          alt="Whatomatic"
-          className="w-full h-auto object-contain"
-        />
+      <div className="px-5 py-6 border-b border-border">
+        <div className="transition-transform duration-300 hover:scale-[1.02]">
+          <img
+            src="/whatomatic-logo.svg"
+            alt="Whatomatic"
+            className="w-full h-auto max-h-11 object-contain block"
+          />
+        </div>
       </div>
 
       {/* Navigation */}
