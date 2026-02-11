@@ -40,7 +40,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
       {/* Logo */}
       <div className="p-4 border-b border-border">
         <img
-          src="/whatomatic-logo.png"
+          src="/whatomatic-logo.svg"
           alt="Whatomatic"
           className="w-full h-auto object-contain"
         />
