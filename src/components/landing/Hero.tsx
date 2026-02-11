@@ -1,14 +1,26 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, MessageCircle, ShoppingBag, Zap } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
+import { ArrowRight, ShoppingCart, Bell, BarChart3, Zap, MessageCircle, ShoppingBag } from 'lucide-react';
+import { Button } from '../ui/button';
+import { useEffect } from 'react';
 
-const Hero = () => {
+export default function Hero() {
+  // Automatically detect shop from URL and redirect to OAuth
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shop = params.get('shop');
+
+    if (shop) {
+      // Shop parameter found in URL - automatically trigger installation
+      console.log(`[Hero] Shop detected in URL: ${shop}. Redirecting to OAuth...`);
+      window.location.href = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+    }
+  }, []);
   return (
     <section className="relative pt-32 pb-20 overflow-hidden gradient-hero">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] opacity-30 pointer-events-none" style={{ background: 'var(--gradient-glow)' }} />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
@@ -44,7 +56,7 @@ const Hero = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Send order confirmations, recover abandoned carts, and keep customers 
+            Send order confirmations, recover abandoned carts, and keep customers
             updated—all through WhatsApp. Seamlessly integrated with your Shopify store.
           </motion.p>
 
@@ -53,14 +65,61 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            className="flex flex-col items-center justify-center gap-6 w-full max-w-md mx-auto"
           >
-            <Link to="/dashboard">
-              <Button variant="hero" size="xl">
-                Start Free Trial
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
+            {/* Dynamic Installation Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const shop = formData.get('shop') as string;
+
+                if (!shop) {
+                  alert('Please enter your store name');
+                  return;
+                }
+
+                // Clean the shop name
+                let shopDomain = shop.trim().toLowerCase();
+
+                // If they only entered the store name (e.g., "mystore"), append .myshopify.com
+                if (!shopDomain.includes('.')) {
+                  shopDomain = `${shopDomain}.myshopify.com`;
+                }
+
+                // If they forgot .myshopify.com but added something else, fix it
+                if (!shopDomain.endsWith('.myshopify.com')) {
+                  shopDomain = shopDomain.replace(/\.(com|net|org)$/, '') + '.myshopify.com';
+                }
+
+                // Redirect to OAuth installation URL
+                window.location.href = `https://api.whatomatic.com/api/auth/shopify?shop=${shopDomain}`;
+              }}
+              className="w-full"
+            >
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    name="shop"
+                    placeholder="your-store"
+                    required
+                    className="w-full px-6 py-4 bg-background/50 backdrop-blur-sm border-2 border-primary/20 rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-all text-lg"
+                  />
+                  <span className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground text-sm hidden sm:inline">
+                    .myshopify.com
+                  </span>
+                </div>
+                <Button type="submit" variant="hero" size="xl" className="whitespace-nowrap">
+                  Install App
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Enter your Shopify store name (e.g., mystore or mystore.myshopify.com)
+              </p>
+            </form>
+
             <a href="#how-it-works">
               <Button variant="glass" size="xl">
                 See How It Works
@@ -120,6 +179,4 @@ const Hero = () => {
       </div>
     </section>
   );
-};
-
-export default Hero;
+}
