@@ -22,6 +22,7 @@ const BillingPlan = () => {
     const [showTrialDialog, setShowTrialDialog] = useState(false);
     const [trialDetails, setTrialDetails] = useState({ name: "", email: "", phone: "" });
     const [isActivatingTrial, setIsActivatingTrial] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
     const queryClient = useQueryClient();
 
     // Fetch current subscription status
@@ -320,21 +321,28 @@ const BillingPlan = () => {
                     </div>
 
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => { setShowTrialDialog(false); setLoadingPlan(null); }}>Cancel</Button>
+                        <Button variant="ghost" onClick={() => { setShowTrialDialog(false); setLoadingPlan(null); setIsConfirming(false); }} disabled={isConfirming}>Cancel</Button>
                         <Button
-                            className="bg-blue-600 hover:bg-blue-500 text-white"
+                            className="bg-blue-600 hover:bg-blue-500 text-white min-w-[160px]"
                             onClick={() => {
+                                setIsConfirming(true);
                                 if (loadingPlan) {
-                                    // If we are activating a regular plan, call createCharge
-                                    // ideally we should save the user details first to backend here but for now let's proceed
                                     createCharge(loadingPlan);
                                 } else {
                                     handleActivateTrial();
                                 }
                             }}
-                            disabled={isActivatingTrial}
+                            disabled={isActivatingTrial || isConfirming}
                         >
-                            {isActivatingTrial ? "Processing..." : loadingPlan ? "Confirm & Proceed" : "Activate Trial"}
+                            {(isActivatingTrial || isConfirming) ? (
+                                <span className="flex items-center gap-2">
+                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                    Processing...
+                                </span>
+                            ) : loadingPlan ? "Confirm & Proceed" : "Activate Trial"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
