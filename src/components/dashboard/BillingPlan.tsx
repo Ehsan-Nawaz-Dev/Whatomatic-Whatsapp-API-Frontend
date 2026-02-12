@@ -86,9 +86,30 @@ const BillingPlan = () => {
                 body: JSON.stringify({ plan: planId }),
             });
 
+            // Handle 404 (Merchant Not Found) - Auto Repair
+            if (res.status === 404) {
+                const params = new URLSearchParams(window.location.search);
+                const shop = params.get("shop");
+                if (shop) {
+                    toast.loading("Setting up your account... please wait.");
+                    const installUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+                    if (window.top) {
+                        window.top.location.href = installUrl;
+                    } else {
+                        window.location.href = installUrl;
+                    }
+                    return;
+                }
+            }
+
             const data = await res.json();
             if (data.confirmationUrl) {
-                window.location.href = data.confirmationUrl;
+                // Shopify Charge Confirmation URL - Needs to be top level
+                if (window.top) {
+                    window.top.location.href = data.confirmationUrl;
+                } else {
+                    window.location.href = data.confirmationUrl;
+                }
             } else {
                 toast.error("Failed to initiate charge");
                 setLoadingPlan(null);
