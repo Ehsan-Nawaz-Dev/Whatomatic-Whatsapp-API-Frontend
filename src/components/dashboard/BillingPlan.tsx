@@ -247,13 +247,19 @@ const BillingPlan = () => {
                                     </ul>
 
                                     <Button
-                                        onClick={() => createCharge(plan.id)}
+                                        onClick={() => {
+                                            // Instead of creating charge directly, show setup dialog first
+                                            setLoadingPlan(plan.id);
+                                            setShowTrialDialog(true);
+                                            // We hijack the trial dialog for plan activation too
+                                            setTrialDetails({ ...trialDetails, name: '', email: '', phone: '' }); // Reset
+                                        }}
                                         disabled={(plan.id === currentPlanId && status?.status === 'active') || !!loadingPlan}
                                         className="w-full"
                                         variant={plan.btnVariant as any}
                                     >
                                         {loadingPlan === plan.id ? (
-                                            "Processing..."
+                                            "Setup..."
                                         ) : (plan.id === currentPlanId && status?.status === 'active') ? (
                                             "Current Plan"
                                         ) : (
@@ -272,10 +278,13 @@ const BillingPlan = () => {
                 <DialogContent className="bg-[#0f172a] text-white border-slate-700">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-xl">
-                            <Gift className="text-blue-500" /> Activate Free Trial
+                            <Gift className="text-blue-500" />
+                            {loadingPlan ? "Complete Account Setup" : "Activate Free Trial"}
                         </DialogTitle>
                         <DialogDescription className="text-slate-400">
-                            Get started instantly with {trialLimit} free messages. No payment info needed.
+                            {loadingPlan
+                                ? "Please provide your details before we activate your selected plan."
+                                : `Get started instantly with ${trialLimit} free messages. No payment info needed.`}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -311,13 +320,21 @@ const BillingPlan = () => {
                     </div>
 
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setShowTrialDialog(false)}>Cancel</Button>
+                        <Button variant="ghost" onClick={() => { setShowTrialDialog(false); setLoadingPlan(null); }}>Cancel</Button>
                         <Button
                             className="bg-blue-600 hover:bg-blue-500 text-white"
-                            onClick={handleActivateTrial}
+                            onClick={() => {
+                                if (loadingPlan) {
+                                    // If we are activating a regular plan, call createCharge
+                                    // ideally we should save the user details first to backend here but for now let's proceed
+                                    createCharge(loadingPlan);
+                                } else {
+                                    handleActivateTrial();
+                                }
+                            }}
                             disabled={isActivatingTrial}
                         >
-                            {isActivatingTrial ? "Activating..." : "Activate Now"}
+                            {isActivatingTrial ? "Processing..." : loadingPlan ? "Confirm & Proceed" : "Activate Trial"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
