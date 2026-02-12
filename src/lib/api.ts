@@ -1,22 +1,28 @@
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://api.whatomatic.com/api").replace(/\/$/, "");
-const getShopFromUrl = () => {
+
+// Dynamic shop detection - called fresh every time, not cached at module level
+const getShopFromUrl = (): string => {
   try {
     const params = new URLSearchParams(window.location.search);
-    return params.get("shop") || params.get("shop_domain") || null;
+    return params.get("shop") || params.get("shop_domain") || "";
   } catch (e) {
-    return null;
+    return "";
   }
 };
 
-const RAW_SHOP = getShopFromUrl() || import.meta.env.VITE_SHOP_DOMAIN || "demo-shop.myshopify.com";
-// Sanitize shop name: only alphanumeric and underscores for maximum backend compatibility
-// We keep the original for webhooks but the sanitized one for general API grouping if needed
-const DEFAULT_SHOP = RAW_SHOP.replace(/[^a-zA-Z0-9\.]/g, "_");
+// Get current shop - always fresh from URL
+export const getCurrentShop = (): string => {
+  return getShopFromUrl() || import.meta.env.VITE_SHOP_DOMAIN || "demo-shop.myshopify.com";
+};
+
+// Keep DEFAULT_SHOP for backward compat
+const DEFAULT_SHOP = getCurrentShop();
 
 export const withShopParam = (path: string) => {
+  const shop = getCurrentShop(); // Always get fresh shop from URL
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   const url = new URL(`${API_BASE_URL}/${cleanPath}`);
-  url.searchParams.set("shop", RAW_SHOP); // Use the real raw shop for backend matching
+  url.searchParams.set("shop", shop);
   return url.toString();
 };
 

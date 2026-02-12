@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Check, Star, Zap, Crown, Info, Gift } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL, withShopParam, activateTrial } from "@/lib/api";
+import { API_BASE_URL, withShopParam, activateTrial, getCurrentShop } from "@/lib/api";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -27,7 +27,7 @@ const BillingPlan = () => {
 
     // Fetch current subscription status
     const { data: status, isLoading: isStatusLoading } = useQuery({
-        queryKey: ["billing-status"],
+        queryKey: ["billing-status", getCurrentShop()],
         queryFn: async () => {
             const res = await fetch(withShopParam("/billing/status"));
             if (!res.ok) return null;
@@ -45,7 +45,7 @@ const BillingPlan = () => {
 
     // Fetch Plans from Backend
     const { data: plansData, isLoading: isPlansLoading } = useQuery({
-        queryKey: ["plans"],
+        queryKey: ["plans", getCurrentShop()],
         queryFn: async () => {
             const res = await fetch(`${API_BASE_URL}/plans`);
             if (!res.ok) throw new Error("Failed to fetch plans");
@@ -70,7 +70,7 @@ const BillingPlan = () => {
 
             toast.success("Trial Activated Successfully!");
             setShowTrialDialog(false);
-            queryClient.invalidateQueries({ queryKey: ["billing-status"] });
+            queryClient.invalidateQueries({ queryKey: ["billing-status", getCurrentShop()] });
         } catch (error: any) {
             toast.error(error.message || "Failed to activate trial");
         } finally {

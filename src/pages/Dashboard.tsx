@@ -15,7 +15,7 @@ import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { withShopParam } from "@/lib/api";
+import { withShopParam, getCurrentShop } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 
@@ -73,7 +73,7 @@ const Dashboard = () => {
 
   // Fetch billing status
   const { data: billing, isLoading: isBillingLoading } = useQuery({
-    queryKey: ["billing-status"],
+    queryKey: ["billing-status", getCurrentShop()],
     queryFn: async () => {
       // If we just activated client-side, don't even wait for server
       if (isJustActivated) return { plan: "unknown", status: "active" };
@@ -126,7 +126,7 @@ const Dashboard = () => {
     if (params.get("billing") === "success") {
       setIsJustActivated(true);
       // Force refresh of billing status
-      queryClient.invalidateQueries({ queryKey: ["billing-status"] });
+      queryClient.invalidateQueries({ queryKey: ["billing-status", getCurrentShop()] });
       // Remove the param to clean URL
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("billing");
