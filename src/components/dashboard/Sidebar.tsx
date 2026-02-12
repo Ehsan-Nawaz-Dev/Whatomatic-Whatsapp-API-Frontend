@@ -58,6 +58,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
                   if (item.locked) return;
                   setActiveTab(item.id);
                 }}
+                title={item.locked ? "🔒 Please subscribe to a package" : undefined}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${item.locked ? 'opacity-40 cursor-not-allowed' : (activeTab === item.id
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -70,12 +71,12 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
                 {item.locked && <Lock className="w-3.5 h-3.5 animate-pulse" />}
               </button>
 
-              {/* Tooltip for locked items */}
+              {/* Tooltip for locked items - appears below */}
               {item.locked && (
-                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <div className="bg-slate-900 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xl border border-slate-700 whitespace-nowrap">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 z-[9999] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="relative bg-slate-900 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xl border border-slate-700 whitespace-nowrap">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-900" />
                     🔒 Please subscribe to a package
-                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900" />
                   </div>
                 </div>
               )}
