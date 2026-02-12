@@ -14,7 +14,7 @@ import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
 import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { withShopParam } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
@@ -28,6 +28,23 @@ const Dashboard = () => {
   useEffect(() => {
     setActiveTabState(tabParam);
   }, [tabParam]);
+
+  const queryClient = useQueryClient();
+
+  // Handle Billing Success Redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("billing") === "success") {
+      // Force refresh of billing status
+      queryClient.invalidateQueries({ queryKey: ["billing-status"] });
+      // Remove the param to clean URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("billing");
+      window.history.replaceState({}, "", newUrl.toString());
+      // Optimistically set active tab to overview
+      setActiveTabState("overview");
+    }
+  }, []);
 
   // AUTO-DETECT: If shop in URL but merchant doesn't exist, trigger OAuth
   useEffect(() => {
