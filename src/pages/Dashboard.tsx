@@ -29,6 +29,28 @@ const Dashboard = () => {
     setActiveTabState(tabParam);
   }, [tabParam]);
 
+  // AUTO-DETECT: If shop in URL but merchant doesn't exist, trigger OAuth
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shop = params.get('shop');
+
+    if (shop) {
+      // Check if merchant exists by calling billing status
+      fetch(withShopParam("/billing/status"))
+        .then(res => res.json())
+        .then(data => {
+          // If plan is 'none' and status is 'none', merchant likely doesn't exist
+          if (data.plan === 'none' && data.status === 'none') {
+            console.log(`[Dashboard] Merchant not found for ${shop}. Triggering OAuth installation...`);
+            window.location.href = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+          }
+        })
+        .catch(err => {
+          console.error('[Dashboard] Failed to check merchant status:', err);
+        });
+    }
+  }, []);
+
   const setActiveTab = (tab: string) => {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
