@@ -249,18 +249,28 @@ const BillingPlan = () => {
 
                                     <Button
                                         onClick={() => {
-                                            // Instead of creating charge directly, show setup dialog first
-                                            setLoadingPlan(plan.id);
-                                            setShowTrialDialog(true);
-                                            // We hijack the trial dialog for plan activation too
-                                            setTrialDetails({ ...trialDetails, name: '', email: '', phone: '' }); // Reset
+                                            if (plan.price === 0) {
+                                                // Free plan: show dialog to collect details
+                                                setLoadingPlan(plan.id);
+                                                setShowTrialDialog(true);
+                                                setTrialDetails({ name: '', email: '', phone: '' });
+                                            } else {
+                                                // Paid plan: go directly to Shopify payment
+                                                createCharge(plan.id);
+                                            }
                                         }}
                                         disabled={(plan.id === currentPlanId && status?.status === 'active') || !!loadingPlan}
                                         className="w-full"
                                         variant={plan.btnVariant as any}
                                     >
                                         {loadingPlan === plan.id ? (
-                                            "Setup..."
+                                            <span className="flex items-center gap-2">
+                                                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                                </svg>
+                                                Processing...
+                                            </span>
                                         ) : (plan.id === currentPlanId && status?.status === 'active') ? (
                                             "Current Plan"
                                         ) : (
