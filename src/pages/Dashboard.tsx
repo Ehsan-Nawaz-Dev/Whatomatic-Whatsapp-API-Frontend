@@ -41,8 +41,15 @@ const Dashboard = () => {
         .then(data => {
           // If plan is 'none' and status is 'none', merchant likely doesn't exist
           if (data.plan === 'none' && data.status === 'none') {
-            console.log(`[Dashboard] Merchant not found for ${shop}. Triggering OAuth installation...`);
-            window.location.href = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+            const redirectUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+            console.log(`[Dashboard] Merchant not found for ${shop}. Triggering OAuth installation to: ${redirectUrl}`);
+
+            // Break out of iframe for OAuth
+            if (window.top) {
+              window.top.location.href = redirectUrl;
+            } else {
+              window.location.href = redirectUrl;
+            }
           }
         })
         .catch(err => {
@@ -73,8 +80,14 @@ const Dashboard = () => {
           const params = new URLSearchParams(window.location.search);
           const shop = params.get("shop");
           if (shop) {
-            console.log("Redirecting to Install...", shop);
-            window.location.href = `https://api.whatomatic.com/auth?shop=${shop}`;
+            const redirectUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+            console.log("Redirecting to Install/Re-auth...", shop);
+
+            if (window.top) {
+              window.top.location.href = redirectUrl;
+            } else {
+              window.location.href = redirectUrl;
+            }
             return { plan: "loading", status: "redirecting" };
           }
         }
