@@ -31,20 +31,7 @@ const Dashboard = () => {
 
   const queryClient = useQueryClient();
 
-  // Handle Billing Success Redirect
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("billing") === "success") {
-      // Force refresh of billing status
-      queryClient.invalidateQueries({ queryKey: ["billing-status"] });
-      // Remove the param to clean URL
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete("billing");
-      window.history.replaceState({}, "", newUrl.toString());
-      // Optimistically set active tab to overview
-      setActiveTabState("overview");
-    }
-  }, []);
+  // (Redundant block removed)
 
   // AUTO-DETECT: If shop in URL but merchant doesn't exist, trigger OAuth
   useEffect(() => {
@@ -88,6 +75,9 @@ const Dashboard = () => {
   const { data: billing, isLoading: isBillingLoading } = useQuery({
     queryKey: ["billing-status"],
     queryFn: async () => {
+      // If we just activated client-side, don't even wait for server
+      if (isJustActivated) return { plan: "unknown", status: "active" };
+
       try {
         const res = await fetch(withShopParam("/billing/status"));
 
@@ -128,7 +118,27 @@ const Dashboard = () => {
     staleTime: 60000,
   });
 
-  const isActive = billing?.status === "active";
+  const [isJustActivated, setIsJustActivated] = useState(false);
+
+  // Handle Billing Success Redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("billing") === "success") {
+      setIsJustActivated(true);
+      // Force refresh of billing status
+      queryClient.invalidateQueries({ queryKey: ["billing-status"] });
+      // Remove the param to clean URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("billing");
+      window.history.replaceState({}, "", newUrl.toString());
+      // Optimistically set active tab to overview
+      setActiveTabState("overview");
+    }
+  }, []);
+
+  // ... (rest of logic)
+
+  const isActive = billing?.status === "active" || isJustActivated; // FORCE ACTIVE if just redirected
 
   // Force billing tab for new/unpaid users, but allow settings for setup
   const effectiveTab = (!isActive && activeTab !== "settings") ? "billing" : activeTab;
