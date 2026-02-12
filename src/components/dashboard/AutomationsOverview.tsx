@@ -58,6 +58,14 @@ const automations = [
         stats: { sent: 12, recovered: null, revenue: null },
         enabled: true,
     },
+    {
+        id: "cancellation-verify",
+        title: "Cancellation Verification",
+        description: "Ask customers to confirm before processing a cancellation.",
+        icon: XCircle,
+        stats: { sent: 0, recovered: null, revenue: null },
+        enabled: true,
+    },
 ];
 
 const AutomationsOverview = () => {
@@ -114,6 +122,7 @@ const AutomationsOverview = () => {
             "order-confirmed-reply": "orders/confirmed",
             "shipping-update": "fulfillments/update",
             "cancellation": "orders/cancelled",
+            "cancellation-verify": "orders/cancel_verify",
         };
 
         const template = templates.find((t: any) => t.event === eventMap[flow.id]);
