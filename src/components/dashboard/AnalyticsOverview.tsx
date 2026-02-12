@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { BarChart3, MessageCircle, ShoppingCart, CheckCircle2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAnalytics } from "@/lib/api";
+import { fetchAnalytics, getCurrentShop } from "@/lib/api";
 import {
   BarChart,
   Bar,
@@ -15,7 +15,7 @@ import {
 
 const AnalyticsOverview = () => {
   const { data, isLoading } = useQuery({
-    queryKey: ["analytics"],
+    queryKey: ["analytics", getCurrentShop()],
     queryFn: fetchAnalytics,
   });
 

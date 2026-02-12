@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { fetchChatButtonSettings, updateChatButtonSettings } from "@/lib/api";
+import { fetchChatButtonSettings, updateChatButtonSettings, getCurrentShop } from "@/lib/api";
 
 const ChatButtonConfig = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
@@ -17,7 +17,7 @@ const ChatButtonConfig = () => {
     const [enabled, setEnabled] = useState(true);
 
     const { data, isLoading } = useQuery({
-        queryKey: ["chat-button-settings"],
+        queryKey: ["chat-button-settings", getCurrentShop()],
         queryFn: fetchChatButtonSettings,
     });
 

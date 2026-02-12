@@ -14,7 +14,8 @@ import {
     updateContact,
     deleteContact,
     Contact,
-    ContactPayload
+    ContactPayload,
+    getCurrentShop
 } from "@/lib/api";
 
 const ContactsManagement = () => {
@@ -33,14 +34,14 @@ const ContactsManagement = () => {
     });
 
     const { data: contacts = [], isLoading } = useQuery({
-        queryKey: ["contacts"],
+        queryKey: ["contacts", getCurrentShop()],
         queryFn: fetchContacts,
     });
 
     const createMut = useMutation({
         mutationFn: createContact,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["contacts"] });
+            queryClient.invalidateQueries({ queryKey: ["contacts", getCurrentShop()] });
             setDialogOpen(false);
             toast.success("Contact created successfully");
         },
@@ -51,7 +52,7 @@ const ContactsManagement = () => {
         mutationFn: ({ id, payload }: { id: string; payload: Partial<ContactPayload> }) =>
             updateContact(id, payload),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["contacts"] });
+            queryClient.invalidateQueries({ queryKey: ["contacts", getCurrentShop()] });
             setDialogOpen(false);
             toast.success("Contact updated successfully");
         },
@@ -61,7 +62,7 @@ const ContactsManagement = () => {
     const deleteMut = useMutation({
         mutationFn: deleteContact,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["contacts"] });
+            queryClient.invalidateQueries({ queryKey: ["contacts", getCurrentShop()] });
             toast.success("Contact deleted");
         },
         onError: () => toast.error("Failed to delete contact"),

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings } from "@/lib/api";
+import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings, getCurrentShop } from "@/lib/api";
 import { toast } from "sonner";
 
 const automations = [
@@ -66,18 +66,18 @@ const AutomationsOverview = () => {
 
     const queryClient = useQueryClient();
     const { data: statsData, isLoading: isStatsLoading } = useQuery({
-        queryKey: ["automations-stats"],
+        queryKey: ["automations-stats", getCurrentShop()],
         queryFn: fetchAutomationsStats,
         refetchInterval: 10000, // Refresh every 10 seconds
     });
 
     const { data: templates = [], isLoading: isTemplatesLoading } = useQuery({
-        queryKey: ["templates"],
+        queryKey: ["templates", getCurrentShop()],
         queryFn: fetchTemplates,
     });
 
     const { data: settings } = useQuery({
-        queryKey: ["merchant-settings"],
+        queryKey: ["merchant-settings", getCurrentShop()],
         queryFn: fetchSettings,
     });
 
@@ -89,7 +89,7 @@ const AutomationsOverview = () => {
         onSuccess: (_, variables) => {
             const status = variables.enabled ? "enabled" : "disabled";
             toast.success(`Automation ${status} successfully!`);
-            queryClient.invalidateQueries({ queryKey: ["automations-stats"] });
+            queryClient.invalidateQueries({ queryKey: ["automations-stats", getCurrentShop()] });
         },
         onError: () => {
             toast.error("Failed to update automation status");

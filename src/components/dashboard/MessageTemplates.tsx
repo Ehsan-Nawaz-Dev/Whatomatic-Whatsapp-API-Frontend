@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchTemplates, createTemplate, updateTemplate, deleteTemplate } from "@/lib/api";
+import { fetchTemplates, createTemplate, updateTemplate, deleteTemplate, getCurrentShop } from "@/lib/api";
 import { toast } from "sonner";
 
 const iconMap = {
@@ -44,7 +44,7 @@ const emptyForm: TemplateFormState = {
 const MessageTemplates = () => {
   const queryClient = useQueryClient();
   const { data: templates = [], isLoading } = useQuery({
-    queryKey: ["templates"],
+    queryKey: ["templates", getCurrentShop()],
     queryFn: fetchTemplates,
   });
 
@@ -55,7 +55,7 @@ const MessageTemplates = () => {
   const createMut = useMutation({
     mutationFn: createTemplate,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["templates"] });
+      queryClient.invalidateQueries({ queryKey: ["templates", getCurrentShop()] });
       setDialogOpen(false);
       setForm(emptyForm);
       toast.success("Template created successfully!");
@@ -69,7 +69,7 @@ const MessageTemplates = () => {
     mutationFn: ({ id, data }: { id: string; data: TemplateFormState }) =>
       updateTemplate(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["templates"] });
+      queryClient.invalidateQueries({ queryKey: ["templates", getCurrentShop()] });
       setDialogOpen(false);
       setForm(emptyForm);
       setIsEdit(false);
@@ -83,7 +83,7 @@ const MessageTemplates = () => {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteTemplate(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["templates"] });
+      queryClient.invalidateQueries({ queryKey: ["templates", getCurrentShop()] });
       toast.success("Template deleted successfully!");
     },
     onError: (error: any) => {

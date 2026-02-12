@@ -14,6 +14,7 @@ import {
   sendCloudMessage,
   WhatsAppQRCodeResponse,
   WhatsAppStatusResponse,
+  getCurrentShop,
 } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -27,7 +28,7 @@ const WhatsAppConnection = () => {
 
   // Fetch WhatsApp connection status
   const { data: status, isLoading: isStatusLoading } = useQuery<WhatsAppStatusResponse>({
-    queryKey: ["whatsapp-status"],
+    queryKey: ["whatsapp-status", getCurrentShop()],
     queryFn: fetchWhatsAppStatus,
     refetchInterval: (query) => (query.state.data?.connected ? false : 3000), // Poll every 3 seconds if not connected
     staleTime: 0,
@@ -38,13 +39,13 @@ const WhatsAppConnection = () => {
   useEffect(() => {
     if (status?.connected) {
       // Invalidate merchant settings to reload the WhatsApp number
-      queryClient.invalidateQueries({ queryKey: ["merchant-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["merchant-settings", getCurrentShop()] });
     }
   }, [status?.connected, queryClient]);
 
   // Fetch QR code
   const { data: qrResponse, isLoading: isQrLoading, error: qrError } = useQuery<WhatsAppQRCodeResponse, Error>({
-    queryKey: ["whatsapp-qr"],
+    queryKey: ["whatsapp-qr", getCurrentShop()],
     queryFn: generateWhatsAppQR,
     enabled: !status?.connected && !isStatusLoading, // Fetch QR if not connected
     refetchInterval: (query) => (status?.connected ? false : 5000), // Increase interval slightly to avoid congestion
@@ -85,8 +86,8 @@ const WhatsAppConnection = () => {
   const disconnectMutation = useMutation({
     mutationFn: disconnectWhatsApp,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["whatsapp-status"] });
-      queryClient.invalidateQueries({ queryKey: ["whatsapp-qr"] });
+      queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
+      queryClient.invalidateQueries({ queryKey: ["whatsapp-qr", getCurrentShop()] });
       toast.success("WhatsApp disconnected successfully");
     },
     onError: () => {
@@ -180,7 +181,7 @@ const WhatsAppConnection = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status"] })}
+                      onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] })}
                       disabled={isStatusLoading}
                       className="text-[10px] h-7 px-3"
                     >
@@ -263,7 +264,7 @@ const WhatsAppConnection = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status"] })}
+                        onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] })}
                         disabled={isStatusLoading}
                         className="text-[10px] h-7 px-3"
                       >

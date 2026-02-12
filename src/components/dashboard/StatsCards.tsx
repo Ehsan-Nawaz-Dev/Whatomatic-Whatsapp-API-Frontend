@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { MessageCircle, ShoppingCart, CheckCircle, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAnalytics } from "@/lib/api";
+import { fetchAnalytics, getCurrentShop } from "@/lib/api";
 
 const StatsCards = () => {
   const { data, isLoading } = useQuery({
-    queryKey: ["analytics"],
+    queryKey: ["analytics", getCurrentShop()],
     queryFn: fetchAnalytics,
   });
 
@@ -60,11 +60,10 @@ const StatsCards = () => {
               <stat.icon className="w-6 h-6 text-primary" />
             </div>
             <span
-              className={`text-xs font-medium px-2 py-1 rounded-full ${
-                stat.positive
+              className={`text-xs font-medium px-2 py-1 rounded-full ${stat.positive
                   ? "bg-success/10 text-success"
                   : "bg-destructive/10 text-destructive"
-              }`}
+                }`}
             >
               {stat.change}
             </span>

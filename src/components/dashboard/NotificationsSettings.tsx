@@ -7,6 +7,7 @@ import {
   fetchNotificationSettings,
   updateNotificationSettings,
   NotificationSettingsPayload,
+  getCurrentShop,
 } from "@/lib/api";
 
 const NotificationsSettings = () => {
@@ -17,7 +18,7 @@ const NotificationsSettings = () => {
   const [whatsappAlerts, setWhatsappAlerts] = useState(false);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["notification-settings"],
+    queryKey: ["notification-settings", getCurrentShop()],
     queryFn: fetchNotificationSettings,
   });
 

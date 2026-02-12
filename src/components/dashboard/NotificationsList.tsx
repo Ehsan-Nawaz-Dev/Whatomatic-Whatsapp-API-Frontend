@@ -8,7 +8,8 @@ import {
     fetchNotifications,
     deleteNotification,
     updateNotification,
-    Notification
+    Notification,
+    getCurrentShop
 } from "@/lib/api";
 import NotificationsSettings from "./NotificationsSettings";
 
@@ -17,14 +18,14 @@ const NotificationsList = () => {
     const [showSettings, setShowSettings] = useState(false);
 
     const { data: notifications = [], isLoading } = useQuery({
-        queryKey: ["notifications"],
+        queryKey: ["notifications", getCurrentShop()],
         queryFn: fetchNotifications,
     });
 
     const deleteMut = useMutation({
         mutationFn: deleteNotification,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+            queryClient.invalidateQueries({ queryKey: ["notifications", getCurrentShop()] });
             toast.success("Notification removed");
         },
     });
@@ -32,7 +33,7 @@ const NotificationsList = () => {
     const markReadMut = useMutation({
         mutationFn: (id: string) => updateNotification(id, { read: true }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+            queryClient.invalidateQueries({ queryKey: ["notifications", getCurrentShop()] });
         },
     });
 

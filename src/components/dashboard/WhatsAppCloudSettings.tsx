@@ -13,7 +13,8 @@ import {
     sendCloudTemplate,
     fetchCloudTemplates,
     CloudMessagePayload,
-    CloudTemplatePayload
+    CloudTemplatePayload,
+    getCurrentShop
 } from "@/lib/api";
 
 const WhatsAppCloudSettings = () => {
@@ -22,7 +23,7 @@ const WhatsAppCloudSettings = () => {
     const [message, setMessage] = useState("");
 
     const { data: templates = [], isLoading: loadingTemplates } = useQuery({
-        queryKey: ["cloud-templates"],
+        queryKey: ["cloud-templates", getCurrentShop()],
         queryFn: fetchCloudTemplates,
     });
 

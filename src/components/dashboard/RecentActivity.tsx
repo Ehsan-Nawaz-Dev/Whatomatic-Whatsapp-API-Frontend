@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Clock, ShoppingCart } from "lucide-react";
-import { fetchActivity, fetchSettings } from "@/lib/api";
+import { fetchActivity, fetchSettings, getCurrentShop } from "@/lib/api";
 
 const typeConfig: Record<string, { icon: any; iconColor: string; bgColor: string }> = {
   confirmed: { icon: CheckCircle2, iconColor: "text-success", bgColor: "bg-success/10" },
@@ -14,12 +14,12 @@ const typeConfig: Record<string, { icon: any; iconColor: string; bgColor: string
 const RecentActivity = () => {
   const queryClient = useQueryClient();
   const { data: activities = [], isLoading } = useQuery({
-    queryKey: ["activity"],
+    queryKey: ["activity", getCurrentShop()],
     queryFn: fetchActivity,
   });
 
   const { data: settings } = useQuery({
-    queryKey: ["merchant-settings"],
+    queryKey: ["merchant-settings", getCurrentShop()],
     queryFn: fetchSettings,
   });
 
@@ -37,7 +37,7 @@ const RecentActivity = () => {
         <div className="flex items-center gap-2">
           {isLoading && <Clock className="w-4 h-4 text-muted-foreground animate-spin" />}
           <button
-            onClick={() => queryClient.invalidateQueries({ queryKey: ["activity"] })}
+            onClick={() => queryClient.invalidateQueries({ queryKey: ["activity", getCurrentShop()] })}
             className="text-xs text-primary hover:underline"
           >
             Refresh

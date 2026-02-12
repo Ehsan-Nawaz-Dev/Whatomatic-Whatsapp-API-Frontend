@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { fetchSettings, updateSettings, fetchWhatsAppStatus, API_BASE_URL } from "@/lib/api";
+import { fetchSettings, updateSettings, fetchWhatsAppStatus, API_BASE_URL, getCurrentShop } from "@/lib/api";
 
 const MerchantSettings = () => {
   const [storeName, setStoreName] = useState("");
@@ -22,13 +22,13 @@ const MerchantSettings = () => {
   const [webhookUrl, setWebhookUrl] = useState("");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["merchant-settings"],
+    queryKey: ["merchant-settings", getCurrentShop()],
     queryFn: fetchSettings,
   });
 
   // Fetch WhatsApp connection status
   const { data: whatsappStatus } = useQuery({
-    queryKey: ["whatsapp-status"],
+    queryKey: ["whatsapp-status", getCurrentShop()],
     queryFn: fetchWhatsAppStatus,
   });
 
