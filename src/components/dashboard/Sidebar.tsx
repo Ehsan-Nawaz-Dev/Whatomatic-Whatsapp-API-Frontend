@@ -52,10 +52,13 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
           {menuItems.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className="relative group">
               <button
-                onClick={() => !item.locked && setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${item.locked ? 'opacity-50 cursor-not-allowed' : (activeTab === item.id
+                onClick={() => {
+                  if (item.locked) return;
+                  setActiveTab(item.id);
+                }}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${item.locked ? 'opacity-40 cursor-not-allowed' : (activeTab === item.id
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}`}
@@ -64,8 +67,18 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
                   <item.icon className="w-5 h-5" />
                   {item.label}
                 </div>
-                {item.locked && <Lock className="w-3.5 h-3.5" />}
+                {item.locked && <Lock className="w-3.5 h-3.5 animate-pulse" />}
               </button>
+
+              {/* Tooltip for locked items */}
+              {item.locked && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="bg-slate-900 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xl border border-slate-700 whitespace-nowrap">
+                    🔒 Please subscribe to a package
+                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900" />
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>
