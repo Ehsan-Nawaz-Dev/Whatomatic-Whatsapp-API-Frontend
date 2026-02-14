@@ -41,10 +41,14 @@ const Dashboard = () => {
     if (shop) {
       // Check if merchant exists by calling billing status
       fetch(withShopParam("/billing/status"))
-        .then(res => res.json())
+        .then(async res => {
+          const is401 = res.status === 401;
+          const data = await res.json().catch(() => ({}));
+          return { ...data, status: is401 ? 401 : data.status };
+        })
         .then(data => {
-          // If plan is 'none' and status is 'none', merchant likely doesn't exist
-          if (data.plan === 'none' && data.status === 'none') {
+          // If merchant doesn't exist OR token is invalid (401), trigger OAuth
+          if (data.status === 401 || (data.plan === 'none' && data.status === 'none')) {
             const redirectUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
             console.log(`[Dashboard] Merchant not found for ${shop}. Triggering OAuth installation to: ${redirectUrl}`);
 
