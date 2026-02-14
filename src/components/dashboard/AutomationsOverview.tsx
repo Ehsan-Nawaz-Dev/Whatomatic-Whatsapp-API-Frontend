@@ -23,11 +23,11 @@ const automations = [
         enabled: true,
     },
     {
-        id: "abandoned-cart",
+        id: "abandoned_cart",
         title: "Abandoned Cart Recovery",
         description: "Send reminders to customers who leave items in their cart.",
         icon: ShoppingCart,
-        stats: { sent: 124, recovered: 28, revenue: "$1,420" },
+        stats: { sent: 0, recovered: 0, revenue: "$0" },
         enabled: true,
     },
     {
@@ -35,7 +35,7 @@ const automations = [
         title: "Order Confirmation",
         description: "Ask customers to confirm their order details via WhatsApp.",
         icon: MessageSquare,
-        stats: { sent: 450, recovered: null, revenue: null },
+        stats: { sent: 0, recovered: null, revenue: null },
         enabled: true,
     },
     {
@@ -43,15 +43,15 @@ const automations = [
         title: "Post-Confirmation Reply",
         description: "Send a beautiful thank you message after confirmation.",
         icon: Zap,
-        stats: { sent: 432, recovered: null, revenue: null },
+        stats: { sent: 0, recovered: null, revenue: null },
         enabled: true,
     },
     {
-        id: "shipping-update",
+        id: "fulfillment_update",
         title: "Shipping Alerts",
         description: "Notify customers when their order is shipped or out for delivery.",
         icon: Truck,
-        stats: { sent: 312, recovered: null, revenue: null },
+        stats: { sent: 0, recovered: null, revenue: null },
         enabled: false,
     },
     {
@@ -59,7 +59,7 @@ const automations = [
         title: "Order Cancellation",
         description: "Automatically inform customers if their order is cancelled.",
         icon: XCircle,
-        stats: { sent: 12, recovered: null, revenue: null },
+        stats: { sent: 0, recovered: null, revenue: null },
         enabled: true,
     },
     {
@@ -159,10 +159,10 @@ const AutomationsOverview = () => {
             // Mapping flow.id to event keys
             const eventMap: Record<string, string> = {
                 "admin-order-alert": "admin-order-alert",
-                "abandoned-cart": "checkouts/abandoned",
+                "abandoned_cart": "checkouts/abandoned",
                 "order-confirmation": "orders/create",
                 "order-confirmed-reply": "orders/confirmed",
-                "shipping-update": "fulfillments/update",
+                "fulfillment_update": "fulfillments/update",
                 "cancellation": "orders/cancelled",
                 "cancellation-verify": "orders/cancel_verify",
             };
@@ -200,10 +200,10 @@ const AutomationsOverview = () => {
         // Mapping flow.id to event keys
         const eventMap: Record<string, string> = {
             "admin-order-alert": "admin-order-alert",
-            "abandoned-cart": "checkouts/abandoned",
+            "abandoned_cart": "checkouts/abandoned",
             "order-confirmation": "orders/create",
             "order-confirmed-reply": "orders/confirmed",
-            "shipping-update": "fulfillments/update",
+            "fulfillment_update": "fulfillments/update",
             "cancellation": "orders/cancelled",
             "cancellation-verify": "orders/cancel_verify",
         };
