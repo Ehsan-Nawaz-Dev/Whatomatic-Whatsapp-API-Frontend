@@ -14,33 +14,35 @@ const StatsCards = () => {
   const confirmedOrders = data?.confirmedOrders ?? 0;
   const responseRate = data?.responseRate ?? 0;
 
+  const growth = data?.growth || { sent: 0, recovered: 0, confirmed: 0, responseRate: 0 };
+
   const stats = [
     {
       label: "Messages Sent",
       value: messagesSent.toLocaleString(),
-      change: "+12.5%",
-      positive: true,
+      change: `${growth.sent > 0 ? '+' : ''}${growth.sent}%`,
+      positive: growth.sent >= 0,
       icon: MessageCircle,
     },
     {
       label: "Carts Recovered",
       value: recoveredCarts.toLocaleString(),
-      change: "+8.2%",
-      positive: true,
+      change: `${growth.recovered > 0 ? '+' : ''}${growth.recovered}%`,
+      positive: growth.recovered >= 0,
       icon: ShoppingCart,
     },
     {
       label: "Orders Confirmed",
       value: confirmedOrders.toLocaleString(),
-      change: "+15.3%",
-      positive: true,
+      change: `${growth.confirmed > 0 ? '+' : ''}${growth.confirmed}%`,
+      positive: growth.confirmed >= 0,
       icon: CheckCircle,
     },
     {
       label: "Response Rate",
       value: `${responseRate}%`,
-      change: "+3.1%",
-      positive: true,
+      change: `${growth.responseRate > 0 ? '+' : ''}${growth.responseRate}%`,
+      positive: growth.responseRate >= 0,
       icon: TrendingUp,
     },
   ];
@@ -61,8 +63,8 @@ const StatsCards = () => {
             </div>
             <span
               className={`text-xs font-medium px-2 py-1 rounded-full ${stat.positive
-                  ? "bg-success/10 text-success"
-                  : "bg-destructive/10 text-destructive"
+                ? "bg-success/10 text-success"
+                : "bg-destructive/10 text-destructive"
                 }`}
             >
               {stat.change}

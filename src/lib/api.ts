@@ -144,6 +144,23 @@ export const updateNotificationSettings = async (payload: NotificationSettingsPa
   return res.json();
 };
 
+export interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  messageLimit: number;
+  features: string[];
+  isActive: boolean;
+  description: string;
+  isPopular?: boolean;
+}
+
+export const fetchPlans = async (): Promise<Plan[]> => {
+  const res = await fetch(`${API_BASE_URL}/plans`);
+  if (!res.ok) throw new Error("Failed to load plans");
+  return res.json();
+};
+
 export interface AnalyticsSummary {
   messagesSent: number;
   recoveredCarts: number;
@@ -156,6 +173,7 @@ export interface AnalyticsSummary {
   cancelled: number;
   periodDays: number;
   dailyStats?: { date: string; count: number }[];
+  growth?: { sent: number; recovered: number; confirmed: number; responseRate: number };
 }
 
 export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {

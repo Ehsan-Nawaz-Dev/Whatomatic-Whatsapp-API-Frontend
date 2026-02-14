@@ -1,56 +1,16 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const plans = [
-  {
-    name: "Starter",
-    price: "$29",
-    period: "/month",
-    description: "Perfect for small stores just getting started.",
-    features: [
-      "Up to 500 messages/month",
-      "Order confirmations",
-      "Shipping notifications",
-      "Basic templates",
-      "Email support",
-    ],
-    popular: false,
-  },
-  {
-    name: "Growth",
-    price: "$79",
-    period: "/month",
-    description: "For growing stores that need more automation.",
-    features: [
-      "Up to 3,000 messages/month",
-      "Everything in Starter",
-      "Abandoned cart recovery",
-      "Custom templates",
-      "Interactive messaging",
-      "Priority support",
-    ],
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: "$199",
-    period: "/month",
-    description: "For high-volume stores with advanced needs.",
-    features: [
-      "Unlimited messages",
-      "Everything in Growth",
-      "Advanced analytics",
-      "Multiple WhatsApp numbers",
-      "API access",
-      "Dedicated account manager",
-    ],
-    popular: false,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { fetchPlans } from "@/lib/api";
 
 const Pricing = () => {
+  const { data: plans = [], isLoading } = useQuery({
+    queryKey: ["public-plans"],
+    queryFn: fetchPlans,
+  });
+
   return (
     <section id="pricing" className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -85,65 +45,71 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className={`relative p-8 rounded-2xl border ${
-                plan.popular
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+            <p className="text-muted-foreground">Loading best deals...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {plans.map((plan, index) => (
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className={`relative p-8 rounded-2xl border ${plan.isPopular
                   ? "border-primary bg-card shadow-glow"
                   : "border-border bg-card"
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full gradient-primary text-xs font-semibold text-primary-foreground">
-                  Most Popular
+                  }`}
+              >
+                {plan.isPopular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full gradient-primary text-xs font-semibold text-primary-foreground">
+                    Most Popular
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    {plan.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {plan.description || `Scale your business with up to ${plan.messageLimit.toLocaleString()} messages.`}
+                  </p>
                 </div>
-              )}
 
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  {plan.name}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {plan.description}
-                </p>
-              </div>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-foreground">
+                    ${plan.price}
+                  </span>
+                  <span className="text-muted-foreground">/month</span>
+                </div>
 
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">
-                  {plan.price}
-                </span>
-                <span className="text-muted-foreground">{plan.period}</span>
-              </div>
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-muted-foreground">
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
 
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-muted-foreground">
-                      {feature}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link to="/dashboard">
-                <Button
-                  variant={plan.popular ? "hero" : "outline"}
-                  className="w-full"
-                >
-                  Start Free Trial
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+                <Link to="/dashboard">
+                  <Button
+                    variant={plan.isPopular ? "hero" : "outline"}
+                    className="w-full"
+                  >
+                    Start Free Trial
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
