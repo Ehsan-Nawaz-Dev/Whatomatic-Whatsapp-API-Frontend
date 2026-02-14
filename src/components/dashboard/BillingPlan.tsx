@@ -144,62 +144,11 @@ const BillingPlan = () => {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
-            {/* Trial Offer Banner (Only for Free users who haven't used trial) */}
-            {!trialActivated && currentPlanId === 'free' && (
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
-                    <div className="absolute top-0 right-0 p-8 opacity-10">
-                        <Gift size={120} />
-                    </div>
-                    <div className="relative z-10 max-w-2xl">
-                        <h2 className="text-3xl font-bold mb-4">Start Your Free Trial Today!</h2>
-                        <p className="text-blue-100 mb-6 text-lg">
-                            Experience the full power of WhatFlow with {trialLimit} free messages. No credit card required.
-                            See how automated WhatsApp notifications can recover lost sales instantly.
-                        </p>
-                        <Button
-                            onClick={() => setShowTrialDialog(true)}
-                            size="lg"
-                            className="bg-white text-blue-600 hover:bg-blue-50 font-bold border-none shadow-lg"
-                        >
-                            <Gift className="mr-2 h-5 w-5" /> Claim Free {trialLimit} Messages
-                        </Button>
-                    </div>
-                </div>
-            )}
-
-            {/* Trial Status Banner (When Trial Active) */}
-            {isTrial && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-6 relative overflow-hidden"
-                >
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                            <h3 className="text-xl font-bold text-purple-400 flex items-center gap-2">
-                                <Crown size={24} /> Trial Subscription Active
-                            </h3>
-                            <p className="text-purple-200/60 mt-1">You are currently on the free trial plan.</p>
-                        </div>
-                        <div className="text-right">
-                            <div className="text-sm uppercase tracking-widest text-purple-400/60 font-bold mb-1">Messages Sent</div>
-                            <div className="text-3xl font-bold text-white font-mono">{trialUsage} <span className="text-lg text-purple-500/50">/ {trialLimit}</span></div>
-                        </div>
-                    </div>
-                    <div className="mt-4 w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                        <div
-                            className="bg-purple-500 h-full transition-all duration-1000 ease-out"
-                            style={{ width: `${Math.min((trialUsage / trialLimit) * 100, 100)}%` }}
-                        />
-                    </div>
-                </motion.div>
-            )}
-
             {/* Plans Grid */}
             <div>
                 <div className="text-center mb-10">
-                    <h2 className="text-3xl font-bold text-slate-100 mb-2">Choose Your Plan</h2>
-                    <p className="text-slate-400">Scale your business with the power of WhatsApp automation</p>
+                    <h2 className="text-3xl font-bold text-black mb-2">Choose Your Plan</h2>
+                    <p className="text-black/70">Scale your business with the power of WhatsApp automation</p>
                 </div>
 
                 {isPlansLoading ? (
