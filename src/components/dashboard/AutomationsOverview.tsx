@@ -1,13 +1,17 @@
 import { motion } from "framer-motion";
-import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye } from "lucide-react";
+import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye, Edit2, Trash2, Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings, getCurrentShop } from "@/lib/api";
+import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings, getCurrentShop, updateTemplate, createTemplate } from "@/lib/api";
 import { toast } from "sonner";
+
 
 const automations = [
     {
@@ -70,7 +74,14 @@ const automations = [
 
 const AutomationsOverview = () => {
     const [previewOpen, setPreviewOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const [selectedFlow, setSelectedFlow] = useState<any>(null);
+    const [editForm, setEditForm] = useState<any>({
+        name: "",
+        message: "",
+        isPoll: false,
+        pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
+    });
 
     const queryClient = useQueryClient();
     const { data: statsData, isLoading: isStatsLoading } = useQuery({
@@ -106,6 +117,78 @@ const AutomationsOverview = () => {
 
     const handleToggle = (id: string, currentStatus: boolean) => {
         toggleMut.mutate({ id, enabled: !currentStatus });
+    };
+
+    const updateMut = useMutation({
+        mutationFn: ({ id, data }: { id: string; data: any }) => updateTemplate(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["templates", getCurrentShop()] });
+            setEditOpen(false);
+            toast.success("Template updated successfully!");
+        },
+        onError: () => {
+            toast.error("Failed to update template");
+        }
+    });
+
+    const createMut = useMutation({
+        mutationFn: (data: any) => createTemplate(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["templates", getCurrentShop()] });
+            setEditOpen(false);
+            toast.success("Template created successfully!");
+        },
+        onError: () => {
+            toast.error("Failed to create template");
+        }
+    });
+
+    const handleEditClick = (flow: any) => {
+        setSelectedFlow(flow);
+        if (flow.template) {
+            setEditForm({
+                id: flow.template._id,
+                name: flow.template.name || flow.title,
+                message: flow.template.message,
+                isPoll: flow.template.isPoll || false,
+                pollOptions: flow.template.pollOptions || ["✅Yes, Confirm✅", "❌No, Cancel❌"],
+                event: flow.template.event,
+                enabled: flow.template.enabled
+            });
+        } else {
+            // Mapping flow.id to event keys
+            const eventMap: Record<string, string> = {
+                "admin-order-alert": "admin-order-alert",
+                "abandoned-cart": "checkouts/abandoned",
+                "order-confirmation": "orders/create",
+                "order-confirmed-reply": "orders/confirmed",
+                "shipping-update": "fulfillments/update",
+                "cancellation": "orders/cancelled",
+                "cancellation-verify": "orders/cancel_verify",
+            };
+            setEditForm({
+                name: flow.title,
+                message: "",
+                isPoll: flow.id === "order-confirmation" || flow.id === "cancellation-verify",
+                pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
+                event: eventMap[flow.id],
+                enabled: true
+            });
+        }
+        setEditOpen(true);
+    };
+
+    const handleSaveTemplate = () => {
+        if (!editForm.message.trim()) {
+            toast.error("Message content is required");
+            return;
+        }
+
+        if (editForm.id) {
+            updateMut.mutate({ id: editForm.id, data: editForm });
+        } else {
+            createMut.mutate(editForm);
+        }
     };
 
     // Merge API stats and actual template content with local automation definitions
@@ -214,6 +297,14 @@ const AutomationsOverview = () => {
                                 <Eye className="w-4 h-4 mr-2" />
                                 Preview
                             </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditClick(flow)}
+                            >
+                                <Edit2 className="w-4 h-4 mr-2" />
+                                Edit
+                            </Button>
                             <Switch
                                 checked={flow.enabled}
                                 onCheckedChange={() => handleToggle(flow.id, flow.enabled)}
@@ -287,6 +378,95 @@ const AutomationsOverview = () => {
                             </div>
                         </div>
                     )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Dialog */}
+            <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle>Edit {selectedFlow?.title} Template</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="tmpl-message">Message Content</Label>
+                            <Textarea
+                                id="tmpl-message"
+                                value={editForm.message}
+                                onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
+                                className="min-h-[200px]"
+                                placeholder="Enter your WhatsApp message here..."
+                            />
+                            <p className="text-[10px] text-muted-foreground">
+                                Use placeholders like {"{{customer_name}}"}, {"{{order_number}}"}, etc.
+                            </p>
+                        </div>
+
+                        {editForm.event !== "admin-order-alert" && (
+                            <div className="space-y-4 pt-2 border-t border-border/50">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <Label className="text-sm font-semibold">Send as Poll</Label>
+                                        <p className="text-[11px] text-muted-foreground">Creates a WhatsApp poll with clickable buttons</p>
+                                    </div>
+                                    <Switch
+                                        checked={editForm.isPoll}
+                                        onCheckedChange={(checked) => setEditForm({ ...editForm, isPoll: checked })}
+                                    />
+                                </div>
+
+                                {editForm.isPoll && (
+                                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <Label className="text-xs font-medium">Poll Options (maximum 2 recommended)</Label>
+                                        {editForm.pollOptions.map((opt: string, idx: number) => (
+                                            <div key={idx} className="flex gap-2">
+                                                <Input
+                                                    value={opt}
+                                                    onChange={(e) => {
+                                                        const newOpts = [...editForm.pollOptions];
+                                                        newOpts[idx] = e.target.value;
+                                                        setEditForm({ ...editForm, pollOptions: newOpts });
+                                                    }}
+                                                    placeholder={`Option ${idx + 1}`}
+                                                    className="h-9"
+                                                />
+                                                {editForm.pollOptions.length > 2 && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="px-2 text-destructive"
+                                                        onClick={() => setEditForm({ ...editForm, pollOptions: editForm.pollOptions.filter((_: any, i: number) => i !== idx) })}
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {editForm.pollOptions.length < 5 && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full h-8 text-xs border-dashed"
+                                                onClick={() => setEditForm({ ...editForm, pollOptions: [...editForm.pollOptions, ""] })}
+                                            >
+                                                <Plus className="w-3 h-3 mr-1" /> Add Option
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+                        <Button
+                            variant="hero"
+                            onClick={handleSaveTemplate}
+                            disabled={updateMut.isPending || createMut.isPending}
+                        >
+                            {updateMut.isPending || createMut.isPending ? "Saving..." : "Save Template"}
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
