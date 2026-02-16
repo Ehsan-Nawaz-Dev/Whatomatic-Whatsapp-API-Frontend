@@ -7,8 +7,11 @@ import {
   HelpCircle,
   MessageCircle,
   Users,
-  Cloud
+  Cloud,
+  Menu,
+  X
 } from "lucide-react";
+import { useState } from "react";
 
 interface SidebarProps {
   activeTab: string;
@@ -24,6 +27,8 @@ const Lock = ({ className }: { className?: string }) => (
 );
 
 const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const menuItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard, locked: !isSubscribed },
     { id: "automations", label: "Automations", icon: Bell, locked: !isSubscribed },
@@ -35,40 +40,50 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
     { id: "billing", label: "Billing", icon: Cloud },
   ];
 
-  return (
-    <aside className="w-64 bg-card border-r border-border flex flex-col">
+  const handleNavClick = (id: string, locked?: boolean) => {
+    if (locked) return;
+    setActiveTab(id);
+    setMobileOpen(false);
+  };
+
+  const sidebarContent = (
+    <>
       {/* Logo */}
-      <div className="px-5 py-6 border-b border-border">
-        <div className="transition-transform duration-300 hover:scale-[1.02]">
+      <div className="px-5 py-6 border-b border-border flex items-center justify-between">
+        <div className="transition-transform duration-300 hover:scale-[1.02] flex-1 min-w-0">
           <img
             src="/whatomatic-logo.svg"
             alt="Whatomatic"
             className="w-full h-auto max-h-11 object-contain block"
           />
         </div>
+        {/* Close button for mobile */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="lg:hidden ml-3 p-1.5 rounded-lg hover:bg-muted text-muted-foreground"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-3 lg:p-4 overflow-y-auto">
         <ul className="space-y-1">
           {menuItems.map((item) => (
             <li key={item.id} className="relative group">
               <button
-                onClick={() => {
-                  if (item.locked) return;
-                  setActiveTab(item.id);
-                }}
+                onClick={() => handleNavClick(item.id, item.locked)}
                 title={item.locked ? "🔒 Please subscribe to a package" : undefined}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${item.locked ? 'opacity-40 cursor-not-allowed' : (activeTab === item.id
+                className={`w-full flex items-center justify-between px-3 lg:px-4 py-2.5 lg:py-3 rounded-lg text-sm font-medium transition-all duration-200 ${item.locked ? 'opacity-40 cursor-not-allowed' : (activeTab === item.id
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}`}
               >
-                <div className="flex items-center gap-3">
-                  <item.icon className="w-5 h-5" />
-                  {item.label}
+                <div className="flex items-center gap-2.5 lg:gap-3 min-w-0">
+                  <item.icon className="w-5 h-5 shrink-0" />
+                  <span className="truncate">{item.label}</span>
                 </div>
-                {item.locked && <Lock className="w-3.5 h-3.5 animate-pulse" />}
+                {item.locked && <Lock className="w-3.5 h-3.5 animate-pulse shrink-0" />}
               </button>
 
               {/* Tooltip for locked items - appears below */}
@@ -86,13 +101,48 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
       </nav>
 
       {/* Help Section */}
-      <div className="p-4 border-t border-border">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200">
-          <HelpCircle className="w-5 h-5" />
-          Help & Support
+      <div className="p-3 lg:p-4 border-t border-border">
+        <button className="w-full flex items-center gap-2.5 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200">
+          <HelpCircle className="w-5 h-5 shrink-0" />
+          <span className="truncate">Help & Support</span>
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-3 left-3 z-50 p-2.5 bg-card border border-border rounded-xl shadow-lg hover:bg-muted transition-colors"
+        aria-label="Open menu"
+      >
+        <Menu className="w-5 h-5 text-foreground" />
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - mobile: slide-over, desktop: fixed */}
+      <aside
+        className={`
+          fixed lg:relative z-50 lg:z-auto
+          top-0 left-0 h-full
+          w-[260px] lg:w-56 xl:w-64
+          bg-card border-r border-border flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 };
 

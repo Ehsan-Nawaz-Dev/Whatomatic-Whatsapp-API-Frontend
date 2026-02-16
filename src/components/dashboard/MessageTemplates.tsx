@@ -136,21 +136,21 @@ const MessageTemplates = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 xl:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Message Templates</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-xl xl:text-2xl font-bold text-foreground">Message Templates</h1>
+          <p className="text-xs xl:text-sm text-muted-foreground mt-1">
             Customize the messages sent to your customers
           </p>
         </div>
-        <Button variant="hero" onClick={openNewDialog}>
+        <Button variant="hero" onClick={openNewDialog} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
           New Template
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-6">
         {isLoading && <p className="text-sm text-muted-foreground">Loading templates...</p>}
         {!isLoading && templates.map((template: any, index: number) => {
           const Icon = iconMap[template.event as EventKey] ?? MessageSquare;

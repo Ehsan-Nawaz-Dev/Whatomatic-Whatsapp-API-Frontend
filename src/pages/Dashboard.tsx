@@ -166,14 +166,14 @@ const Dashboard = () => {
         isSubscribed={isActive}
       />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <DashboardHeader billing={billing} />
 
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
               <StatsCards />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <WhatsAppConnection />
                 <RecentActivity />
               </div>
@@ -187,7 +187,7 @@ const Dashboard = () => {
           {effectiveTab === "automations" && <AutomationsOverview />}
 
           {effectiveTab === "analytics" && (
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
               <AnalyticsOverview />
             </div>
           )}
@@ -201,13 +201,13 @@ const Dashboard = () => {
           )}
 
           {effectiveTab === "billing" && (
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
               <BillingPlan />
             </div>
           )}
 
           {effectiveTab === "settings" && (
-            <div className="space-y-6 max-w-5xl">
+            <div className="space-y-4 lg:space-y-6 max-w-5xl">
               <MerchantSettings />
             </div>
           )}

@@ -49,7 +49,7 @@ const StatsCards = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="h-32 bg-card animate-pulse rounded-xl border border-border" />
         ))}
@@ -58,18 +58,18 @@ const StatsCards = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          className="p-6 bg-card rounded-xl border border-border shadow-card hover:shadow-lg transition-all duration-300"
+          className="p-4 lg:p-6 bg-card rounded-xl border border-border shadow-card hover:shadow-lg transition-all duration-300"
         >
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
-              <stat.icon className="w-6 h-6 text-primary" />
+          <div className="flex items-start justify-between mb-3 lg:mb-4">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-accent flex items-center justify-center">
+              <stat.icon className="w-5 h-5 lg:w-6 lg:h-6 text-primary" />
             </div>
             <span
               className={`text-xs font-medium px-2 py-1 rounded-full ${stat.positive
@@ -80,7 +80,7 @@ const StatsCards = () => {
               {stat.change}
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-foreground mb-1">{stat.value}</h3>
+          <h3 className="text-xl lg:text-2xl font-bold text-foreground mb-1">{stat.value}</h3>
           <p className="text-sm text-muted-foreground">{stat.label}</p>
         </motion.div>
       ))}

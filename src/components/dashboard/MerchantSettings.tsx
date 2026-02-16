@@ -96,8 +96,8 @@ const MerchantSettings = () => {
       className="space-y-6"
     >
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Merchant Settings</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
+        <h1 className="text-xl xl:text-2xl font-bold text-foreground">Merchant Settings</h1>
+        <p className="text-muted-foreground mt-1 text-xs xl:text-sm max-w-2xl">
           Configure your Shopify store and WhatsApp connection. These settings will be used by
           the automation engine.
         </p>
@@ -105,7 +105,7 @@ const MerchantSettings = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8"
       >
         <div className="space-y-4">
           <div className="space-y-2">

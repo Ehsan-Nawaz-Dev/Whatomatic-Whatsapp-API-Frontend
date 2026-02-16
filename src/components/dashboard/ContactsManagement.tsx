@@ -102,15 +102,15 @@ const ContactsManagement = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-4 xl:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">Contact Management</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-xl xl:text-2xl font-bold text-foreground">Contact Management</h1>
+                    <p className="text-xs xl:text-sm text-muted-foreground mt-1 text-xs xl:text-sm">
                         Manage your customer database and WhatsApp contacts
                     </p>
                 </div>
-                <Button variant="hero" onClick={openNewDialog}>
+                <Button variant="hero" onClick={openNewDialog} className="w-full sm:w-auto">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Contact
                 </Button>
@@ -120,13 +120,13 @@ const ContactsManagement = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                     placeholder="Search by name, phone or email..."
-                    className="pl-10"
+                    className="pl-10 h-10 xl:h-11"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-6">
                 {isLoading ? (
                     Array.from({ length: 6 }).map((_, i) => (
                         <div key={i} className="h-40 bg-muted animate-pulse rounded-xl" />

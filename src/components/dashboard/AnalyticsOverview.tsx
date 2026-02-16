@@ -53,23 +53,23 @@ const AnalyticsOverview = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 xl:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+          <h1 className="text-xl xl:text-2xl font-bold text-foreground">Analytics</h1>
+          <p className="text-muted-foreground mt-1 text-xs xl:text-sm">
             Track how WhatFlow impacts your orders, recoveries, and confirmations.
           </p>
         </div>
         {isLoading && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground animate-pulse">
+          <div className="flex items-center gap-2 text-[10px] xl:text-xs text-muted-foreground animate-pulse">
             <div className="w-2 h-2 rounded-full bg-primary" />
             Updating analytics...
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 xl:gap-4">
         {isLoading ? (
           [1, 2, 3].map(i => (
             <div key={i} className="h-32 bg-card animate-pulse rounded-xl border border-border" />

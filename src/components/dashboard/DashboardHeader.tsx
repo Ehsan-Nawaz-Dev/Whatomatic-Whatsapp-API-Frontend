@@ -19,42 +19,42 @@ const DashboardHeader = ({ billing }: DashboardHeaderProps) => {
   const remaining = limit - usage;
 
   return (
-    <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between">
-      {/* Search */}
-      <div className="flex-1 max-w-md">
+    <header className="h-14 lg:h-16 bg-card border-b border-border px-4 lg:px-6 flex items-center justify-between">
+      {/* Search - push right on mobile to make room for hamburger */}
+      <div className="flex-1 max-w-xs lg:max-w-md ml-10 lg:ml-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search orders, customers..."
-            className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted/50 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+            className="w-full h-9 lg:h-10 pl-10 pr-4 rounded-lg bg-muted/50 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
           />
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 lg:gap-4 ml-2">
         {isActive && (
-          <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 ${isTrial ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-blue-500/10 text-blue-600 border-blue-500/20'} rounded-full border text-xs font-medium`}>
-            <Zap className="w-3.5 h-3.5" />
-            <span>{isTrial ? 'Trial:' : 'Plan:'} {remaining} messages left</span>
+          <div className={`hidden lg:flex items-center gap-2 px-2.5 xl:px-3 py-1.5 ${isTrial ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-blue-500/10 text-blue-600 border-blue-500/20'} rounded-full border text-xs font-medium whitespace-nowrap`}>
+            <Zap className="w-3.5 h-3.5 shrink-0" />
+            <span>{isTrial ? 'Trial:' : 'Plan:'} {remaining} left</span>
           </div>
         )}
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
+        <button className="relative p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0">
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
         </button>
 
         {/* Profile */}
-        <div className="flex items-center gap-3 pl-4 border-l border-border">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium text-foreground">{billing?.shopName || "My Store"}</p>
+        <div className="flex items-center gap-2 lg:gap-3 pl-2 lg:pl-4 border-l border-border">
+          <div className="text-right hidden md:block min-w-0">
+            <p className="text-sm font-medium text-foreground truncate max-w-[120px] lg:max-w-[160px]">{billing?.shopName || "My Store"}</p>
             <p className="text-xs text-muted-foreground capitalize">{billing?.plan || "Free Plan"}</p>
           </div>
-          <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
-            <User className="w-5 h-5 text-primary-foreground" />
+          <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full gradient-primary flex items-center justify-center shrink-0">
+            <User className="w-4 h-4 lg:w-5 lg:h-5 text-primary-foreground" />
           </div>
         </div>
       </div>

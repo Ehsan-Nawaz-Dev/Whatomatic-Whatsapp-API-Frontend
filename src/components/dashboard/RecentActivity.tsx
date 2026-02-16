@@ -30,10 +30,10 @@ const RecentActivity = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="p-6 bg-card rounded-xl border border-border shadow-card"
+      className="p-4 xl:p-6 bg-card rounded-xl border border-border shadow-card"
     >
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
+      <div className="flex items-center justify-between mb-4 xl:mb-6">
+        <h2 className="text-base xl:text-lg font-semibold text-foreground">Recent Activity</h2>
         <div className="flex items-center gap-2">
           {isLoading && <Clock className="w-4 h-4 text-muted-foreground animate-spin" />}
           <button

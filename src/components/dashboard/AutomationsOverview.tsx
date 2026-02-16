@@ -243,68 +243,72 @@ const AutomationsOverview = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`p-6 bg-card rounded-2xl border border-border shadow-card flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:border-primary/30 ${!flow.enabled && "opacity-75 grayscale-[0.5]"
+                        className={`p-4 lg:p-6 bg-card rounded-2xl border border-border shadow-card flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6 transition-all hover:border-primary/30 ${!flow.enabled && "opacity-75 grayscale-[0.5]"
                             }`}
                     >
-                        <div className="flex items-center gap-4">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${flow.enabled ? "gradient-primary shadow-lg shadow-primary/20" : "bg-muted"
+                        <div className="flex items-start lg:items-center gap-4">
+                            <div className={`w-12 h-12 lg:w-14 lg:h-14 shrink-0 rounded-2xl flex items-center justify-center ${flow.enabled ? "gradient-primary shadow-lg shadow-primary/20" : "bg-muted"
                                 }`}>
-                                <flow.icon className={`w-7 h-7 ${flow.enabled ? "text-primary-foreground" : "text-muted-foreground"}`} />
+                                <flow.icon className={`w-6 h-6 lg:w-7 lg:h-7 ${flow.enabled ? "text-primary-foreground" : "text-muted-foreground"}`} />
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                            <div className="min-w-0">
+                                <h3 className="font-bold text-base lg:text-lg text-foreground flex items-center gap-2 flex-wrap">
                                     {flow.title}
                                     {!flow.enabled && <Badge variant="secondary" className="text-[10px] font-normal">Disabled</Badge>}
                                 </h3>
-                                <p className="text-sm text-muted-foreground max-w-md">{flow.description}</p>
+                                <p className="text-xs lg:text-sm text-muted-foreground max-w-md line-clamp-2 md:line-clamp-none">{flow.description}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-8 px-4 flex-wrap md:flex-nowrap">
-                            <div className="space-y-1">
-                                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Sent</p>
-                                <p className="text-xl font-bold">{flow.stats.sent}</p>
+                        <div className="flex items-center gap-4 sm:gap-8 px-0 lg:px-4 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+                            <div className="space-y-1 shrink-0">
+                                <p className="text-[10px] lg:text-xs text-muted-foreground uppercase tracking-wider font-semibold">Sent</p>
+                                <p className="text-lg lg:text-xl font-bold">{flow.stats.sent}</p>
                             </div>
                             {flow.stats.recovered !== null && (
                                 <>
-                                    <div className="w-px h-10 bg-border hidden md:block" />
-                                    <div className="space-y-1">
-                                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Recovered</p>
-                                        <p className="text-xl font-bold text-emerald-500">{flow.stats.recovered}</p>
+                                    <div className="w-px h-8 lg:h-10 bg-border shrink-0" />
+                                    <div className="space-y-1 shrink-0">
+                                        <p className="text-[10px] lg:text-xs text-muted-foreground uppercase tracking-wider font-semibold">Recovered</p>
+                                        <p className="text-lg lg:text-xl font-bold text-emerald-500">{flow.stats.recovered}</p>
                                     </div>
                                 </>
                             )}
                             {flow.stats.revenue !== null && (
                                 <>
-                                    <div className="w-px h-10 bg-border hidden md:block" />
-                                    <div className="space-y-1">
-                                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenue</p>
-                                        <p className="text-xl font-bold text-emerald-500">{flow.stats.revenue}</p>
+                                    <div className="w-px h-8 lg:h-10 bg-border shrink-0" />
+                                    <div className="space-y-1 shrink-0">
+                                        <p className="text-[10px] lg:text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenue</p>
+                                        <p className="text-lg lg:text-xl font-bold text-emerald-500">{flow.stats.revenue}</p>
                                     </div>
                                 </>
                             )}
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                    setSelectedFlow(flow);
-                                    setPreviewOpen(true);
-                                }}
-                            >
-                                <Eye className="w-4 h-4 mr-2" />
-                                Preview
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditClick(flow)}
-                            >
-                                <Edit2 className="w-4 h-4 mr-2" />
-                                Edit
-                            </Button>
+                        <div className="flex items-center justify-between lg:justify-end gap-3 lg:gap-4 mt-2 lg:mt-0 pt-3 lg:pt-0 border-t border-border/50 lg:border-none">
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 lg:h-9 text-xs"
+                                    onClick={() => {
+                                        setSelectedFlow(flow);
+                                        setPreviewOpen(true);
+                                    }}
+                                >
+                                    <Eye className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1.5" />
+                                    Preview
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 lg:h-9 text-xs"
+                                    onClick={() => handleEditClick(flow)}
+                                >
+                                    <Edit2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1.5" />
+                                    Edit
+                                </Button>
+                            </div>
                             <Switch
                                 checked={flow.enabled}
                                 onCheckedChange={() => handleToggle(flow.id, flow.enabled)}

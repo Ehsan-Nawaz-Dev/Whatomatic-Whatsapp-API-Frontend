@@ -146,15 +146,15 @@ const BillingPlan = () => {
         <div className="space-y-8 max-w-6xl mx-auto">
             {/* Plans Grid */}
             <div>
-                <div className="text-center mb-10">
-                    <h2 className="text-3xl font-bold text-black mb-2">Choose Your Plan</h2>
-                    <p className="text-black/70">Scale your business with the power of WhatsApp automation</p>
+                <div className="text-center mb-6 xl:mb-10">
+                    <h2 className="text-2xl xl:text-3xl font-bold text-black mb-2">Choose Your Plan</h2>
+                    <p className="text-sm xl:text-base text-black/70 italic px-4">Scale your business with the power of WhatsApp automation</p>
                 </div>
 
                 {isPlansLoading ? (
-                    <div className="text-center py-20 text-slate-500">Loading plans...</div>
+                    <div className="text-center py-20 text-slate-500 animate-pulse">Loading plans...</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 xl:gap-6">
                         {displayPlans.map((plan: any) => {
                             const isCurrent = plan.id === currentPlanId || (isTrial && plan.id === 'trial'); // Wait, trial is special handling
                             const Icon = plan.icon;
