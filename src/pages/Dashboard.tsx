@@ -20,6 +20,7 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import SupportContactCard from "@/components/dashboard/SupportContactCard";
+import { NavMenu } from "@shopify/app-bridge-react";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -173,6 +174,22 @@ const Dashboard = () => {
           billing={billing}
           onNavigateNotifications={() => setActiveTab("notifications")}
         />
+
+        {/* 
+          Native Shopify Navigation:
+          Configures the sidebar menu items in the Shopify Admin.
+        */}
+        <NavMenu>
+          <a href="/dashboard" rel="home">Overview</a>
+          <a href="/dashboard?tab=notifications">Notifications</a>
+          <a href="/dashboard?tab=automations">Automations</a>
+          <a href="/dashboard?tab=contacts">Contacts</a>
+          <a href="/dashboard?tab=templates">Templates</a>
+          <a href="/dashboard?tab=analytics">Analytics</a>
+          <a href="/dashboard?tab=chat-button">Chat Button</a>
+          <a href="/dashboard?tab=settings">Settings</a>
+          <a href="/dashboard?tab=billing">Plans & Usage</a>
+        </NavMenu>
 
         <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
