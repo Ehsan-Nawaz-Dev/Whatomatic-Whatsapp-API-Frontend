@@ -14,7 +14,6 @@ import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
 import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
-import AppStoreReviews from "@/components/dashboard/AppStoreReviews";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { withShopParam, getCurrentShop } from "@/lib/api";
 import { Loader2 } from "lucide-react";
@@ -189,8 +188,6 @@ const Dashboard = () => {
           {effectiveTab === "contacts" && <ContactsManagement />}
 
           {effectiveTab === "automations" && <AutomationsOverview />}
-
-          {effectiveTab === "reviews" && <AppStoreReviews />}
 
           {effectiveTab === "analytics" && (
             <div className="space-y-4 lg:space-y-6">
