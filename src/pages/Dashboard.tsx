@@ -18,6 +18,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { withShopParam, getCurrentShop } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
+import SetupChecklist from "@/components/dashboard/SetupChecklist";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -175,6 +176,7 @@ const Dashboard = () => {
         <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
             <div className="space-y-4 lg:space-y-6">
+              <SetupChecklist onNavigate={setActiveTab} />
               <StatsCards />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <WhatsAppConnection />

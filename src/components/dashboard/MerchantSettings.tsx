@@ -7,8 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { fetchSettings, updateSettings, fetchWhatsAppStatus, API_BASE_URL, getCurrentShop } from "@/lib/api";
+import { SaveBar, useAppBridge } from "@shopify/app-bridge-react";
+import { toast } from "sonner";
 
 const MerchantSettings = () => {
+  const shopify = useAppBridge();
   const [storeName, setStoreName] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [defaultCountry, setDefaultCountry] = useState("");
@@ -23,12 +26,14 @@ const MerchantSettings = () => {
   const [adminPhoneNumber, setAdminPhoneNumber] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
 
+  // Track initial state
+  const [initialState, setInitialState] = useState<any>(null);
+
   const { data, isLoading } = useQuery({
     queryKey: ["merchant-settings", getCurrentShop()],
     queryFn: fetchSettings,
   });
 
-  // Fetch WhatsApp connection status
   const { data: whatsappStatus } = useQuery({
     queryKey: ["whatsapp-status", getCurrentShop()],
     queryFn: fetchWhatsAppStatus,
@@ -36,65 +41,90 @@ const MerchantSettings = () => {
 
   useEffect(() => {
     if (data) {
-      // Store name from Shopify (fetched by backend)
-      setStoreName(data.storeName || data.shopDomain || "My Store");
-
-      // WhatsApp number - show only if connected, otherwise clear it
-      if (whatsappStatus?.connected && whatsappStatus?.phoneNumber) {
-        setWhatsappNumber(whatsappStatus.phoneNumber);
-      } else {
-        // When disconnected, show empty - user must connect WhatsApp to get number
-        setWhatsappNumber("");
-      }
-
-      setDefaultCountry(data.defaultCountry || data.country || "US");
-      setLanguage(data.language || "English");
-      setOrderConfirmTag(data.orderConfirmTag || "Order Confirmed");
-      setOrderCancelTag(data.orderCancelTag || "Order Cancel By customer");
-      setPendingConfirmTag(data.pendingConfirmTag || "Pending Confirmation");
-      setAdminNotifiedTag(data.adminNotifiedTag || "Admin Notified");
-      setNoWhatsappTag(data.noWhatsappTag || "No WhatsApp");
-      setOrderConfirmReply(data.orderConfirmReply || "✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
-      setOrderCancelReply(data.orderCancelReply || "Your order has been cancelled as requested. ❌");
-      setAdminPhoneNumber(data.adminPhoneNumber || data.phone || "");
-    } else {
-      setStoreName("My Store");
-      setWhatsappNumber("");
-      setDefaultCountry("US");
-      setLanguage("English");
-      setOrderConfirmTag("Order Confirmed");
-      setOrderCancelTag("Order Cancel By customer");
-      setPendingConfirmTag("Pending Confirmation");
-      setAdminNotifiedTag("Admin Notified");
-      setNoWhatsappTag("No WhatsApp");
-      setOrderConfirmReply("✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
-      setOrderCancelReply("Your order has been cancelled as requested. ❌");
-      setAdminPhoneNumber("");
+      const state = {
+        storeName: data.storeName || data.shopDomain || "My Store",
+        whatsappNumber: (whatsappStatus?.connected && whatsappStatus?.phoneNumber) ? whatsappStatus.phoneNumber : "",
+        defaultCountry: data.defaultCountry || data.country || "US",
+        language: data.language || "English",
+        orderConfirmTag: data.orderConfirmTag || "Order Confirmed",
+        orderCancelTag: data.orderCancelTag || "Order Cancel By customer",
+        pendingConfirmTag: data.pendingConfirmTag || "Pending Confirmation",
+        adminNotifiedTag: data.adminNotifiedTag || "Admin Notified",
+        noWhatsappTag: data.noWhatsappTag || "No WhatsApp",
+        orderConfirmReply: data.orderConfirmReply || "✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚",
+        orderCancelReply: data.orderCancelReply || "Your order has been cancelled as requested. ❌",
+        adminPhoneNumber: data.adminPhoneNumber || data.phone || ""
+      };
+      setStoreName(state.storeName);
+      setWhatsappNumber(state.whatsappNumber);
+      setDefaultCountry(state.defaultCountry);
+      setLanguage(state.language);
+      setOrderConfirmTag(state.orderConfirmTag);
+      setOrderCancelTag(state.orderCancelTag);
+      setPendingConfirmTag(state.pendingConfirmTag);
+      setAdminNotifiedTag(state.adminNotifiedTag);
+      setNoWhatsappTag(state.noWhatsappTag);
+      setOrderConfirmReply(state.orderConfirmReply);
+      setOrderCancelReply(state.orderCancelReply);
+      setAdminPhoneNumber(state.adminPhoneNumber);
+      setInitialState(state);
     }
-
     setWebhookUrl(`${API_BASE_URL.replace(/\/api$/, "")}/api/webhooks/shopify`);
   }, [data, whatsappStatus]);
 
+  const isDirty = initialState && (
+    storeName !== initialState.storeName ||
+    whatsappNumber !== initialState.whatsappNumber ||
+    defaultCountry !== initialState.defaultCountry ||
+    language !== initialState.language ||
+    orderConfirmTag !== initialState.orderConfirmTag ||
+    orderCancelTag !== initialState.orderCancelTag ||
+    pendingConfirmTag !== initialState.pendingConfirmTag ||
+    adminNotifiedTag !== initialState.adminNotifiedTag ||
+    noWhatsappTag !== initialState.noWhatsappTag ||
+    orderConfirmReply !== initialState.orderConfirmReply ||
+    orderCancelReply !== initialState.orderCancelReply ||
+    adminPhoneNumber !== initialState.adminPhoneNumber
+  );
+
   const mutation = useMutation({
     mutationFn: updateSettings,
+    onSuccess: () => {
+      toast.success("Settings saved!");
+      setInitialState({
+        storeName, whatsappNumber, defaultCountry, language,
+        orderConfirmTag, orderCancelTag, pendingConfirmTag,
+        adminNotifiedTag, noWhatsappTag, orderConfirmReply,
+        orderCancelReply, adminPhoneNumber
+      });
+    },
+    onError: () => toast.error("Failed to save")
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = () => {
     mutation.mutate({
-      storeName,
-      whatsappNumber,
-      defaultCountry,
-      language,
-      orderConfirmTag,
-      orderCancelTag,
-      pendingConfirmTag,
-      adminNotifiedTag,
-      noWhatsappTag,
-      orderConfirmReply,
-      orderCancelReply,
-      adminPhoneNumber,
+      storeName, whatsappNumber, defaultCountry, language,
+      orderConfirmTag, orderCancelTag, pendingConfirmTag,
+      adminNotifiedTag, noWhatsappTag, orderConfirmReply,
+      orderCancelReply, adminPhoneNumber
     });
+  };
+
+  const handleDiscard = () => {
+    if (initialState) {
+      setStoreName(initialState.storeName);
+      setWhatsappNumber(initialState.whatsappNumber);
+      setDefaultCountry(initialState.defaultCountry);
+      setLanguage(initialState.language);
+      setOrderConfirmTag(initialState.orderConfirmTag);
+      setOrderCancelTag(initialState.orderCancelTag);
+      setPendingConfirmTag(initialState.pendingConfirmTag);
+      setAdminNotifiedTag(initialState.adminNotifiedTag);
+      setNoWhatsappTag(initialState.noWhatsappTag);
+      setOrderConfirmReply(initialState.orderConfirmReply);
+      setOrderCancelReply(initialState.orderCancelReply);
+      setAdminPhoneNumber(initialState.adminPhoneNumber);
+    }
   };
 
   return (
@@ -103,6 +133,13 @@ const MerchantSettings = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
+      {isDirty && (
+        <SaveBar id="merchant-settings-save-bar">
+          <button variant="primary" onClick={handleSave}>Save</button>
+          <button onClick={handleDiscard}>Discard</button>
+        </SaveBar>
+      )}
+
       <div>
         <h1 className="text-xl xl:text-2xl font-bold text-foreground">Merchant Settings</h1>
         <p className="text-muted-foreground mt-1 text-xs xl:text-sm max-w-2xl">
@@ -111,10 +148,7 @@ const MerchantSettings = () => {
         </p>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8"
-      >
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8">
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -278,12 +312,7 @@ const MerchantSettings = () => {
             <p className="text-[11px] text-muted-foreground">
               Shopify order tags will be applied automatically based on the message status and customer replies.
             </p>
-          </div>
-
-
-
-
-          <div className="space-y-2">
+          </div>          <div className="space-y-2">
             <Label htmlFor="notes">Internal notes</Label>
             <Textarea
               id="notes"
@@ -291,20 +320,8 @@ const MerchantSettings = () => {
               className="min-h-[80px]"
             />
           </div>
-
-          <div className="pt-2 flex items-center gap-3">
-            <Button type="submit" variant="hero" disabled={mutation.isPending || isLoading}>
-              {mutation.isPending ? "Saving..." : "Save settings"}
-            </Button>
-            {mutation.isSuccess && (
-              <span className="text-xs text-success">Settings saved</span>
-            )}
-            {mutation.isError && (
-              <span className="text-xs text-destructive">Failed to save settings</span>
-            )}
-          </div>
         </div>
-      </form>
+      </div>
     </motion.div >
   );
 };

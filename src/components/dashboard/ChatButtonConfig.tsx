@@ -8,13 +8,18 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchChatButtonSettings, updateChatButtonSettings, getCurrentShop } from "@/lib/api";
+import { SaveBar, useAppBridge } from "@shopify/app-bridge-react";
 
 const ChatButtonConfig = () => {
+    const shopify = useAppBridge();
     const [phoneNumber, setPhoneNumber] = useState("");
     const [buttonText, setButtonText] = useState("Chat with us");
     const [position, setPosition] = useState("right");
     const [themeColor, setThemeColor] = useState("#25D366");
     const [enabled, setEnabled] = useState(true);
+
+    // Track initial state for dirty check
+    const [initialState, setInitialState] = useState<any>(null);
 
     const { data, isLoading } = useQuery({
         queryKey: ["chat-button-settings", getCurrentShop()],
@@ -23,18 +28,35 @@ const ChatButtonConfig = () => {
 
     useEffect(() => {
         if (data) {
-            setPhoneNumber(data.phoneNumber || "");
-            setButtonText(data.buttonText || "Chat with us");
-            setPosition(data.position || "right");
-            setThemeColor(data.color || "#25D366");
-            setEnabled(data.enabled !== undefined ? data.enabled : true);
+            const state = {
+                phoneNumber: data.phoneNumber || "",
+                buttonText: data.buttonText || "Chat with us",
+                position: data.position || "right",
+                color: data.color || "#25D366",
+                enabled: data.enabled !== undefined ? data.enabled : true
+            };
+            setPhoneNumber(state.phoneNumber);
+            setButtonText(state.buttonText);
+            setPosition(state.position);
+            setThemeColor(state.color);
+            setEnabled(state.enabled);
+            setInitialState(state);
         }
     }, [data]);
+
+    const isDirty = initialState && (
+        phoneNumber !== initialState.phoneNumber ||
+        buttonText !== initialState.buttonText ||
+        position !== initialState.position ||
+        themeColor !== initialState.color ||
+        enabled !== initialState.enabled
+    );
 
     const mutation = useMutation({
         mutationFn: updateChatButtonSettings,
         onSuccess: () => {
             toast.success("Chat button settings saved!");
+            setInitialState({ phoneNumber, buttonText, position, color: themeColor, enabled });
         },
         onError: () => {
             toast.error("Failed to save settings");
@@ -51,6 +73,16 @@ const ChatButtonConfig = () => {
         });
     };
 
+    const handleDiscard = () => {
+        if (initialState) {
+            setPhoneNumber(initialState.phoneNumber);
+            setButtonText(initialState.buttonText);
+            setPosition(initialState.position);
+            setThemeColor(initialState.color);
+            setEnabled(initialState.enabled);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="h-[400px] flex items-center justify-center">
@@ -61,17 +93,19 @@ const ChatButtonConfig = () => {
 
     return (
         <div className="space-y-6">
+            {isDirty && (
+                <SaveBar id="chat-button-save-bar">
+                    <button variant="primary" onClick={handleSave}>Save</button>
+                    <button onClick={handleDiscard}>Discard</button>
+                </SaveBar>
+            )}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-foreground">Storefront Chat Button</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <p className="text-muted-foreground mt-1 text-sm">
                         Let customers start a conversation directly from your website.
                     </p>
                 </div>
-                <Button variant="hero" onClick={handleSave} disabled={mutation.isPending}>
-                    {mutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                    Save Settings
-                </Button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

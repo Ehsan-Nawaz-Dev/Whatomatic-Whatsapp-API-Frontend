@@ -40,6 +40,8 @@ export interface MerchantSettingsPayload {
   orderConfirmTag?: string;
   orderCancelTag?: string;
   pendingConfirmTag?: string;
+  adminNotifiedTag?: string;
+  noWhatsappTag?: string;
   orderConfirmReply?: string;
   orderCancelReply?: string;
 }
