@@ -19,6 +19,7 @@ import { withShopParam, getCurrentShop } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
+import SupportContactCard from "@/components/dashboard/SupportContactCard";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -178,9 +179,10 @@ const Dashboard = () => {
             <div className="space-y-4 lg:space-y-6">
               <SetupChecklist onNavigate={setActiveTab} />
               <StatsCards />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                 <WhatsAppConnection />
                 <RecentActivity />
+                <SupportContactCard />
               </div>
             </div>
           )}
