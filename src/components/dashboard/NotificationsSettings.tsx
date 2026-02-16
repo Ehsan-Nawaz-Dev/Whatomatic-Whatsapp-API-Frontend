@@ -16,6 +16,7 @@ const NotificationsSettings = () => {
   const [notifyOnAbandoned, setNotifyOnAbandoned] = useState(false);
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [whatsappAlerts, setWhatsappAlerts] = useState(false);
+  const [pushNotifications, setPushNotifications] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["notification-settings", getCurrentShop()],
@@ -33,6 +34,7 @@ const NotificationsSettings = () => {
     setNotifyOnAbandoned(!!data.notifyOnAbandoned);
     setEmailAlerts(!!data.emailAlerts);
     setWhatsappAlerts(!!data.whatsappAlerts);
+    setPushNotifications(!!data.pushNotifications);
   }, [data]);
 
   const handleToggle = (next: Partial<NotificationSettingsPayload>) => {
@@ -42,6 +44,7 @@ const NotificationsSettings = () => {
       notifyOnAbandoned,
       emailAlerts,
       whatsappAlerts,
+      pushNotifications,
       ...next,
     };
     mutation.mutate(payload);
@@ -152,6 +155,20 @@ const NotificationsSettings = () => {
                 onCheckedChange={(v) => {
                   setWhatsappAlerts(v);
                   handleToggle({ whatsappAlerts: v });
+                }}
+              />
+            </label>
+            <label className="flex items-center justify-between gap-4">
+              <span className="flex items-center gap-2 text-foreground">
+                <Bell className="w-4 h-4" />
+                Browser push notifications
+              </span>
+              <Switch
+                checked={pushNotifications}
+                disabled={isLoading || mutation.isPending}
+                onCheckedChange={(v) => {
+                  setPushNotifications(v);
+                  handleToggle({ pushNotifications: v });
                 }}
               />
             </label>

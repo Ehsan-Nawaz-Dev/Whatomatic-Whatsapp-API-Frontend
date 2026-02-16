@@ -37,7 +37,7 @@ const DashboardHeader = ({ billing }: DashboardHeaderProps) => {
         {isActive && (
           <div className={`hidden lg:flex items-center gap-2 px-2.5 xl:px-3 py-1.5 ${isTrial ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-blue-500/10 text-blue-600 border-blue-500/20'} rounded-full border text-xs font-medium whitespace-nowrap`}>
             <Zap className="w-3.5 h-3.5 shrink-0" />
-            <span>{isTrial ? 'Trial:' : 'Plan:'} {remaining} left</span>
+            <span className="capitalize">{billing?.plan || 'Plan'}: {remaining} left</span>
           </div>
         )}
 
@@ -51,7 +51,6 @@ const DashboardHeader = ({ billing }: DashboardHeaderProps) => {
         <div className="flex items-center gap-2 lg:gap-3 pl-2 lg:pl-4 border-l border-border">
           <div className="text-right hidden md:block min-w-0">
             <p className="text-sm font-medium text-foreground truncate max-w-[120px] lg:max-w-[160px]">{billing?.shopName || "My Store"}</p>
-            <p className="text-xs text-muted-foreground capitalize">{billing?.plan || "Free Plan"}</p>
           </div>
           <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full gradient-primary flex items-center justify-center shrink-0">
             <User className="w-4 h-4 lg:w-5 lg:h-5 text-primary-foreground" />

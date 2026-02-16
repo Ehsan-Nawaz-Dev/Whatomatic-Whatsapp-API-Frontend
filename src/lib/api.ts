@@ -126,6 +126,7 @@ export interface NotificationSettingsPayload {
   notifyOnAbandoned: boolean;
   emailAlerts: boolean;
   whatsappAlerts: boolean;
+  pushNotifications: boolean;
 }
 
 export const fetchNotificationSettings = async () => {
