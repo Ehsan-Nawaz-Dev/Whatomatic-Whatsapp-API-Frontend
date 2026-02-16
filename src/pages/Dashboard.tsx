@@ -20,6 +20,7 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import SupportContactCard from "@/components/dashboard/SupportContactCard";
+import HelpSupport from "@/components/dashboard/HelpSupport";
 import { NavMenu } from "@shopify/app-bridge-react";
 
 const Dashboard = () => {
@@ -189,6 +190,7 @@ const Dashboard = () => {
           <a href="/dashboard?tab=chat-button">Chat Button</a>
           <a href="/dashboard?tab=settings">Settings</a>
           <a href="/dashboard?tab=billing">Plans & Usage</a>
+          <a href="/dashboard?tab=help">Help & Support</a>
         </NavMenu>
 
         <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto overflow-x-hidden">
@@ -233,6 +235,12 @@ const Dashboard = () => {
           {effectiveTab === "settings" && (
             <div className="space-y-4 lg:space-y-6 max-w-5xl">
               <MerchantSettings />
+            </div>
+          )}
+
+          {effectiveTab === "help" && (
+            <div className="space-y-4 lg:space-y-6">
+              <HelpSupport />
             </div>
           )}
         </main>

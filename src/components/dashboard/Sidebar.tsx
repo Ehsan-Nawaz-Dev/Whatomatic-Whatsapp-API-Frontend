@@ -40,6 +40,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
     { id: "chat-button", label: "Chat Button", icon: MessageCircle, locked: !isSubscribed },
     { id: "settings", label: "Settings", icon: Settings },
     { id: "billing", label: "Billing", icon: Cloud },
+    { id: "help", label: "Help & Support", icon: HelpCircle },
   ];
 
   const handleNavClick = (id: string, locked?: boolean) => {
@@ -101,17 +102,6 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
           ))}
         </ul>
       </nav>
-
-      {/* Help Section */}
-      <div className="p-3 lg:p-4 border-t border-border">
-        <button
-          onClick={() => window.open('/help', '_blank')}
-          className="w-full flex items-center gap-2.5 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
-        >
-          <HelpCircle className="w-5 h-5 shrink-0" />
-          <span className="truncate">Help & Support</span>
-        </button>
-      </div>
     </>
   );
 

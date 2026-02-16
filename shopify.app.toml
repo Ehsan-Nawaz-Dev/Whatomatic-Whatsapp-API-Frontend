@@ -60,6 +60,10 @@ path = "/dashboard?tab=settings"
 label = "Plans & Usage"
 path = "/dashboard?tab=billing"
 
+[[navigation.links]]
+label = "Help & Support"
+path = "/dashboard?tab=help"
+
 [auth]
 redirect_urls = [
   "https://whatflow-alpha.vercel.app/api/auth/callback",
