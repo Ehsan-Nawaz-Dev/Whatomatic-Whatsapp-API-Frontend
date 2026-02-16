@@ -575,3 +575,33 @@ export const toggleAutomation = async (id: string, enabled: boolean) => {
   if (!res.ok) throw new Error("Failed to toggle automation");
   return res.json();
 };
+
+// Feedback API
+export interface FeedbackItem {
+  _id: string;
+  orderId: string;
+  customerName: string;
+  customerPhone: string;
+  rating: number;
+  comment: string;
+  sentiment: "positive" | "neutral" | "negative";
+  createdAt: string;
+}
+
+export interface FeedbackStats {
+  averageRating: number;
+  totalFeedback: number;
+  positiveCount: number;
+}
+
+export const fetchFeedback = async (): Promise<FeedbackItem[]> => {
+  const res = await fetch(withShopParam("/feedback"));
+  if (!res.ok) throw new Error("Failed to fetch feedback");
+  return res.json();
+};
+
+export const fetchFeedbackStats = async (): Promise<FeedbackStats> => {
+  const res = await fetch(withShopParam("/feedback/stats"));
+  if (!res.ok) throw new Error("Failed to fetch feedback stats");
+  return res.json();
+};
