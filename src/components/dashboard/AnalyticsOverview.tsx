@@ -108,7 +108,7 @@ const AnalyticsOverview = () => {
             <BarChart3 className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h2 className="font-semibold text-foreground">Daily Activity</h2>
+            <h2 className="font-semibold text-foreground">30 Days Activity</h2>
             <p className="text-xs text-muted-foreground">Messages sent per day for the last 30 days</p>
           </div>
         </div>
