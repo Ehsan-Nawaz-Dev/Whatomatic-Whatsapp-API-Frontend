@@ -9,9 +9,10 @@ interface DashboardHeaderProps {
     limit?: number;
     shopName?: string;
   };
+  onNavigateNotifications?: () => void;
 }
 
-const DashboardHeader = ({ billing }: DashboardHeaderProps) => {
+const DashboardHeader = ({ billing, onNavigateNotifications }: DashboardHeaderProps) => {
   const isTrial = billing?.plan === 'trial';
   const isActive = billing?.status === 'active';
   const usage = billing?.usage || 0;
@@ -42,20 +43,13 @@ const DashboardHeader = ({ billing }: DashboardHeaderProps) => {
         )}
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0">
+        <button
+          onClick={onNavigateNotifications}
+          className="relative p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0"
+        >
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
         </button>
-
-        {/* Profile */}
-        <div className="flex items-center gap-2 lg:gap-3 pl-2 lg:pl-4 border-l border-border">
-          <div className="text-right hidden md:block min-w-0">
-            <p className="text-sm font-medium text-foreground truncate max-w-[120px] lg:max-w-[160px]">{billing?.shopName || "My Store"}</p>
-          </div>
-          <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full gradient-primary flex items-center justify-center shrink-0">
-            <User className="w-4 h-4 lg:w-5 lg:h-5 text-primary-foreground" />
-          </div>
-        </div>
       </div>
     </header>
   );

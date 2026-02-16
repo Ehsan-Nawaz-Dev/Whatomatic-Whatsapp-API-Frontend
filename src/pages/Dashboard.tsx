@@ -167,7 +167,10 @@ const Dashboard = () => {
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <DashboardHeader billing={billing} />
+        <DashboardHeader
+          billing={billing}
+          onNavigateNotifications={() => setActiveTab("notifications")}
+        />
 
         <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (

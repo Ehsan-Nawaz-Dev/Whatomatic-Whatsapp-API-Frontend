@@ -423,9 +423,32 @@ export interface NotificationPayload {
 }
 
 export const fetchNotifications = async (): Promise<Notification[]> => {
-  const res = await fetch(withShopParam("/notifications"));
+  const res = await fetch(withShopParam("/activity"));
   if (!res.ok) throw new Error("Failed to fetch notifications");
-  return res.json();
+  const data = await res.json();
+
+  // Map ActivityLog & GlobalBroadcasts to Notification interface
+  return data.map((log: any) => {
+    if (log.isBroadcast) {
+      return {
+        id: log._id,
+        title: log.title || "📢 System Announcement",
+        message: log.message,
+        type: (log.type === 'error' ? 'error' : (log.type === 'warning' ? 'warning' : (log.type === 'success' ? 'success' : 'info'))) as any,
+        read: false,
+        createdAt: log.createdAt
+      };
+    }
+
+    return {
+      id: log._id,
+      title: log.type.charAt(0).toUpperCase() + log.type.slice(1) + " Alert",
+      message: log.message || `${log.type} event for order ${log.orderId || 'N/A'}`,
+      type: log.type === 'failed' ? 'error' : (log.type === 'confirmed' ? 'success' : 'info'),
+      read: false, // Activity logs don't have read status yet, default to false
+      createdAt: log.createdAt
+    };
+  });
 };
 
 export const createNotification = async (payload: NotificationPayload): Promise<Notification> => {

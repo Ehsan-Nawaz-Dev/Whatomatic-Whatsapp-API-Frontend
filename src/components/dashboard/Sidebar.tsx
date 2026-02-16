@@ -9,7 +9,8 @@ import {
   Users,
   Cloud,
   Menu,
-  X
+  X,
+  Zap
 } from "lucide-react";
 import { useState } from "react";
 
@@ -31,7 +32,8 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
 
   const menuItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard, locked: !isSubscribed },
-    { id: "automations", label: "Automations", icon: Bell, locked: !isSubscribed },
+    { id: "notifications", label: "Notifications", icon: Bell, locked: !isSubscribed },
+    { id: "automations", label: "Automations", icon: Zap, locked: !isSubscribed },
     { id: "contacts", label: "Contacts", icon: Users, locked: !isSubscribed },
     { id: "templates", label: "Templates", icon: MessageSquare, locked: !isSubscribed },
     { id: "analytics", label: "Analytics", icon: BarChart3, locked: !isSubscribed },
