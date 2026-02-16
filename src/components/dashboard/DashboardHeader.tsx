@@ -45,6 +45,7 @@ const DashboardHeader = ({ billing, onNavigateNotifications }: DashboardHeaderPr
         {/* Notifications */}
         <button
           onClick={onNavigateNotifications}
+          aria-label="View notifications"
           className="relative p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0"
         >
           <Bell className="w-5 h-5" />

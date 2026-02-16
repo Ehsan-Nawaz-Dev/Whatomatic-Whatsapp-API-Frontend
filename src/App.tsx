@@ -25,7 +25,7 @@ const App = () => (
       <Sonner />
       {/* Shopify Navigation Menu - appears in Shopify Admin sidebar */}
       <NavMenu>
-        <a href="/" rel="home">Home</a>
+        <a href="/dashboard">Overview</a>
         <a href="/dashboard?tab=notifications">Notifications</a>
         <a href="/dashboard?tab=automations">Automations</a>
         <a href="/dashboard?tab=contacts">Contacts</a>
