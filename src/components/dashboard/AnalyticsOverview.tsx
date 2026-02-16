@@ -109,7 +109,7 @@ const AnalyticsOverview = () => {
           </div>
           <div>
             <h2 className="font-semibold text-foreground">Daily Activity</h2>
-            <p className="text-xs text-muted-foreground">Messages sent per day for the last 7 days</p>
+            <p className="text-xs text-muted-foreground">Messages sent per day for the last 30 days</p>
           </div>
         </div>
 
@@ -121,8 +121,9 @@ const AnalyticsOverview = () => {
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                 dy={10}
+                interval={Math.ceil(chartData.length / 7)} // Show roughly 7-8 labels
               />
               <YAxis
                 axisLine={false}
@@ -138,7 +139,7 @@ const AnalyticsOverview = () => {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }}
               />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={40}>
+              <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={undefined}>
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? 'hsl(var(--primary))' : 'hsl(var(--primary) / 0.6)'} />
                 ))}
