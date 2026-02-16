@@ -47,6 +47,16 @@ const StatsCards = () => {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-32 bg-card animate-pulse rounded-xl border border-border" />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat, index) => (
@@ -74,9 +84,6 @@ const StatsCards = () => {
           <p className="text-sm text-muted-foreground">{stat.label}</p>
         </motion.div>
       ))}
-      {isLoading && stats.length === 0 && (
-        <p className="text-xs text-muted-foreground">Loading overview...</p>
-      )}
     </div>
   );
 };
