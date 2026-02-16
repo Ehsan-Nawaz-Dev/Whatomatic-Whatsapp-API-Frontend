@@ -9,20 +9,28 @@ interface SetupChecklistProps {
 }
 
 const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
-    const { data: settings } = useQuery({
+    const { data: settings, isLoading: settingsLoading } = useQuery({
         queryKey: ["merchant-settings", getCurrentShop()],
         queryFn: fetchSettings,
     });
 
-    const { data: whatsapp } = useQuery({
+    const { data: whatsapp, isLoading: whatsappLoading } = useQuery({
         queryKey: ["whatsapp-status", getCurrentShop()],
         queryFn: fetchWhatsAppStatus,
     });
 
-    const { data: chatButton } = useQuery({
+    const { data: chatButton, isLoading: chatLoading } = useQuery({
         queryKey: ["chat-button-settings", getCurrentShop()],
         queryFn: fetchChatButtonSettings,
     });
+
+    const isLoading = settingsLoading || whatsappLoading || chatLoading;
+
+    // Use a refined check for Step 2 completion
+    const isStep2Completed = !!(settings?.whatsappNumber || settings?.adminPhoneNumber || settings?.phone);
+
+    // Step 3 is completed if it's explicitly enabled in settings (it defaults to true, so it usually starts completed)
+    const isStep3Completed = !!chatButton?.enabled;
 
     const steps = [
         {
@@ -30,14 +38,14 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
             title: "Connect WhatsApp",
             description: "Scan the QR code to link your business WhatsApp account.",
             completed: !!whatsapp?.connected,
-            tab: "overview", // It's on the overview page
+            tab: "overview",
             icon: Smartphone
         },
         {
             id: "settings",
             title: "Configure Settings",
             description: "Set your business number and order tags for automation.",
-            completed: !!(settings?.whatsappNumber || settings?.adminPhoneNumber || settings?.phone),
+            completed: isStep2Completed,
             tab: "settings",
             icon: Zap
         },
@@ -54,7 +62,7 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
     const completedCount = steps.filter(s => s.completed).length;
     const isFinished = completedCount === steps.length;
 
-    if (isFinished) return null;
+    if (isLoading || isFinished) return null;
 
     return (
         <motion.div
