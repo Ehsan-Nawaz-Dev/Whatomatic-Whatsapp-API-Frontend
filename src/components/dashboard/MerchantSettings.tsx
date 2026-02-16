@@ -16,6 +16,8 @@ const MerchantSettings = () => {
   const [orderConfirmTag, setOrderConfirmTag] = useState("");
   const [orderCancelTag, setOrderCancelTag] = useState("");
   const [pendingConfirmTag, setPendingConfirmTag] = useState("");
+  const [adminNotifiedTag, setAdminNotifiedTag] = useState("");
+  const [noWhatsappTag, setNoWhatsappTag] = useState("");
   const [orderConfirmReply, setOrderConfirmReply] = useState("");
   const [orderCancelReply, setOrderCancelReply] = useState("");
   const [adminPhoneNumber, setAdminPhoneNumber] = useState("");
@@ -50,6 +52,8 @@ const MerchantSettings = () => {
       setOrderConfirmTag(data.orderConfirmTag || "Order Confirmed");
       setOrderCancelTag(data.orderCancelTag || "Order Cancel By customer");
       setPendingConfirmTag(data.pendingConfirmTag || "Pending Confirmation");
+      setAdminNotifiedTag(data.adminNotifiedTag || "Admin Notified");
+      setNoWhatsappTag(data.noWhatsappTag || "No WhatsApp");
       setOrderConfirmReply(data.orderConfirmReply || "✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
       setOrderCancelReply(data.orderCancelReply || "Your order has been cancelled as requested. ❌");
       setAdminPhoneNumber(data.adminPhoneNumber || data.phone || "");
@@ -61,6 +65,8 @@ const MerchantSettings = () => {
       setOrderConfirmTag("Order Confirmed");
       setOrderCancelTag("Order Cancel By customer");
       setPendingConfirmTag("Pending Confirmation");
+      setAdminNotifiedTag("Admin Notified");
+      setNoWhatsappTag("No WhatsApp");
       setOrderConfirmReply("✅ *Order Confirmed!*\n\nHi {{customer_name}}, thank you for your order! 🛍️\n\n*Order:* {{order_number}}\n*Total:* {{grand_total}}\n\nWe're preparing your items for shipping. We'll notify you once it's on the way! 🚚");
       setOrderCancelReply("Your order has been cancelled as requested. ❌");
       setAdminPhoneNumber("");
@@ -83,6 +89,8 @@ const MerchantSettings = () => {
       orderConfirmTag,
       orderCancelTag,
       pendingConfirmTag,
+      adminNotifiedTag,
+      noWhatsappTag,
       orderConfirmReply,
       orderCancelReply,
       adminPhoneNumber,
@@ -220,7 +228,7 @@ const MerchantSettings = () => {
 
           <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
             <Label className="text-sm font-medium">Order Tagging</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="pendingTag" className="text-[10px] uppercase font-bold text-muted-foreground">Pending tag</Label>
                 <Input
@@ -246,6 +254,24 @@ const MerchantSettings = () => {
                   value={orderCancelTag}
                   onChange={(e) => setOrderCancelTag(e.target.value)}
                   placeholder="Cancelled"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="adminTag" className="text-[10px] uppercase font-bold text-muted-foreground">Admin Notified tag</Label>
+                <Input
+                  id="adminTag"
+                  value={adminNotifiedTag}
+                  onChange={(e) => setAdminNotifiedTag(e.target.value)}
+                  placeholder="Admin Notified"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="noWpTag" className="text-[10px] uppercase font-bold text-muted-foreground">No WhatsApp tag</Label>
+                <Input
+                  id="noWpTag"
+                  value={noWhatsappTag}
+                  onChange={(e) => setNoWhatsappTag(e.target.value)}
+                  placeholder="No WhatsApp"
                 />
               </div>
             </div>
