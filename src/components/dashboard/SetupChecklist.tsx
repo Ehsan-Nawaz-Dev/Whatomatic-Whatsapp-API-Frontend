@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2, Circle, ArrowRight, Smartphone, Zap, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSettings, fetchWhatsAppStatus, getCurrentShop } from "@/lib/api";
+import { fetchSettings, fetchWhatsAppStatus, fetchChatButtonSettings, getCurrentShop } from "@/lib/api";
 
 interface SetupChecklistProps {
     onNavigate: (tab: string) => void;
@@ -19,6 +19,11 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
         queryFn: fetchWhatsAppStatus,
     });
 
+    const { data: chatButton } = useQuery({
+        queryKey: ["chat-button-settings", getCurrentShop()],
+        queryFn: fetchChatButtonSettings,
+    });
+
     const steps = [
         {
             id: "whatsapp",
@@ -32,7 +37,7 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
             id: "settings",
             title: "Configure Settings",
             description: "Set your business number and order tags for automation.",
-            completed: !!settings?.adminPhoneNumber,
+            completed: !!(settings?.whatsappNumber || settings?.adminPhoneNumber || settings?.phone),
             tab: "settings",
             icon: Zap
         },
@@ -40,7 +45,7 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
             id: "chat-button",
             title: "Enable Chat Button",
             description: "Optional: Add a WhatsApp button to your storefront.",
-            completed: !!settings?.chatButtonEnabled,
+            completed: !!chatButton?.enabled,
             tab: "chat-button",
             icon: MessageSquare
         }
@@ -82,8 +87,8 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
                     <div
                         key={step.id}
                         className={`p-4 rounded-xl border transition-all ${step.completed
-                                ? "bg-success/5 border-success/20 opacity-75"
-                                : "bg-card border-border hover:border-primary/50"
+                            ? "bg-success/5 border-success/20 opacity-75"
+                            : "bg-card border-border hover:border-primary/50"
                             }`}
                     >
                         <div className="flex items-start justify-between mb-3">
