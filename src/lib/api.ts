@@ -359,6 +359,8 @@ export interface Contact {
   email?: string;
   tags?: string[];
   notes?: string;
+  totalOrders?: number;
+  lastOrderAt?: string;
   createdAt: string;
   updatedAt?: string;
 }
