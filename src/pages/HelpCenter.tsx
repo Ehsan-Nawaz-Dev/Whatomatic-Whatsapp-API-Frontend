@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { submitContact } from "@/lib/api";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
-import { Mail, MessageCircle, Clock, ShieldCheck } from "lucide-react";
+import { Mail, MessageCircle, Clock, ShieldCheck, Phone, MapPin } from "lucide-react";
 
 const HelpCenter = () => {
   const [name, setName] = useState("");
@@ -70,20 +70,22 @@ const HelpCenter = () => {
               </div>
               <div className="flex items-center gap-4 mb-4 text-primary">
                 <div className="p-3 rounded-xl bg-primary/10">
-                  <Clock className="w-6 h-6" />
+                  <Phone className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold">Average Response</h3>
-                  <p className="text-sm text-muted-foreground">Under 12 hours</p>
+                  <h3 className="font-bold">Phone Support</h3>
+                  <p className="text-sm text-muted-foreground">+92 310-5878854</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 text-primary">
                 <div className="p-3 rounded-xl bg-primary/10">
-                  <ShieldCheck className="w-6 h-6" />
+                  <MapPin className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold">Privacy Guaranteed</h3>
-                  <p className="text-sm text-muted-foreground">100% secure connection</p>
+                  <h3 className="font-bold">Office Address</h3>
+                  <p className="text-xs text-muted-foreground leading-tight">
+                    Street 36 Silk Bank Plaza Lower Basement Workzone E11/3 Islamabad, Pakistan
+                  </p>
                 </div>
               </div>
             </div>
