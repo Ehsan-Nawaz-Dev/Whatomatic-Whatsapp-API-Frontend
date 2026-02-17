@@ -136,11 +136,11 @@ const MessageTemplates = () => {
   };
 
   return (
-    <div className="space-y-4 xl:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-3 lg:space-y-4 xl:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl xl:text-2xl font-bold text-foreground">Message Templates</h1>
-          <p className="text-xs xl:text-sm text-muted-foreground mt-1">
+          <h1 className="text-lg lg:text-xl xl:text-2xl font-bold text-foreground">Message Templates</h1>
+          <p className="text-[10px] lg:text-xs xl:text-sm text-muted-foreground mt-0.5">
             Customize the messages sent to your customers
           </p>
         </div>
@@ -150,8 +150,8 @@ const MessageTemplates = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-6">
-        {isLoading && <p className="text-sm text-muted-foreground">Loading templates...</p>}
+      <div className="grid grid-cols-2 gap-2.5 lg:gap-3 xl:gap-4">
+        {isLoading && <p className="text-sm text-muted-foreground col-span-2">Loading templates...</p>}
         {!isLoading && templates.map((template: any, index: number) => {
           const Icon = iconMap[template.event as EventKey] ?? MessageSquare;
           return (
@@ -160,54 +160,54 @@ const MessageTemplates = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`p-6 bg-card rounded-xl border shadow-card transition-all duration-300 ${template.enabled ? "border-primary/30" : "border-border opacity-70"
+              className={`p-3 lg:p-4 xl:p-5 bg-card rounded-xl border shadow-card transition-all duration-300 ${template.enabled ? "border-primary/30" : "border-border opacity-70"
                 }`}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${template.enabled ? "gradient-primary" : "bg-muted"
+              <div className="flex items-start justify-between mb-2 lg:mb-3">
+                <div className="flex items-center gap-2 lg:gap-3">
+                  <div className={`w-8 h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12 rounded-lg xl:rounded-xl flex items-center justify-center shrink-0 ${template.enabled ? "gradient-primary" : "bg-muted"
                     }`}>
-                    <Icon className={`w-6 h-6 ${template.enabled ? "text-primary-foreground" : "text-muted-foreground"
+                    <Icon className={`w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 ${template.enabled ? "text-primary-foreground" : "text-muted-foreground"
                       }`} />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-foreground">{template.name}</h3>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 lg:gap-2">
+                      <h3 className="font-semibold text-xs lg:text-sm xl:text-base text-foreground truncate">{template.name}</h3>
                       {template.isPoll && (
-                        <span className="text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-md font-bold uppercase">Poll</span>
+                        <span className="text-[8px] lg:text-[9px] xl:text-[10px] px-1 lg:px-1.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-md font-bold uppercase shrink-0">Poll</span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground font-mono">{template.event}</p>
+                    <p className="text-[10px] lg:text-xs text-muted-foreground font-mono truncate">{template.event}</p>
                   </div>
                 </div>
 
                 {/* Toggle Switch */}
                 <button
                   onClick={() => toggleTemplate(template)}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${template.enabled ? "bg-primary" : "bg-muted"
+                  className={`relative w-9 h-5 lg:w-10 lg:h-5 xl:w-11 xl:h-6 rounded-full transition-colors duration-200 shrink-0 ${template.enabled ? "bg-primary" : "bg-muted"
                     }`}
                 >
                   <span
-                    className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-card shadow-sm transition-transform duration-200 ${template.enabled ? "translate-x-5" : "translate-x-0"
+                    className={`absolute top-0.5 left-0.5 lg:top-1 lg:left-1 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 rounded-full bg-card shadow-sm transition-transform duration-200 ${template.enabled ? "translate-x-4 lg:translate-x-5" : "translate-x-0"
                       }`}
                   />
                 </button>
               </div>
 
               {/* Message Preview */}
-              <div className="p-4 bg-muted/50 rounded-lg mb-4">
-                <pre className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">
+              <div className="p-2 lg:p-3 xl:p-4 bg-muted/50 rounded-lg mb-2 lg:mb-3">
+                <pre className="text-[10px] lg:text-xs xl:text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed line-clamp-4 xl:line-clamp-6">
                   {template.message}
                 </pre>
               </div>
 
               {/* Poll Options Preview */}
               {template.isPoll && template.pollOptions && template.pollOptions.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1 lg:gap-1.5 mb-2 lg:mb-3">
                   {template.pollOptions.map((opt: string, i: number) => (
                     <span
                       key={i}
-                      className="px-2.5 py-1 bg-primary/5 border border-primary/20 rounded-full text-[10px] font-bold text-primary flex items-center gap-1 shadow-sm"
+                      className="px-1.5 lg:px-2 py-0.5 bg-primary/5 border border-primary/20 rounded-full text-[8px] lg:text-[9px] xl:text-[10px] font-bold text-primary flex items-center gap-0.5 shadow-sm"
                     >
                       <div className="w-1 h-1 rounded-full bg-primary" />
                       {opt}
@@ -217,23 +217,23 @@ const MessageTemplates = () => {
               )}
 
               {/* Actions */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 lg:gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 h-7 lg:h-8 text-[10px] lg:text-xs"
                   onClick={() => openEditDialog(template)}
                 >
-                  <Edit2 className="w-4 h-4 mr-2" />
+                  <Edit2 className="w-3 h-3 lg:w-3.5 lg:h-3.5 mr-1 lg:mr-1.5" />
                   Edit
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 lg:h-8 w-7 lg:w-8 p-0"
                   onClick={() => deleteMut.mutate(template._id)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
                 </Button>
               </div>
             </motion.div>
@@ -246,10 +246,10 @@ const MessageTemplates = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="p-6 bg-accent/30 rounded-xl border border-border"
+        className="p-3 lg:p-4 xl:p-6 bg-accent/30 rounded-xl border border-border"
       >
-        <h3 className="font-semibold text-foreground mb-4">Available Placeholders</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <h3 className="font-semibold text-xs lg:text-sm xl:text-base text-foreground mb-2 lg:mb-3 xl:mb-4">Available Placeholders</h3>
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 lg:gap-2 xl:gap-3">
           {[
             "{{customer_name}}",
             "{{order_id}}",
@@ -271,7 +271,7 @@ const MessageTemplates = () => {
           ].map((placeholder) => (
             <code
               key={placeholder}
-              className="px-3 py-2 bg-card rounded-lg text-sm font-mono text-primary border border-border"
+              className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 bg-card rounded-lg text-[9px] lg:text-[10px] xl:text-xs font-mono text-primary border border-border truncate"
             >
               {placeholder}
             </code>
