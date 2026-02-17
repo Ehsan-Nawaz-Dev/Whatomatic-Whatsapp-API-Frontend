@@ -196,12 +196,12 @@ const Dashboard = () => {
           <a href="/dashboard?tab=help">Help & Support</a>
         </NavMenu>
 
-        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto overflow-x-hidden">
+        <main className="flex-1 p-2.5 sm:p-3 lg:p-4 xl:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
-            <div className="space-y-4 lg:space-y-6">
+            <div className="space-y-3 lg:space-y-4 xl:space-y-6">
               <SetupChecklist onNavigate={setActiveTab} />
               <StatsCards />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 xl:gap-6">
                 <WhatsAppConnection />
                 <RecentActivity />
               </div>
@@ -215,7 +215,7 @@ const Dashboard = () => {
           {effectiveTab === "automations" && <AutomationsOverview />}
 
           {effectiveTab === "analytics" && (
-            <div className="space-y-4 lg:space-y-6">
+            <div className="space-y-3 lg:space-y-4 xl:space-y-6">
               <AnalyticsOverview />
             </div>
           )}
@@ -229,19 +229,19 @@ const Dashboard = () => {
           )}
 
           {effectiveTab === "billing" && (
-            <div className="space-y-4 lg:space-y-6">
+            <div className="space-y-3 lg:space-y-4 xl:space-y-6">
               <BillingPlan />
             </div>
           )}
 
           {effectiveTab === "settings" && (
-            <div className="space-y-4 lg:space-y-6 max-w-5xl">
+            <div className="space-y-3 lg:space-y-4 xl:space-y-6 max-w-5xl">
               <MerchantSettings />
             </div>
           )}
 
           {effectiveTab === "help" && (
-            <div className="space-y-4 lg:space-y-6">
+            <div className="space-y-3 lg:space-y-4 xl:space-y-6">
               <HelpSupport />
             </div>
           )}

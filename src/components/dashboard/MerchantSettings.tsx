@@ -131,7 +131,7 @@ const MerchantSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-3 lg:space-y-4 xl:space-y-6"
     >
       {isDirty && (
         <SaveBar id="merchant-settings-save-bar">
@@ -141,14 +141,14 @@ const MerchantSettings = () => {
       )}
 
       <div>
-        <h1 className="text-xl xl:text-2xl font-bold text-foreground">Merchant Settings</h1>
-        <p className="text-muted-foreground mt-1 text-xs xl:text-sm max-w-2xl">
+        <h1 className="text-lg lg:text-xl xl:text-2xl font-bold text-foreground">Merchant Settings</h1>
+        <p className="text-muted-foreground mt-0.5 lg:mt-1 text-[10px] lg:text-xs xl:text-sm max-w-2xl">
           Configure your Shopify store and WhatsApp connection. These settings will be used by
           the automation engine.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 xl:gap-8">
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">

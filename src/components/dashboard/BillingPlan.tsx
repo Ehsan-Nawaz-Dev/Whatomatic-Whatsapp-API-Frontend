@@ -143,18 +143,18 @@ const BillingPlan = () => {
     });
 
     return (
-        <div className="space-y-8 max-w-6xl mx-auto">
+        <div className="space-y-4 lg:space-y-6 xl:space-y-8 max-w-6xl mx-auto">
             {/* Plans Grid */}
             <div>
-                <div className="text-center mb-6 xl:mb-10">
-                    <h2 className="text-2xl xl:text-3xl font-bold text-black mb-2">Choose Your Plan</h2>
-                    <p className="text-sm xl:text-base text-black/70 italic px-4">Scale your business with the power of WhatsApp automation</p>
+                <div className="text-center mb-4 lg:mb-6 xl:mb-10">
+                    <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-black mb-1 lg:mb-2">Choose Your Plan</h2>
+                    <p className="text-xs lg:text-sm xl:text-base text-black/70 italic px-4">Scale your business with the power of WhatsApp automation</p>
                 </div>
 
                 {isPlansLoading ? (
-                    <div className="text-center py-20 text-slate-500 animate-pulse">Loading plans...</div>
+                    <div className="text-center py-12 lg:py-20 text-slate-500 animate-pulse">Loading plans...</div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 xl:gap-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 lg:gap-4 xl:gap-6">
                         {displayPlans.map((plan: any) => {
                             const isCurrent = plan.id === currentPlanId || (isTrial && plan.id === 'trial'); // Wait, trial is special handling
                             const Icon = plan.icon;
@@ -162,35 +162,35 @@ const BillingPlan = () => {
                             return (
                                 <motion.div
                                     key={plan.id}
-                                    whileHover={{ y: -5 }}
-                                    className={`relative bg-card text-card-foreground rounded-2xl border ${plan.popular ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border'} p-6 flex flex-col`}
+                                    whileHover={{ y: -3 }}
+                                    className={`relative bg-card text-card-foreground rounded-xl lg:rounded-2xl border ${plan.popular ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border'} p-3 lg:p-4 xl:p-6 flex flex-col`}
                                 >
                                     {plan.popular && (
-                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
-                                            <Star size={12} fill="currentColor" /> MOST POPULAR
+                                        <div className="absolute -top-2.5 lg:-top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[9px] lg:text-xs font-bold px-2 lg:px-3 py-0.5 lg:py-1 rounded-full flex items-center gap-1 shadow-lg">
+                                            <Star size={10} fill="currentColor" /> POPULAR
                                         </div>
                                     )}
 
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${plan.bgColor} ${plan.color}`}>
-                                        <Icon size={24} />
+                                    <div className={`w-8 h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12 rounded-lg xl:rounded-xl flex items-center justify-center mb-2 lg:mb-3 xl:mb-4 ${plan.bgColor} ${plan.color}`}>
+                                        <Icon className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
                                     </div>
 
-                                    <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                                    <div className="flex items-baseline gap-1 mb-6">
-                                        <span className="text-3xl font-bold">${plan.price}</span>
-                                        <span className="text-muted-foreground text-sm">/mo</span>
+                                    <h3 className="text-sm lg:text-base xl:text-xl font-bold mb-0.5 lg:mb-1">{plan.name}</h3>
+                                    <div className="flex items-baseline gap-0.5 lg:gap-1 mb-3 lg:mb-4 xl:mb-6">
+                                        <span className="text-xl lg:text-2xl xl:text-3xl font-bold">${plan.price}</span>
+                                        <span className="text-muted-foreground text-[10px] lg:text-xs xl:text-sm">/mo</span>
                                     </div>
 
-                                    <ul className="space-y-3 mb-8 flex-1">
-                                        <li className="flex items-center gap-3 text-sm">
-                                            <div className={`p-1 rounded-full ${plan.bgColor} ${plan.color}`}>
-                                                <Check size={12} />
+                                    <ul className="space-y-1.5 lg:space-y-2 xl:space-y-3 mb-4 lg:mb-6 xl:mb-8 flex-1">
+                                        <li className="flex items-center gap-2 lg:gap-3 text-xs lg:text-sm">
+                                            <div className={`p-0.5 lg:p-1 rounded-full ${plan.bgColor} ${plan.color}`}>
+                                                <Check className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
                                             </div>
                                             <span className="font-bold">{plan.messageLimit} Messages</span>
                                         </li>
                                         {plan.features.map((feature: string, i: number) => (
-                                            <li key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-                                                <Check size={16} className="text-green-500 shrink-0" />
+                                            <li key={i} className="flex items-center gap-2 lg:gap-3 text-[11px] lg:text-xs xl:text-sm text-muted-foreground">
+                                                <Check className="w-3 h-3 lg:w-4 lg:h-4 text-green-500 shrink-0" />
                                                 <span>{feature}</span>
                                             </li>
                                         ))}

@@ -77,13 +77,13 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
               <button
                 onClick={() => handleNavClick(item.id, item.locked)}
                 title={item.locked ? "🔒 Please subscribe to a package" : undefined}
-                className={`w-full flex items-center justify-between px-3 lg:px-4 py-2.5 lg:py-3 rounded-lg text-sm font-medium transition-all duration-200 ${item.locked ? 'opacity-40 cursor-not-allowed' : (activeTab === item.id
+                className={`w-full flex items-center justify-between px-2.5 lg:px-3 xl:px-4 py-2 lg:py-2 xl:py-2.5 rounded-lg text-xs lg:text-[13px] xl:text-sm font-medium transition-all duration-200 ${item.locked ? 'opacity-40 cursor-not-allowed' : (activeTab === item.id
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}`}
               >
-                <div className="flex items-center gap-2.5 lg:gap-3 min-w-0">
-                  <item.icon className="w-5 h-5 shrink-0" />
+                <div className="flex items-center gap-2 lg:gap-2 xl:gap-3 min-w-0">
+                  <item.icon className="w-4 h-4 lg:w-[18px] lg:h-[18px] xl:w-5 xl:h-5 shrink-0" />
                   <span className="truncate">{item.label}</span>
                 </div>
                 {item.locked && <Lock className="w-3.5 h-3.5 animate-pulse shrink-0" />}
@@ -129,8 +129,8 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
         className={`
           fixed lg:relative z-50 lg:z-auto
           top-0 left-0 h-full
-          w-[260px] lg:w-56 xl:w-64
-          bg-card border-r border-border flex flex-col
+          w-[260px] lg:w-48 xl:w-56 2xl:w-64
+          bg-card border-r border-border flex flex-col shrink-0
           transform transition-transform duration-300 ease-in-out
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}

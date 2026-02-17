@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ArrowRight, Smartphone, Zap, MessageSquare } from "lucide-react";
+import { CheckCircle2, Circle, ArrowRight, Smartphone, Zap, MessageSquare, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSettings, fetchWhatsAppStatus, fetchChatButtonSettings, getCurrentShop } from "@/lib/api";
@@ -68,19 +68,20 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
         <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 bg-gradient-to-br from-primary/10 via-background to-background rounded-2xl border border-primary/20 shadow-sm mb-6"
+            className="p-3 lg:p-4 xl:p-6 bg-gradient-to-br from-primary/5 via-card to-card rounded-xl border border-primary/10 shadow-card"
         >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center justify-between mb-3 lg:mb-4 xl:mb-6">
                 <div>
-                    <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-                        🚀 Complete your setup
+                    <h2 className="text-sm lg:text-base xl:text-lg font-bold text-foreground flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 text-primary" />
+                        Quick Setup Guide
                     </h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Finish these steps to start automating your customer communications.
+                    <p className="text-[10px] lg:text-xs xl:text-sm text-muted-foreground mt-0.5 lg:mt-1">
+                        Complete these steps to get started with WhatFlow
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="h-2 w-32 bg-muted rounded-full overflow-hidden">
+                <div className="flex items-center gap-2 lg:gap-3">
+                    <div className="w-16 lg:w-20 xl:w-24 h-1.5 lg:h-2 rounded-full bg-muted overflow-hidden">
                         <div
                             className="h-full bg-primary transition-all duration-500"
                             style={{ width: `${(completedCount / steps.length) * 100}%` }}

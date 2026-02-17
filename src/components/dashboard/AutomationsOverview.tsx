@@ -227,8 +227,8 @@ const AutomationsOverview = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">WhatsApp Automations</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-lg lg:text-xl xl:text-2xl font-bold text-foreground">WhatsApp Automations</h1>
+                    <p className="text-muted-foreground mt-0.5 lg:mt-1 text-xs lg:text-sm">
                         Increase conversions and keep customers updated with automated flows.
                     </p>
                 </div>
@@ -243,46 +243,46 @@ const AutomationsOverview = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`p-4 lg:p-6 bg-card rounded-2xl border border-border shadow-card flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6 transition-all hover:border-primary/30 ${!flow.enabled && "opacity-75 grayscale-[0.5]"
+                        className={`p-3 lg:p-4 xl:p-6 bg-card rounded-xl lg:rounded-2xl border border-border shadow-card flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 xl:gap-6 transition-all hover:border-primary/30 ${!flow.enabled && "opacity-75 grayscale-[0.5]"
                             }`}
                     >
-                        <div className="flex items-start lg:items-center gap-4">
-                            <div className={`w-12 h-12 lg:w-14 lg:h-14 shrink-0 rounded-2xl flex items-center justify-center ${flow.enabled ? "gradient-primary shadow-lg shadow-primary/20" : "bg-muted"
+                        <div className="flex items-start lg:items-center gap-3 lg:gap-4">
+                            <div className={`w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 shrink-0 rounded-xl lg:rounded-2xl flex items-center justify-center ${flow.enabled ? "gradient-primary shadow-lg shadow-primary/20" : "bg-muted"
                                 }`}>
-                                <flow.icon className={`w-6 h-6 lg:w-7 lg:h-7 ${flow.enabled ? "text-primary-foreground" : "text-muted-foreground"}`} />
+                                <flow.icon className={`w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 ${flow.enabled ? "text-primary-foreground" : "text-muted-foreground"}`} />
                             </div>
                             <div className="min-w-0">
-                                <h3 className="font-bold text-base lg:text-lg text-foreground flex items-center gap-2 flex-wrap">
+                                <h3 className="font-bold text-sm lg:text-base xl:text-lg text-foreground flex items-center gap-2 flex-wrap">
                                     {flow.title}
-                                    {!flow.enabled && <Badge variant="secondary" className="text-[10px] font-normal">Disabled</Badge>}
+                                    {!flow.enabled && <Badge variant="secondary" className="text-[9px] lg:text-[10px] font-normal">Disabled</Badge>}
                                 </h3>
-                                <p className="text-xs lg:text-sm text-muted-foreground max-w-md line-clamp-2 md:line-clamp-none">{flow.description}</p>
+                                <p className="text-[11px] lg:text-xs xl:text-sm text-muted-foreground max-w-md line-clamp-2 md:line-clamp-none">{flow.description}</p>
                             </div>
                         </div>
 
                         {/* Stats removed as per user request */}
 
-                        <div className="flex items-center justify-between lg:justify-end gap-3 lg:gap-4 mt-2 lg:mt-0 pt-3 lg:pt-0 border-t border-border/50 lg:border-none">
-                            <div className="flex gap-2">
+                        <div className="flex items-center justify-between lg:justify-end gap-2 lg:gap-3 xl:gap-4 mt-1 lg:mt-0 pt-2 lg:pt-0 border-t border-border/50 lg:border-none">
+                            <div className="flex gap-1.5 lg:gap-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-8 lg:h-9 text-xs"
+                                    className="h-7 lg:h-8 xl:h-9 text-[11px] lg:text-xs px-2 lg:px-3"
                                     onClick={() => {
                                         setSelectedFlow(flow);
                                         setPreviewOpen(true);
                                     }}
                                 >
-                                    <Eye className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1.5" />
+                                    <Eye className="w-3 h-3 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 mr-1 lg:mr-1.5" />
                                     Preview
                                 </Button>
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-8 lg:h-9 text-xs"
+                                    className="h-7 lg:h-8 xl:h-9 text-[11px] lg:text-xs px-2 lg:px-3"
                                     onClick={() => handleEditClick(flow)}
                                 >
-                                    <Edit2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1.5" />
+                                    <Edit2 className="w-3 h-3 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 mr-1 lg:mr-1.5" />
                                     Edit
                                 </Button>
                             </div>

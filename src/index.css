@@ -201,120 +201,422 @@ ui-title-bar {
   }
 }
 
-/* Small Screen Optimization (e.g., 13-14 inch screens) */
-@media (max-width: 1440px) or (max-height: 850px) {
+/* ============================================================
+   RESPONSIVE DESIGN SYSTEM
+   Min screen: 13" laptops (1280x800 / 1366x768)
+   Scales gracefully up to 4K displays
+   ============================================================ */
+
+/* --- Fluid base font size: 13px at 1280px → 16px at 1920px+ --- */
+html {
+  font-size: clamp(13px, 0.625rem + 0.3906vw, 16px);
+}
+
+/* --- Compact layout for screens ≤1440px wide OR ≤850px tall --- */
+@media (max-width: 1440px),
+(max-height: 850px) {
   :root {
     --radius: 0.5rem;
   }
+}
 
-  html {
-    font-size: 14px;
-    /* Global scale down from 16px */
+/* ===================== SIDEBAR ===================== */
+/* Sidebar compactness on smaller laptops */
+@media (max-width: 1440px) {
+  aside[class] {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
   }
 
-  /* Compact Sidebar */
-  aside {
-    width: 220px !important;
+  /* Compact logo area */
+  aside .px-5 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 
-  aside nav {
-    padding: 0.5rem !important;
+  aside .py-6 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
 
-  aside nav button {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
-    margin-bottom: 2px !important;
-  }
-
-  /* Compact Dashboard Header */
-  header {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
-    height: auto !important;
-    min-height: 56px !important;
-  }
-
-  /* Main Content Spacing */
-  main {
-    padding: 1rem !important;
-  }
-
-  .space-y-4 {
-    margin-top: 0.75rem !important;
-    margin-bottom: 0.75rem !important;
-  }
-
-  .space-y-6 {
-    margin-top: 1rem !important;
-    margin-bottom: 1rem !important;
-  }
-
-  /* Font Adjustments */
-  h1 {
-    font-size: 1.5rem !important;
-    letter-spacing: -0.01em !important;
-  }
-
-  h2 {
-    font-size: 1.25rem !important;
-  }
-
-  h3 {
-    font-size: 1.1rem !important;
-  }
-
-  .text-sm {
-    font-size: 0.825rem !important;
-  }
-
-  .text-xs {
-    font-size: 0.75rem !important;
-  }
-
-  /* Card and Stat Card Optimization */
-  .card,
-  [class*="bg-card"] {
-    padding: 1rem !important;
-  }
-
-  /* Reduce gaps in grids */
-  .grid {
-    gap: 0.75rem !important;
-  }
-
-  /* Specific Component Adjustments */
-  .max-h-\[400px\] {
-    max-height: 280px !important;
-  }
-
-  /* Hide Search on very short screens to save vertical space */
-  @media (max-height: 780px) {
-    header input {
-      display: none !important;
-    }
-
-    header .relative {
-      display: none !important;
-    }
-  }
-
-  /* Scale down the setup checklist if present */
-  [class*="SetupChecklist"] h2 {
-    font-size: 1.1rem !important;
-  }
-
-  [class*="SetupChecklist"] .grid {
-    gap: 0.5rem !important;
-  }
-
-  /* Fix for sidebar logo height */
   aside img {
-    max-height: 32px !important;
+    max-height: 28px;
   }
 
-  aside .px-5.py-6 {
-    padding-top: 1rem !important;
-    padding-bottom: 1rem !important;
+  /* Compact nav items */
+  aside nav {
+    padding: 0.375rem;
+  }
+
+  aside nav button,
+  aside nav a {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+    margin-bottom: 1px;
+  }
+
+  aside nav .gap-3 {
+    gap: 0.5rem;
+  }
+
+  aside nav svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+/* Extra tight sidebar for very small screens */
+@media (max-width: 1366px) {
+  aside[class] {
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
+  }
+
+  aside nav button,
+  aside nav a {
+    padding: 0.3125rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ===================== HEADER ===================== */
+@media (max-width: 1440px) {
+  header[class] {
+    height: 3rem;
+    min-height: 3rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  header input[type="text"] {
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Hide search on short screens */
+@media (max-height: 780px) {
+  header .relative:has(input) {
+    display: none;
+  }
+}
+
+/* ===================== MAIN CONTENT ===================== */
+@media (max-width: 1440px) {
+  main[class] {
+    padding: 0.75rem;
+  }
+}
+
+@media (min-width: 1441px) and (max-width: 1920px) {
+  main[class] {
+    padding: 1.25rem;
+  }
+}
+
+/* ===================== CARDS ===================== */
+/* Stat cards, automation cards, and content cards */
+@media (max-width: 1440px) {
+
+  /* Automation flow cards */
+  [class*="bg-card"][class*="rounded-2xl"] {
+    padding: 0.75rem;
+  }
+
+  /* Stat cards with shadows */
+  [class*="shadow-card"] {
+    padding: 0.75rem;
+  }
+
+  /* Setup checklist */
+  [class*="from-primary"] {
+    padding: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* ===================== TYPOGRAPHY ===================== */
+@media (max-width: 1440px) {
+
+  /* Dashboard section titles */
+  .text-2xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .text-xl {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+
+  .text-lg {
+    font-size: 1rem;
+    line-height: 1.375rem;
+  }
+
+  .text-3xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
+
+/* ===================== GRIDS & SPACING ===================== */
+@media (max-width: 1440px) {
+
+  /* Tighter grid gaps */
+  .gap-4 {
+    gap: 0.625rem;
+  }
+
+  .gap-6 {
+    gap: 0.75rem;
+  }
+
+  .gap-8 {
+    gap: 1rem;
+  }
+
+  /* Tighter vertical spacing */
+  .space-y-4>*+* {
+    margin-top: 0.625rem;
+  }
+
+  .space-y-6>*+* {
+    margin-top: 0.75rem;
+  }
+
+  .space-y-8>*+* {
+    margin-top: 1rem;
+  }
+
+  /* Margins and padding adjustments */
+  .mb-4 {
+    margin-bottom: 0.625rem;
+  }
+
+  .mb-6 {
+    margin-bottom: 0.75rem;
+  }
+
+  .mb-8 {
+    margin-bottom: 1rem;
+  }
+
+  .p-4 {
+    padding: 0.625rem;
+  }
+
+  .p-5 {
+    padding: 0.75rem;
+  }
+
+  .p-6 {
+    padding: 0.875rem;
+  }
+
+  .p-8 {
+    padding: 1rem;
+  }
+
+  .py-6,
+  .py-8,
+  .py-12,
+  .py-20 {
+    padding-top: clamp(0.75rem, 1vw, 1.5rem);
+    padding-bottom: clamp(0.75rem, 1vw, 1.5rem);
+  }
+
+  .px-6,
+  .px-8 {
+    padding-left: clamp(0.75rem, 1vw, 1.5rem);
+    padding-right: clamp(0.75rem, 1vw, 1.5rem);
+  }
+}
+
+/* ===================== BUTTONS ===================== */
+@media (max-width: 1440px) {
+
+  button[class*="h-9"],
+  button[class*="h-10"],
+  button[class*="h-11"] {
+    height: auto;
+    min-height: 2rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .py-6>button,
+  button[class*="py-6"] {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+}
+
+/* ===================== FORM INPUTS ===================== */
+@media (max-width: 1440px) {
+
+  input[class*="h-10"],
+  input[class*="h-11"],
+  select[class*="h-10"] {
+    height: 2.25rem;
+    font-size: 0.8125rem;
+  }
+
+  textarea {
+    font-size: 0.8125rem;
+  }
+
+  textarea[class*="min-h-"] {
+    min-height: 70px;
+  }
+}
+
+/* ===================== ICONS ===================== */
+@media (max-width: 1440px) {
+
+  /* Large icons scale down */
+  .w-12.h-12,
+  [class*="w-12"][class*="h-12"] {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .w-14.h-14,
+  [class*="w-14"][class*="h-14"] {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .w-16.h-16 {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+/* ===================== CHARTS ===================== */
+@media (max-width: 1440px) {
+
+  /* Make chart containers shorter */
+  .h-\[300px\] {
+    height: 220px;
+  }
+}
+
+@media (max-height: 850px) {
+  .h-\[300px\] {
+    height: 200px;
+  }
+}
+
+/* ===================== SCROLLABLE LISTS ===================== */
+@media (max-width: 1440px) {
+  .max-h-\[400px\] {
+    max-height: 250px;
+  }
+}
+
+@media (max-height: 800px) {
+  .max-h-\[400px\] {
+    max-height: 200px;
+  }
+}
+
+/* ===================== BILLING PLAN CARDS ===================== */
+@media (max-width: 1440px) {
+
+  /* Plan card feature lists tighter */
+  [class*="space-y-3"][class*="mb-8"] {
+    margin-bottom: 1rem;
+  }
+
+  [class*="space-y-3"][class*="mb-8"]>*+* {
+    margin-top: 0.375rem;
+  }
+}
+
+/* ===================== DIALOGS / MODALS ===================== */
+@media (max-width: 1440px) {
+  [role="dialog"] {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  [role="dialog"] .min-h-\[200px\] {
+    min-height: 120px;
+  }
+
+  [role="dialog"] .min-h-\[400px\] {
+    min-height: 280px;
+  }
+}
+
+/* ===================== QR CODE / WHATSAPP CONNECTION ===================== */
+@media (max-width: 1440px) {
+  .w-64.h-64 {
+    width: 12rem;
+    height: 12rem;
+  }
+}
+
+@media (max-height: 850px) {
+  .w-64.h-64 {
+    width: 10rem;
+    height: 10rem;
+  }
+}
+
+/* ===================== PHONE PREVIEW (Chat Button Config) ===================== */
+@media (max-width: 1440px) {
+  .w-\[280px\] {
+    width: 220px;
+  }
+
+  .h-\[500px\] {
+    height: 380px;
+  }
+
+  .min-h-\[400px\] {
+    min-height: 300px;
+  }
+}
+
+/* ===================== AUTOMATION CARDS ===================== */
+@media (max-width: 1440px) {
+
+  /* Tighter automation card layout */
+  [class*="flex-col"][class*="lg:flex-row"] {
+    gap: 0.5rem;
+  }
+}
+
+/* ===================== BADGE / TAGS ===================== */
+@media (max-width: 1440px) {
+  [class*="rounded-full"][class*="text-xs"] {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+}
+
+/* ===================== VERY SHORT SCREENS (laptops with task bars) ===================== */
+@media (max-height: 768px) {
+  main[class] {
+    padding: 0.5rem;
+  }
+
+  /* Hide decorative elements to save space */
+  .animate-float {
+    animation: none;
+  }
+}
+
+/* ===================== LARGE SCREENS (1920px+) ===================== */
+@media (min-width: 1921px) {
+
+  /* Allow content to breathe on ultra-wide */
+  main[class] {
+    max-width: 1600px;
   }
 }

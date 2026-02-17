@@ -58,21 +58,21 @@ const StatsCards = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-3 xl:gap-4">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          className="p-4 lg:p-6 bg-card rounded-xl border border-border shadow-card hover:shadow-lg transition-all duration-300"
+          className="p-3 lg:p-4 xl:p-6 bg-card rounded-xl border border-border shadow-card hover:shadow-lg transition-all duration-300"
         >
-          <div className="flex items-start justify-between mb-3 lg:mb-4">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-accent flex items-center justify-center">
-              <stat.icon className="w-5 h-5 lg:w-6 lg:h-6 text-primary" />
+          <div className="flex items-start justify-between mb-2 lg:mb-3 xl:mb-4">
+            <div className="w-8 h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12 rounded-lg xl:rounded-xl bg-accent flex items-center justify-center">
+              <stat.icon className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 text-primary" />
             </div>
             <span
-              className={`text-xs font-medium px-2 py-1 rounded-full ${stat.positive
+              className={`text-[10px] lg:text-xs font-medium px-1.5 lg:px-2 py-0.5 lg:py-1 rounded-full ${stat.positive
                 ? "bg-success/10 text-success"
                 : "bg-destructive/10 text-destructive"
                 }`}
@@ -80,8 +80,8 @@ const StatsCards = () => {
               {stat.change}
             </span>
           </div>
-          <h3 className="text-xl lg:text-2xl font-bold text-foreground mb-1">{stat.value}</h3>
-          <p className="text-sm text-muted-foreground">{stat.label}</p>
+          <h3 className="text-lg lg:text-xl xl:text-2xl font-bold text-foreground mb-0.5 lg:mb-1">{stat.value}</h3>
+          <p className="text-[11px] lg:text-xs xl:text-sm text-muted-foreground">{stat.label}</p>
         </motion.div>
       ))}
     </div>
