@@ -154,44 +154,44 @@ const BillingPlan = () => {
                 {isPlansLoading ? (
                     <div className="text-center py-12 lg:py-20 text-slate-500 animate-pulse">Loading plans...</div>
                 ) : (
-                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 lg:gap-4 xl:gap-6">
+                    <div className="grid grid-cols-4 gap-2 lg:gap-3 xl:gap-4">
                         {displayPlans.map((plan: any) => {
-                            const isCurrent = plan.id === currentPlanId || (isTrial && plan.id === 'trial'); // Wait, trial is special handling
+                            const isCurrent = plan.id === currentPlanId || (isTrial && plan.id === 'trial');
                             const Icon = plan.icon;
 
                             return (
                                 <motion.div
                                     key={plan.id}
                                     whileHover={{ y: -3 }}
-                                    className={`relative bg-card text-card-foreground rounded-xl lg:rounded-2xl border ${plan.popular ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border'} p-3 lg:p-4 xl:p-6 flex flex-col`}
+                                    className={`relative bg-card text-card-foreground rounded-xl border ${plan.popular ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border'} p-2.5 lg:p-3 xl:p-4 flex flex-col`}
                                 >
                                     {plan.popular && (
-                                        <div className="absolute -top-2.5 lg:-top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[9px] lg:text-xs font-bold px-2 lg:px-3 py-0.5 lg:py-1 rounded-full flex items-center gap-1 shadow-lg">
-                                            <Star size={10} fill="currentColor" /> POPULAR
+                                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[8px] lg:text-[9px] xl:text-[10px] font-bold px-1.5 lg:px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-lg whitespace-nowrap">
+                                            <Star size={8} fill="currentColor" /> POPULAR
                                         </div>
                                     )}
 
-                                    <div className={`w-8 h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12 rounded-lg xl:rounded-xl flex items-center justify-center mb-2 lg:mb-3 xl:mb-4 ${plan.bgColor} ${plan.color}`}>
-                                        <Icon className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
+                                    <div className={`w-7 h-7 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-lg flex items-center justify-center mb-1.5 lg:mb-2 xl:mb-3 ${plan.bgColor} ${plan.color}`}>
+                                        <Icon className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-5 xl:h-5" />
                                     </div>
 
-                                    <h3 className="text-sm lg:text-base xl:text-xl font-bold mb-0.5 lg:mb-1">{plan.name}</h3>
-                                    <div className="flex items-baseline gap-0.5 lg:gap-1 mb-3 lg:mb-4 xl:mb-6">
-                                        <span className="text-xl lg:text-2xl xl:text-3xl font-bold">${plan.price}</span>
-                                        <span className="text-muted-foreground text-[10px] lg:text-xs xl:text-sm">/mo</span>
+                                    <h3 className="text-xs lg:text-sm xl:text-base font-bold mb-0.5">{plan.name}</h3>
+                                    <div className="flex items-baseline gap-0.5 mb-2 lg:mb-3 xl:mb-4">
+                                        <span className="text-base lg:text-lg xl:text-2xl font-bold">${plan.price}</span>
+                                        <span className="text-muted-foreground text-[9px] lg:text-[10px] xl:text-xs">/mo</span>
                                     </div>
 
-                                    <ul className="space-y-1.5 lg:space-y-2 xl:space-y-3 mb-4 lg:mb-6 xl:mb-8 flex-1">
-                                        <li className="flex items-center gap-2 lg:gap-3 text-xs lg:text-sm">
-                                            <div className={`p-0.5 lg:p-1 rounded-full ${plan.bgColor} ${plan.color}`}>
-                                                <Check className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
+                                    <ul className="space-y-1 lg:space-y-1.5 xl:space-y-2 mb-3 lg:mb-4 xl:mb-6 flex-1">
+                                        <li className="flex items-center gap-1.5 lg:gap-2 text-[10px] lg:text-xs xl:text-sm">
+                                            <div className={`p-0.5 rounded-full ${plan.bgColor} ${plan.color}`}>
+                                                <Check className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
                                             </div>
-                                            <span className="font-bold">{plan.messageLimit} Messages</span>
+                                            <span className="font-bold truncate">{plan.messageLimit} Msgs</span>
                                         </li>
                                         {plan.features.map((feature: string, i: number) => (
-                                            <li key={i} className="flex items-center gap-2 lg:gap-3 text-[11px] lg:text-xs xl:text-sm text-muted-foreground">
-                                                <Check className="w-3 h-3 lg:w-4 lg:h-4 text-green-500 shrink-0" />
-                                                <span>{feature}</span>
+                                            <li key={i} className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] xl:text-xs text-muted-foreground">
+                                                <Check className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-green-500 shrink-0" />
+                                                <span className="truncate">{feature}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -199,22 +199,20 @@ const BillingPlan = () => {
                                     <Button
                                         onClick={() => {
                                             if (plan.price === 0) {
-                                                // Free plan: show dialog to collect details
                                                 setLoadingPlan(plan.id);
                                                 setShowTrialDialog(true);
                                                 setTrialDetails({ name: '', email: '', phone: '' });
                                             } else {
-                                                // Paid plan: go directly to Shopify payment
                                                 createCharge(plan.id);
                                             }
                                         }}
                                         disabled={(plan.id === currentPlanId && status?.status === 'active') || !!loadingPlan}
-                                        className="w-full"
+                                        className="w-full h-7 lg:h-8 xl:h-9 text-[10px] lg:text-xs"
                                         variant={plan.btnVariant as any}
                                     >
                                         {loadingPlan === plan.id ? (
-                                            <span className="flex items-center gap-2">
-                                                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                            <span className="flex items-center gap-1.5">
+                                                <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                                 </svg>
@@ -223,7 +221,7 @@ const BillingPlan = () => {
                                         ) : (plan.id === currentPlanId && status?.status === 'active') ? (
                                             "Current Plan"
                                         ) : (
-                                            "Activate Plan"
+                                            "Activate"
                                         )}
                                     </Button>
                                 </motion.div>
