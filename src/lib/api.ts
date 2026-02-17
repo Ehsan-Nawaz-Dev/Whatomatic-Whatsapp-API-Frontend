@@ -12,7 +12,7 @@ const getShopFromUrl = (): string => {
 
 // Get current shop - always fresh from URL
 export const getCurrentShop = (): string => {
-  return getShopFromUrl() || import.meta.env.VITE_SHOP_DOMAIN || "demo-shop.myshopify.com";
+  return getShopFromUrl() || import.meta.env.VITE_SHOP_DOMAIN || "";
 };
 
 // Keep DEFAULT_SHOP for backward compat

@@ -36,35 +36,40 @@ const Dashboard = () => {
 
   // (Redundant block removed)
 
-  // AUTO-DETECT: If shop in URL but merchant doesn't exist, trigger OAuth
+  // AUTO-DETECT: If shop in URL but merchant doesn't exist or token is missing, trigger OAuth
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const shop = params.get('shop');
 
     if (shop) {
-      // Check if merchant exists by calling billing status
       fetch(withShopParam("/billing/status"))
         .then(async res => {
-          const is401 = res.status === 401;
-          const data = await res.json().catch(() => ({}));
-          return { ...data, status: is401 ? 401 : data.status };
-        })
-        .then(data => {
-          // If merchant doesn't exist OR token is invalid (401), trigger OAuth
-          if (data.status === 401 || (data.plan === 'none' && data.status === 'none')) {
-            const redirectUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
-            console.log(`[Dashboard] Merchant not found for ${shop}. Triggering OAuth installation to: ${redirectUrl}`);
+          if (res.status === 401) {
+            console.warn(`[Dashboard] Token MISSING (401) for ${shop}. Breaking out to OAuth...`);
+            const authUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
 
-            // Break out of iframe for OAuth
-            if (window.top) {
-              window.top.location.href = redirectUrl;
+            // Standard breakout for Shopify Iframe
+            if (window.top !== window.self) {
+              window.top.location.href = authUrl;
             } else {
-              window.location.href = redirectUrl;
+              window.location.href = authUrl;
+            }
+            return;
+          }
+
+          const data = await res.json().catch(() => ({}));
+          // Handle cases where merchant doesn't exist at all
+          if (data.plan === 'none' && data.status === 'none') {
+            const authUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+            if (window.top !== window.self) {
+              window.top.location.href = authUrl;
+            } else {
+              window.location.href = authUrl;
             }
           }
         })
         .catch(err => {
-          console.error('[Dashboard] Failed to check merchant status:', err);
+          console.error('[Dashboard] Status check failed:', err);
         });
     }
   }, []);
