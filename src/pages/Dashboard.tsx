@@ -46,13 +46,12 @@ const Dashboard = () => {
         .then(async res => {
           if (res.status === 401) {
             console.warn(`[Dashboard] Token MISSING (401) for ${shop}. Breaking out to OAuth...`);
-            const authUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+            const authUrl = `https://api.whatomatic.com/Api/auth/shopify?shop=${shop}`;
 
-            // Standard breakout for Shopify Iframe
-            if (window.top !== window.self) {
-              window.top.location.href = authUrl;
+            if (window.top && window.top !== window.self) {
+              window.top.location.replace(authUrl);
             } else {
-              window.location.href = authUrl;
+              window.location.replace(authUrl);
             }
             return;
           }
@@ -60,11 +59,11 @@ const Dashboard = () => {
           const data = await res.json().catch(() => ({}));
           // Handle cases where merchant doesn't exist at all
           if (data.plan === 'none' && data.status === 'none') {
-            const authUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
-            if (window.top !== window.self) {
-              window.top.location.href = authUrl;
+            const authUrl = `https://api.whatomatic.com/Api/auth/shopify?shop=${shop}`;
+            if (window.top && window.top !== window.self) {
+              window.top.location.replace(authUrl);
             } else {
-              window.location.href = authUrl;
+              window.location.replace(authUrl);
             }
           }
         })
