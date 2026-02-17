@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "75863c3625995c738abd1c50caa3e20b"
-name = "Ehsan_Whatomatic"
+name = "Whatomatic"
 application_url = "https://whatflow-alpha.vercel.app/"
 embedded = true
 
