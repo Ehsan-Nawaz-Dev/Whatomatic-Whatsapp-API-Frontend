@@ -174,7 +174,8 @@ ui-title-bar {
   }
 
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
+    /* Thinner scrollbar */
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
@@ -187,7 +188,7 @@ ui-title-bar {
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.3);
+    background: hsl(var(--muted-foreground) / 0.4);
   }
 
   .scrollbar-hide::-webkit-scrollbar {
@@ -197,5 +198,123 @@ ui-title-bar {
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+}
+
+/* Small Screen Optimization (e.g., 13-14 inch screens) */
+@media (max-width: 1440px) or (max-height: 850px) {
+  :root {
+    --radius: 0.5rem;
+  }
+
+  html {
+    font-size: 14px;
+    /* Global scale down from 16px */
+  }
+
+  /* Compact Sidebar */
+  aside {
+    width: 220px !important;
+  }
+
+  aside nav {
+    padding: 0.5rem !important;
+  }
+
+  aside nav button {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Compact Dashboard Header */
+  header {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    height: auto !important;
+    min-height: 56px !important;
+  }
+
+  /* Main Content Spacing */
+  main {
+    padding: 1rem !important;
+  }
+
+  .space-y-4 {
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .space-y-6 {
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Font Adjustments */
+  h1 {
+    font-size: 1.5rem !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+  }
+
+  h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .text-sm {
+    font-size: 0.825rem !important;
+  }
+
+  .text-xs {
+    font-size: 0.75rem !important;
+  }
+
+  /* Card and Stat Card Optimization */
+  .card,
+  [class*="bg-card"] {
+    padding: 1rem !important;
+  }
+
+  /* Reduce gaps in grids */
+  .grid {
+    gap: 0.75rem !important;
+  }
+
+  /* Specific Component Adjustments */
+  .max-h-\[400px\] {
+    max-height: 280px !important;
+  }
+
+  /* Hide Search on very short screens to save vertical space */
+  @media (max-height: 780px) {
+    header input {
+      display: none !important;
+    }
+
+    header .relative {
+      display: none !important;
+    }
+  }
+
+  /* Scale down the setup checklist if present */
+  [class*="SetupChecklist"] h2 {
+    font-size: 1.1rem !important;
+  }
+
+  [class*="SetupChecklist"] .grid {
+    gap: 0.5rem !important;
+  }
+
+  /* Fix for sidebar logo height */
+  aside img {
+    max-height: 32px !important;
+  }
+
+  aside .px-5.py-6 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
   }
 }
