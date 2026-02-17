@@ -260,30 +260,7 @@ const AutomationsOverview = () => {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 sm:gap-8 px-0 lg:px-4 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-                            <div className="space-y-1 shrink-0">
-                                <p className="text-[10px] lg:text-xs text-muted-foreground uppercase tracking-wider font-semibold">Sent</p>
-                                <p className="text-lg lg:text-xl font-bold">{flow.stats.sent}</p>
-                            </div>
-                            {flow.stats.recovered !== null && (
-                                <>
-                                    <div className="w-px h-8 lg:h-10 bg-border shrink-0" />
-                                    <div className="space-y-1 shrink-0">
-                                        <p className="text-[10px] lg:text-xs text-muted-foreground uppercase tracking-wider font-semibold">Recovered</p>
-                                        <p className="text-lg lg:text-xl font-bold text-emerald-500">{flow.stats.recovered}</p>
-                                    </div>
-                                </>
-                            )}
-                            {flow.stats.revenue !== null && (
-                                <>
-                                    <div className="w-px h-8 lg:h-10 bg-border shrink-0" />
-                                    <div className="space-y-1 shrink-0">
-                                        <p className="text-[10px] lg:text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenue</p>
-                                        <p className="text-lg lg:text-xl font-bold text-emerald-500">{flow.stats.revenue}</p>
-                                    </div>
-                                </>
-                            )}
-                        </div>
+                        {/* Stats removed as per user request */}
 
                         <div className="flex items-center justify-between lg:justify-end gap-3 lg:gap-4 mt-2 lg:mt-0 pt-3 lg:pt-0 border-t border-border/50 lg:border-none">
                             <div className="flex gap-2">
