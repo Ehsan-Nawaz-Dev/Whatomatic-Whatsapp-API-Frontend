@@ -1,62 +1,30 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "4df3a61b37affbf1442f3978ef4e42e1"
+client_id = "d04dbfca79ff1cd51fb3eb76e32ef6e7"
 name = "Whatomatic-Whatsapp Automation"
-application_url = "https://shopify.dev/apps/default-app-home"
+application_url = "https://whatflow-alpha.vercel.app"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
 
 [webhooks]
-api_version = "2026-04"
+api_version = "2024-01"
+
+  [[webhooks.subscriptions]]
+  topics = [
+  "checkouts/create",
+  "fulfillments/update",
+  "orders/cancelled",
+  "orders/create"
+]
+  uri = "https://api.whatomatic.com/Api/webhooks/shopify"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_checkouts,write_checkouts,read_customers,write_customers,read_fulfillments,write_fulfillments,read_orders,write_orders,write_script_tags,read_script_tags"
 optional_scopes = [ ]
 use_legacy_install_flow = false
-
-[navigation]
-[[navigation.links]]
-label = "Overview"
-path = "/dashboard"
-
-[[navigation.links]]
-label = "Notifications"
-path = "/dashboard?tab=notifications"
-
-[[navigation.links]]
-label = "Automations"
-path = "/dashboard?tab=automations"
-
-[[navigation.links]]
-label = "Contacts"
-path = "/dashboard?tab=contacts"
-
-[[navigation.links]]
-label = "Templates"
-path = "/dashboard?tab=templates"
-
-[[navigation.links]]
-label = "Analytics"
-path = "/dashboard?tab=analytics"
-
-[[navigation.links]]
-label = "Chat Button"
-path = "/dashboard?tab=chat-button"
-
-[[navigation.links]]
-label = "Settings"
-path = "/dashboard?tab=settings"
-
-[[navigation.links]]
-label = "Plans & Usage"
-path = "/dashboard?tab=billing"
-
-[[navigation.links]]
-label = "Help & Support"
-path = "/dashboard?tab=help"
 
 [auth]
 redirect_urls = [
