@@ -20,7 +20,6 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import HelpSupport from "@/components/dashboard/HelpSupport";
-import { NavMenu } from "@shopify/app-bridge-react";
 
 
 const Dashboard = () => {
@@ -171,17 +170,45 @@ const Dashboard = () => {
 
   if (isBillingLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto" />
-          <p className="text-sm text-muted-foreground animate-pulse">Checking subscription...</p>
+      <>
+        <ui-nav-menu>
+          <a href="/dashboard" rel="home">Whatomatic</a>
+          <a href="/dashboard?tab=notifications">Notifications</a>
+          <a href="/dashboard?tab=automations">Automations</a>
+          <a href="/dashboard?tab=contacts">Contacts</a>
+          <a href="/dashboard?tab=templates">Templates</a>
+          <a href="/dashboard?tab=analytics">Analytics</a>
+          <a href="/dashboard?tab=chat-button">Chat Button</a>
+          <a href="/dashboard?tab=bulk-messenger">Bulk Messenger</a>
+          <a href="/dashboard?tab=settings">Settings</a>
+          <a href="/dashboard?tab=billing">Plans & Billing</a>
+          <a href="/dashboard?tab=help">Help & Support</a>
+        </ui-nav-menu>
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto" />
+            <p className="text-sm text-muted-foreground animate-pulse">Checking subscription...</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      <ui-nav-menu>
+        <a href="/dashboard" rel="home">Whatomatic</a>
+        <a href="/dashboard?tab=notifications">Notifications</a>
+        <a href="/dashboard?tab=automations">Automations</a>
+        <a href="/dashboard?tab=contacts">Contacts</a>
+        <a href="/dashboard?tab=templates">Templates</a>
+        <a href="/dashboard?tab=analytics">Analytics</a>
+        <a href="/dashboard?tab=chat-button">Chat Button</a>
+        <a href="/dashboard?tab=bulk-messenger">Bulk Messenger</a>
+        <a href="/dashboard?tab=settings">Settings</a>
+        <a href="/dashboard?tab=billing">Plans & Billing</a>
+        <a href="/dashboard?tab=help">Help & Support</a>
+      </ui-nav-menu>
       <Sidebar
         activeTab={effectiveTab}
         setActiveTab={setActiveTab}
@@ -194,23 +221,8 @@ const Dashboard = () => {
           onNavigateNotifications={() => setActiveTab("notifications")}
         />
 
-        {/* 
-          Shopify Navigation Menu:
-          Using the official App Bridge React component for better integration.
-        */}
-        <NavMenu>
-          <a href="/dashboard" rel="home">Overview</a>
-          <a href="/dashboard?tab=notifications">Notifications</a>
-          <a href="/dashboard?tab=automations">Automations</a>
-          <a href="/dashboard?tab=contacts">Contacts</a>
-          <a href="/dashboard?tab=templates">Templates</a>
-          <a href="/dashboard?tab=analytics">Analytics</a>
-          <a href="/dashboard?tab=chat-button">Chat Button</a>
-          <a href="/dashboard?tab=bulk-messenger">Bulk Messenger</a>
-          <a href="/dashboard?tab=settings">Settings</a>
-          <a href="/dashboard?tab=billing">Plans & Billing</a>
-          <a href="/dashboard?tab=help">Help & Support</a>
-        </NavMenu>
+        <ui-title-bar title="Dashboard" />
+
 
         <main className="flex-1 p-2.5 sm:p-3 lg:p-4 xl:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
