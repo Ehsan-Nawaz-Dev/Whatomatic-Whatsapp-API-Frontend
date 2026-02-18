@@ -15,7 +15,7 @@ import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { withShopParam, getCurrentShop } from "@/lib/api";
+import { withShopParam, getCurrentShop, getAuthUrl } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
@@ -46,7 +46,7 @@ const Dashboard = () => {
         .then(async res => {
           if (res.status === 401) {
             console.warn(`[Dashboard] Token MISSING (401) for ${shop}. Breaking out to OAuth...`);
-            const authUrl = `https://api.whatomatic.com/Api/auth/shopify?shop=${shop}`;
+            const authUrl = getAuthUrl(shop);
 
             if (window.top && window.top !== window.self) {
               window.top.location.replace(authUrl);
@@ -57,14 +57,28 @@ const Dashboard = () => {
           }
 
           const data = await res.json().catch(() => ({}));
+
           // Handle cases where merchant doesn't exist at all
           if (data.plan === 'none' && data.status === 'none') {
-            const authUrl = `https://api.whatomatic.com/Api/auth/shopify?shop=${shop}`;
+            const authUrl = getAuthUrl(shop);
             if (window.top && window.top !== window.self) {
               window.top.location.replace(authUrl);
             } else {
               window.location.replace(authUrl);
             }
+            return;
+          }
+
+          // Handle case: plan is active but Shopify token is missing (needed for tagging, etc.)
+          if (data.needsToken) {
+            console.warn(`[Dashboard] Plan active but token missing for ${shop}. Redirecting to OAuth to get token...`);
+            const authUrl = getAuthUrl(shop);
+            if (window.top && window.top !== window.self) {
+              window.top.location.replace(authUrl);
+            } else {
+              window.location.replace(authUrl);
+            }
+            return;
           }
         })
         .catch(err => {
@@ -98,7 +112,7 @@ const Dashboard = () => {
           const params = new URLSearchParams(window.location.search);
           const shop = params.get("shop");
           if (shop) {
-            const redirectUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+            const redirectUrl = getAuthUrl(shop);
             console.log("Redirecting to Install/Re-auth...", shop);
 
             if (window.top) {

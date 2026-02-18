@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Check, Star, Zap, Crown, Info, Gift } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL, withShopParam, activateTrial, getCurrentShop } from "@/lib/api";
+import { API_BASE_URL, withShopParam, activateTrial, getCurrentShop, getAuthUrl } from "@/lib/api";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -93,7 +93,7 @@ const BillingPlan = () => {
                 const shop = params.get("shop");
                 if (shop) {
                     toast.loading("Setting up your account... please wait.");
-                    const installUrl = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+                    const installUrl = getAuthUrl(shop);
                     if (window.top) {
                         window.top.location.href = installUrl;
                     } else {

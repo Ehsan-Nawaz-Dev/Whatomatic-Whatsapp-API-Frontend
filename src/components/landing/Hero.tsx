@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, ShoppingCart, Bell, BarChart3, Zap, MessageCircle, ShoppingBag } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useEffect } from 'react';
+import { getAuthUrl } from '@/lib/api';
 
 export default function Hero() {
   // Automatically detect shop from URL and redirect to OAuth
@@ -13,7 +14,7 @@ export default function Hero() {
     if (shop) {
       // Shop parameter found in URL - automatically trigger installation
       console.log(`[Hero] Shop detected in URL: ${shop}. Redirecting to OAuth...`);
-      window.location.href = `https://api.whatomatic.com/api/auth/shopify?shop=${shop}`;
+      window.location.href = getAuthUrl(shop);
     }
   }, []);
   return (
@@ -93,7 +94,7 @@ export default function Hero() {
                 }
 
                 // Redirect to OAuth installation URL
-                window.location.href = `https://api.whatomatic.com/api/auth/shopify?shop=${shopDomain}`;
+                window.location.href = getAuthUrl(shopDomain);
               }}
               className="w-full"
             >

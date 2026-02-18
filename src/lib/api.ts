@@ -1,5 +1,11 @@
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://api.whatomatic.com/api").replace(/\/$/, "");
 
+// Dynamic OAuth URL - derives from API_BASE_URL so it works on any deployment
+// API_BASE_URL = "https://api.whatomatic.com/api" → auth = "https://api.whatomatic.com/api/auth/shopify"
+export const getAuthUrl = (shop: string): string => {
+  return `${API_BASE_URL}/auth/shopify?shop=${shop}`;
+};
+
 // Dynamic shop detection - called fresh every time, not cached at module level
 const getShopFromUrl = (): string => {
   try {
