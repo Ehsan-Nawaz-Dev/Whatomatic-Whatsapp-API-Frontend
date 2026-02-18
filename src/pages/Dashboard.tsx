@@ -20,6 +20,7 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import HelpSupport from "@/components/dashboard/HelpSupport";
+import { NavMenu } from "@shopify/app-bridge-react";
 
 
 const Dashboard = () => {
@@ -194,12 +195,11 @@ const Dashboard = () => {
         />
 
         {/* 
-          Native Shopify Navigation (ui-nav-menu):
-          Configures the sidebar menu items in the Shopify Admin.
-          The rel="home" link sets the app's root route and is NOT shown as a nav item.
+          Shopify Navigation Menu:
+          Using the official App Bridge React component for better integration.
         */}
-        <ui-nav-menu>
-          <a href="/dashboard" rel="home">WhatFlow</a>
+        <NavMenu>
+          <a href="/dashboard" rel="home">Overview</a>
           <a href="/dashboard?tab=notifications">Notifications</a>
           <a href="/dashboard?tab=automations">Automations</a>
           <a href="/dashboard?tab=contacts">Contacts</a>
@@ -210,7 +210,7 @@ const Dashboard = () => {
           <a href="/dashboard?tab=settings">Settings</a>
           <a href="/dashboard?tab=billing">Plans & Billing</a>
           <a href="/dashboard?tab=help">Help & Support</a>
-        </ui-nav-menu>
+        </NavMenu>
 
         <main className="flex-1 p-2.5 sm:p-3 lg:p-4 xl:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
