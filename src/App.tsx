@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { NavMenu } from "@shopify/app-bridge-react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,19 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <NavMenu>
+          <a href="/dashboard" rel="home">Whatomatic</a>
+          <a href="/dashboard?tab=notifications">Notifications</a>
+          <a href="/dashboard?tab=automations">Automations</a>
+          <a href="/dashboard?tab=contacts">Contacts</a>
+          <a href="/dashboard?tab=templates">Templates</a>
+          <a href="/dashboard?tab=analytics">Analytics</a>
+          <a href="/dashboard?tab=chat-button">Chat Button</a>
+          <a href="/dashboard?tab=bulk-messenger">Bulk Messenger</a>
+          <a href="/dashboard?tab=settings">Settings</a>
+          <a href="/dashboard?tab=billing">Plans & Billing</a>
+          <a href="/dashboard?tab=help">Help & Support</a>
+        </NavMenu>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/landing" element={<Index />} />
@@ -44,4 +58,3 @@ const App = () => (
 );
 
 export default App;
-
