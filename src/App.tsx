@@ -26,10 +26,8 @@ const App = () => (
       <BrowserRouter>
         <NavMenu>
           <a href="/dashboard" rel="home">Whatomatic</a>
-          <a href="/dashboard?tab=notifications">Notifications</a>
           <a href="/dashboard?tab=automations">Automations</a>
           <a href="/dashboard?tab=contacts">Contacts</a>
-          <a href="/dashboard?tab=templates">Templates</a>
           <a href="/dashboard?tab=analytics">Analytics</a>
           <a href="/dashboard?tab=chat-button">Chat Button</a>
           <a href="/dashboard?tab=bulk-messenger">Bulk Messenger</a>
