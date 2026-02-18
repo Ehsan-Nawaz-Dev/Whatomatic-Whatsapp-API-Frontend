@@ -45,7 +45,7 @@ const ContactsManagement = () => {
             setDialogOpen(false);
             toast.success("Contact created successfully");
         },
-        onError: () => toast.error("Failed to create contact"),
+        onError: (err: any) => toast.error(err?.message || "Failed to create contact"),
     });
 
     const updateMut = useMutation({

@@ -387,7 +387,10 @@ export const createContact = async (payload: ContactPayload): Promise<Contact> =
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error("Failed to create contact");
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to create contact");
+  }
   return res.json();
 };
 

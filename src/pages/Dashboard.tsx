@@ -20,7 +20,7 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import HelpSupport from "@/components/dashboard/HelpSupport";
-import { NavMenu } from "@shopify/app-bridge-react";
+
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -180,21 +180,23 @@ const Dashboard = () => {
         />
 
         {/* 
-          Native Shopify Navigation:
+          Native Shopify Navigation (s-app-nav):
           Configures the sidebar menu items in the Shopify Admin.
+          The rel="home" link sets the app's root route and is NOT shown as a nav item.
         */}
-        <NavMenu>
-          <a href="/dashboard" rel="home">Overview</a>
-          <a href="/dashboard?tab=notifications">Notifications</a>
-          <a href="/dashboard?tab=automations">Automations</a>
-          <a href="/dashboard?tab=contacts">Contacts</a>
-          <a href="/dashboard?tab=templates">Templates</a>
-          <a href="/dashboard?tab=analytics">Analytics</a>
-          <a href="/dashboard?tab=chat-button">Chat Button</a>
-          <a href="/dashboard?tab=settings">Settings</a>
-          <a href="/dashboard?tab=billing">Plans & Usage</a>
-          <a href="/dashboard?tab=help">Help & Support</a>
-        </NavMenu>
+        <s-app-nav>
+          <a href="/" rel="home">WhatFlow</a>
+          <a href="/?tab=overview">Overview</a>
+          <a href="/?tab=automations">Automations</a>
+          <a href="/?tab=contacts">Contacts</a>
+          <a href="/?tab=templates">Templates</a>
+          <a href="/?tab=analytics">Analytics</a>
+          <a href="/?tab=chat-button">Chat Button</a>
+          <a href="/?tab=bulk-messenger">Bulk Messenger</a>
+          <a href="/?tab=settings">Settings</a>
+          <a href="/?tab=billing">Plans & Billing</a>
+          <a href="/?tab=help">Help & Support</a>
+        </s-app-nav>
 
         <main className="flex-1 p-2.5 sm:p-3 lg:p-4 xl:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
