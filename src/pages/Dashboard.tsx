@@ -58,8 +58,8 @@ const Dashboard = () => {
 
           const data = await res.json().catch(() => ({}));
 
-          // Handle cases where merchant doesn't exist at all
-          if (data.plan === 'none' && data.status === 'none') {
+          // Handle cases where merchant doesn't exist at all or needs token
+          if (data.needsToken || (data.plan === 'none' && data.status === 'none')) {
             const authUrl = getAuthUrl(shop);
             if (window.top && window.top !== window.self) {
               window.top.location.replace(authUrl);

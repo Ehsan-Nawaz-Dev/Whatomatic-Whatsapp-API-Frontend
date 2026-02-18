@@ -71,18 +71,22 @@ const RecentActivity = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs lg:text-sm font-medium text-foreground truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {activity.message || `Order Notification`}
                   </p>
                   {activity.type === 'pending' && (
-                    <span className="text-[9px] lg:text-[10px] bg-warning/20 text-warning px-1 lg:px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">{pendingLabel}</span>
+                    <span className="flex-shrink-0 whitespace-nowrap text-[10px] sm:text-xs bg-warning/15 text-warning-foreground px-2 py-0.5 rounded-full font-semibold border border-warning/20 shadow-sm">
+                      {pendingLabel}
+                    </span>
                   )}
                   {activity.type === 'failed' && (
-                    <span className="text-[9px] lg:text-[10px] bg-destructive/20 text-destructive px-1 lg:px-1.5 py-0.5 rounded-full font-bold">FAILED</span>
+                    <span className="flex-shrink-0 whitespace-nowrap text-[10px] sm:text-xs bg-destructive/15 text-destructive px-2 py-0.5 rounded-full font-semibold border border-destructive/20 shadow-sm">
+                      FAILED
+                    </span>
                   )}
                 </div>
-                <p className="text-[10px] lg:text-xs text-muted-foreground">
-                  {activity.customerName || "No Name Provided"} • {new Date(activity.createdAt).toLocaleString()}
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {activity.customerName || "No Name Provided"} • {new Date(activity.createdAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
                 </p>
               </div>
             </motion.div>
