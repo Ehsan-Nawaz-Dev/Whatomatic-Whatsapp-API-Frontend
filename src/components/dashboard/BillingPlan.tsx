@@ -84,10 +84,11 @@ const BillingPlan = () => {
             setLoadingPlan(planId);
 
             // App Bridge 4 provides a global 'shopify' object
+            // We check local window first, then top-level window as a fallback
             // @ts-ignore
-            const activeShopify = window.shopify;
+            const activeShopify = window.shopify || (window.top && (window.top as any).shopify);
 
-            console.log("[Billing] App Bridge (window.shopify):", activeShopify);
+            console.log("[Billing] App Bridge (activeShopify):", activeShopify);
 
             if (activeShopify && activeShopify.billing && typeof activeShopify.billing.request === 'function') {
                 console.log(`[Billing] Requesting Shopify Managed Billing for plan: ${planId}`);
@@ -98,7 +99,7 @@ const BillingPlan = () => {
                 });
             } else {
                 console.error("[Billing] Shopify billing API not found. activeShopify:", activeShopify);
-                toast.error("Billing not available. Please ensure: 1. You are viewing this inside Shopify Admin. 2. Your app is set to 'Managed Pricing' in the Partner Dashboard.");
+                toast.error("Billing not ready. Please ensure: 1. You are inside Shopify Admin. 2. You have RE-INSTALLED the app after setting Managed Pricing in the Partner Dashboard.");
                 setLoadingPlan(null);
             }
         } catch (err) {
@@ -121,7 +122,7 @@ const BillingPlan = () => {
             free: { icon: Gift, color: "text-gray-500", bgColor: "bg-gray-500/10", borderColor: "border-gray-500/20", btnVariant: "outline" },
             starter: { icon: Star, color: "text-blue-500", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", btnVariant: "outline" },
             growth: { icon: Zap, color: "text-amber-500", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", popular: true, btnVariant: "default" },
-            pro: { icon: Crown, color: "text-purple-500", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20", btnVariant: "outline" }
+            professional: { icon: Crown, color: "text-purple-500", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20", btnVariant: "outline" }
         }[plan.id] || { icon: Star, color: "text-gray-500", bgColor: "bg-gray-100", borderColor: "border-gray-200", btnVariant: "outline" };
 
         // Fix mapping for specific fields
