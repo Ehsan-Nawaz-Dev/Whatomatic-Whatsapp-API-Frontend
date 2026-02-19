@@ -83,23 +83,27 @@ const BillingPlan = () => {
         try {
             setLoadingPlan(planId);
 
+            // App Bridge 4 provides a global 'shopify' object
             // @ts-ignore
-            if (window.shopify && window.shopify.billing && typeof window.shopify.billing.request === 'function') {
+            const activeShopify = window.shopify;
+
+            console.log("[Billing] App Bridge (window.shopify):", activeShopify);
+
+            if (activeShopify && activeShopify.billing && typeof activeShopify.billing.request === 'function') {
                 console.log(`[Billing] Requesting Shopify Managed Billing for plan: ${planId}`);
                 // @ts-ignore
-                await window.shopify.billing.request({
+                await activeShopify.billing.request({
                     plan: planId,
-                    isTest: true // Enable test mode
+                    isTest: true
                 });
-                // Note: The page will redirect or Shopify will handle the UI.
-                // We don't necessarily get back to this code immediately.
             } else {
-                toast.error("Shopify App Bridge billing not available");
+                console.error("[Billing] Shopify billing API not found. activeShopify:", activeShopify);
+                toast.error("Billing not available. Please ensure: 1. You are viewing this inside Shopify Admin. 2. Your app is set to 'Managed Pricing' in the Partner Dashboard.");
                 setLoadingPlan(null);
             }
         } catch (err) {
-            console.error(err);
-            toast.error("An error occurred");
+            console.error("[Billing] Error in createCharge:", err);
+            toast.error("An error occurred during billing request");
             setLoadingPlan(null);
         }
     };
