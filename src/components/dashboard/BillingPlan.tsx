@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Check, Star, Zap, Crown, Info, Gift } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL, withShopParam, activateTrial, getCurrentShop, getAuthUrl } from "@/lib/api";
+import { API_BASE_URL, withShopParam, activateTrial, getCurrentShop, getAuthUrl, getAuthHeaders } from "@/lib/api";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -29,13 +29,14 @@ const BillingPlan = () => {
     const { data: status, isLoading: isStatusLoading } = useQuery({
         queryKey: ["billing-status", getCurrentShop()],
         queryFn: async () => {
-            const res = await fetch(withShopParam("/billing/status"));
+            const headers = await getAuthHeaders();
+            const res = await fetch(withShopParam("/billing/status"), { headers });
             if (!res.ok) return null;
             const data = await res.json();
 
             // If they are trial, we fetch detailed trial status
             if (data.plan === 'trial') {
-                const trialRes = await fetch(withShopParam("/trial/status"));
+                const trialRes = await fetch(withShopParam("/trial/status"), { headers });
                 if (trialRes.ok) return trialRes.json();
             }
             return data;
@@ -81,9 +82,10 @@ const BillingPlan = () => {
     const createCharge = async (planId: string) => {
         try {
             setLoadingPlan(planId);
+            const headers = await getAuthHeaders();
             const res = await fetch(withShopParam("/billing/create"), {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers,
                 body: JSON.stringify({ plan: planId }),
             });
 

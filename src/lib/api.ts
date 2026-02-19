@@ -37,6 +37,30 @@ const sanitizePhone = (phone: string) => {
   return phone.replace(/[^\d+]/g, "");
 };
 
+// Helper to get authenticated headers (Shopify Session Token)
+export const getAuthHeaders = async (existingHeaders = {}) => {
+  const headers: Record<string, string> = {
+    ...existingHeaders,
+    "Content-Type": "application/json"
+  };
+
+  try {
+    // App Bridge 4 provides idToken() which returns a Promise for the JWT session token
+    // @ts-ignore
+    if (window.shopify && typeof window.shopify.idToken === 'function') {
+      // @ts-ignore
+      const token = await window.shopify.idToken();
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+    }
+  } catch (err) {
+    console.warn("[AppBridge] Failed to get session token:", err);
+  }
+
+  return headers;
+};
+
 export interface MerchantSettingsPayload {
   storeName?: string;
   whatsappNumber?: string;
@@ -53,15 +77,17 @@ export interface MerchantSettingsPayload {
 }
 
 export const fetchSettings = async () => {
-  const res = await fetch(withShopParam("/settings"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/settings"), { headers });
   if (!res.ok) throw new Error("Failed to load settings");
   return res.json();
 };
 
 export const updateSettings = async (payload: MerchantSettingsPayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/settings"), {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to save settings");
@@ -79,15 +105,17 @@ export interface TemplatePayload {
 }
 
 export const fetchTemplates = async () => {
-  const res = await fetch(withShopParam("/templates"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/templates"), { headers });
   if (!res.ok) throw new Error("Failed to load templates");
   return res.json();
 };
 
 export const createTemplate = async (payload: TemplatePayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/templates"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to create template");
@@ -95,9 +123,10 @@ export const createTemplate = async (payload: TemplatePayload) => {
 };
 
 export const updateTemplate = async (id: string, payload: TemplatePayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam(`/templates/${id}`), {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to update template");
@@ -105,15 +134,18 @@ export const updateTemplate = async (id: string, payload: TemplatePayload) => {
 };
 
 export const deleteTemplate = async (id: string) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam(`/templates/${id}`), {
     method: "DELETE",
+    headers,
   });
   if (!res.ok) throw new Error("Failed to delete template");
   return res.json();
 };
 
 export const fetchActivity = async () => {
-  const res = await fetch(withShopParam("/activity"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/activity"), { headers });
   if (!res.ok) throw new Error("Failed to load activity");
   return res.json();
 };
@@ -138,15 +170,17 @@ export interface NotificationSettingsPayload {
 }
 
 export const fetchNotificationSettings = async () => {
-  const res = await fetch(withShopParam("/notifications"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/notifications"), { headers });
   if (!res.ok) throw new Error("Failed to load notification settings");
   return res.json();
 };
 
 export const updateNotificationSettings = async (payload: NotificationSettingsPayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/notifications"), {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to save notification settings");
@@ -186,7 +220,8 @@ export interface AnalyticsSummary {
 }
 
 export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
-  const res = await fetch(withShopParam("/analytics"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/analytics"), { headers });
   if (!res.ok) throw new Error("Failed to load analytics");
   return res.json();
 };
@@ -217,7 +252,8 @@ export const generateWhatsAppQR = async (): Promise<WhatsAppQRCodeResponse> => {
   const url = withShopParam("/whatsapp/qr");
   console.log(`[WhatsApp] Fetching QR from: ${url}`);
 
-  const res = await fetch(url);
+  const headers = await getAuthHeaders();
+  const res = await fetch(url, { headers });
   if (!res.ok) {
     const errorText = await res.text().catch(() => "Unknown error");
     console.error(`[WhatsApp] QR fetch failed: ${res.status} ${res.statusText}`, errorText);
@@ -252,9 +288,10 @@ export const getWhatsAppPairingCode = async (phone: string): Promise<{ pairingCo
   console.log(`[API] Requesting pairing code for ${sanitizedPhone} to ${url}`);
 
   try {
+    const headers = await getAuthHeaders();
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({
         phone: sanitizedPhone,
         shop: DEFAULT_SHOP
@@ -279,31 +316,37 @@ export const getWhatsAppPairingCode = async (phone: string): Promise<{ pairingCo
 
 
 export const fetchWhatsAppStatus = async (): Promise<WhatsAppStatusResponse> => {
-  const res = await fetch(withShopParam("/whatsapp/status"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp/status"), { headers });
   if (!res.ok) throw new Error("Failed to fetch WhatsApp status");
   return res.json();
 };
 
 export const connectWhatsApp = async () => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/whatsapp/connect"), {
     method: "POST",
+    headers,
   });
   if (!res.ok) throw new Error("Failed to connect WhatsApp");
   return res.json();
 };
 
 export const disconnectWhatsApp = async () => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/whatsapp/disconnect"), {
     method: "POST",
+    headers,
   });
   if (!res.ok) throw new Error("Failed to disconnect WhatsApp");
   return res.json();
 };
 
 export const sendWhatsAppMessage = async (payload: WhatsAppMessagePayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/whatsapp/send"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to send WhatsApp message");
@@ -334,9 +377,10 @@ export interface CloudTemplate {
 }
 
 export const sendCloudMessage = async (payload: CloudMessagePayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/whatsapp-cloud/send"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to send cloud message");
@@ -344,9 +388,10 @@ export const sendCloudMessage = async (payload: CloudMessagePayload) => {
 };
 
 export const sendCloudTemplate = async (payload: CloudTemplatePayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/whatsapp-cloud/send-template"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to send template message");
@@ -354,7 +399,8 @@ export const sendCloudTemplate = async (payload: CloudTemplatePayload) => {
 };
 
 export const fetchCloudTemplates = async (): Promise<CloudTemplate[]> => {
-  const res = await fetch(withShopParam("/whatsapp-cloud/templates"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp-cloud/templates"), { headers });
   if (!res.ok) throw new Error("Failed to fetch cloud templates");
   return res.json();
 };
@@ -382,15 +428,17 @@ export interface ContactPayload {
 }
 
 export const fetchContacts = async (): Promise<Contact[]> => {
-  const res = await fetch(withShopParam("/contact"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/contact"), { headers });
   if (!res.ok) throw new Error("Failed to fetch contacts");
   return res.json();
 };
 
 export const createContact = async (payload: ContactPayload): Promise<Contact> => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/contact"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -401,9 +449,10 @@ export const createContact = async (payload: ContactPayload): Promise<Contact> =
 };
 
 export const updateContact = async (id: string, payload: Partial<ContactPayload>): Promise<Contact> => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam(`/contact/${id}`), {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to update contact");
@@ -411,8 +460,10 @@ export const updateContact = async (id: string, payload: Partial<ContactPayload>
 };
 
 export const deleteContact = async (id: string) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam(`/contact/${id}`), {
     method: "DELETE",
+    headers,
   });
   if (!res.ok) throw new Error("Failed to delete contact");
   return res.json();
@@ -436,7 +487,8 @@ export interface NotificationPayload {
 }
 
 export const fetchNotifications = async (): Promise<Notification[]> => {
-  const res = await fetch(withShopParam("/activity"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/activity"), { headers });
   if (!res.ok) throw new Error("Failed to fetch notifications");
   const data = await res.json();
 
@@ -465,9 +517,10 @@ export const fetchNotifications = async (): Promise<Notification[]> => {
 };
 
 export const createNotification = async (payload: NotificationPayload): Promise<Notification> => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/notifications"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to create notification");
@@ -475,9 +528,10 @@ export const createNotification = async (payload: NotificationPayload): Promise<
 };
 
 export const updateNotification = async (id: string, payload: Partial<Notification>): Promise<Notification> => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam(`/notifications/${id}`), {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to update notification");
@@ -485,8 +539,10 @@ export const updateNotification = async (id: string, payload: Partial<Notificati
 };
 
 export const deleteNotification = async (id: string) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam(`/notifications/${id}`), {
     method: "DELETE",
+    headers,
   });
   if (!res.ok) throw new Error("Failed to delete notification");
   return res.json();
@@ -500,9 +556,10 @@ export interface ActivityLogPayload {
 }
 
 export const createActivityLog = async (payload: ActivityLogPayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/activity"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to create activity log");
@@ -511,9 +568,10 @@ export const createActivityLog = async (payload: ActivityLogPayload) => {
 
 // Campaigns API
 export const sendCampaign = async (payload: { contacts: any[]; message: string }) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/campaigns/send"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to send campaign");
@@ -530,15 +588,17 @@ export interface ChatButtonSettings {
 }
 
 export const fetchChatButtonSettings = async (): Promise<ChatButtonSettings> => {
-  const res = await fetch(withShopParam("/settings/chat-button"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/settings/chat-button"), { headers });
   if (!res.ok) throw new Error("Failed to fetch chat button settings");
   return res.json();
 };
 
 export const updateChatButtonSettings = async (payload: ChatButtonSettings) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/settings/chat-button"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to update chat button settings");
@@ -547,7 +607,8 @@ export const updateChatButtonSettings = async (payload: ChatButtonSettings) => {
 
 // Automations Stats API
 export const fetchAutomationsStats = async () => {
-  const res = await fetch(withShopParam("/automations/stats"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/automations/stats"), { headers });
   if (!res.ok) throw new Error("Failed to fetch automations stats");
   return res.json();
 };
@@ -559,9 +620,10 @@ export interface TrialActivationPayload {
 }
 
 export const activateTrial = async (payload: TrialActivationPayload) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/trial/activate"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -572,15 +634,17 @@ export const activateTrial = async (payload: TrialActivationPayload) => {
 };
 
 export const fetchTrialStatus = async () => {
-  const res = await fetch(withShopParam("/trial/status"));
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/trial/status"), { headers });
   if (!res.ok) throw new Error("Failed to fetch trial status");
   return res.json();
 };
 
 export const toggleAutomation = async (id: string, enabled: boolean) => {
+  const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/automations/toggle"), {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ id, enabled }),
   });
   if (!res.ok) throw new Error("Failed to toggle automation");

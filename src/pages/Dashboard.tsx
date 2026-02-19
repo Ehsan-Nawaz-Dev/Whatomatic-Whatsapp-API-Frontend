@@ -15,7 +15,7 @@ import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { withShopParam, getCurrentShop, getAuthUrl } from "@/lib/api";
+import { withShopParam, getCurrentShop, getAuthUrl, getAuthHeaders } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
@@ -42,8 +42,11 @@ const Dashboard = () => {
     const shop = params.get('shop');
 
     if (shop) {
-      fetch(withShopParam("/billing/status"))
-        .then(async res => {
+      (async () => {
+        try {
+          const headers = await getAuthHeaders();
+          const res = await fetch(withShopParam("/billing/status"), { headers });
+
           if (res.status === 401) {
             console.warn(`[Dashboard] Token MISSING (401) for ${shop}. Breaking out to OAuth...`);
             const authUrl = getAuthUrl(shop);
@@ -80,10 +83,10 @@ const Dashboard = () => {
             }
             return;
           }
-        })
-        .catch(err => {
+        } catch (err) {
           console.error('[Dashboard] Status check failed:', err);
-        });
+        }
+      })();
     }
   }, []);
 
@@ -104,7 +107,8 @@ const Dashboard = () => {
       if (isJustActivated) return { plan: "unknown", status: "active" };
 
       try {
-        const res = await fetch(withShopParam("/billing/status"));
+        const headers = await getAuthHeaders();
+        const res = await fetch(withShopParam("/billing/status"), { headers });
 
         // --- LAZY AUTH CHECK ---
         // If 401/403 or network error with 'shop' param, we might need to install
@@ -129,7 +133,7 @@ const Dashboard = () => {
 
         // If trial plan, ensure we get the full trial status
         if (data.plan === 'trial') {
-          const trialRes = await fetch(withShopParam("/trial/status"));
+          const trialRes = await fetch(withShopParam("/trial/status"), { headers });
           if (trialRes.ok) return trialRes.json();
         }
 
