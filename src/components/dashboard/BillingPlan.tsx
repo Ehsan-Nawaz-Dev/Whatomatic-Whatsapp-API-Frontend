@@ -82,39 +82,19 @@ const BillingPlan = () => {
     const createCharge = async (planId: string) => {
         try {
             setLoadingPlan(planId);
-            const headers = await getAuthHeaders();
-            const res = await fetch(withShopParam("/billing/create"), {
-                method: "POST",
-                headers,
-                body: JSON.stringify({ plan: planId }),
-            });
 
-            // Handle 404 (Merchant Not Found) - Auto Repair
-            if (res.status === 404) {
-                const params = new URLSearchParams(window.location.search);
-                const shop = params.get("shop");
-                if (shop) {
-                    toast.loading("Setting up your account... please wait.");
-                    const installUrl = getAuthUrl(shop);
-                    if (window.top) {
-                        window.top.location.href = installUrl;
-                    } else {
-                        window.location.href = installUrl;
-                    }
-                    return;
-                }
-            }
-
-            const data = await res.json();
-            if (data.confirmationUrl) {
-                // Shopify Charge Confirmation URL - Needs to be top level
-                if (window.top) {
-                    window.top.location.href = data.confirmationUrl;
-                } else {
-                    window.location.href = data.confirmationUrl;
-                }
+            // @ts-ignore
+            if (window.shopify && window.shopify.billing && typeof window.shopify.billing.request === 'function') {
+                console.log(`[Billing] Requesting Shopify Managed Billing for plan: ${planId}`);
+                // @ts-ignore
+                await window.shopify.billing.request({
+                    plan: planId,
+                    isTest: true // Enable test mode
+                });
+                // Note: The page will redirect or Shopify will handle the UI.
+                // We don't necessarily get back to this code immediately.
             } else {
-                toast.error("Failed to initiate charge");
+                toast.error("Shopify App Bridge billing not available");
                 setLoadingPlan(null);
             }
         } catch (err) {

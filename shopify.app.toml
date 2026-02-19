@@ -14,7 +14,8 @@ api_version = "2024-10"
   "fulfillments/update",
   "orders/cancelled",
   "orders/create",
-  "app/uninstalled"
+  "app/uninstalled",
+  "app_subscriptions/update"
 ]
   uri = "https://api.whatomatic.com/Api/webhooks/shopify"
 
