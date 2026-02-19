@@ -77,11 +77,13 @@ const WhatsAppConnection = () => {
     }
   });
 
-  // Auto-connect on mount
+  // Auto-connect only if not already connected (prevents duplicate socket conflicts)
   useEffect(() => {
-    connectMutation.mutate();
+    if (!isStatusLoading && !status?.connected) {
+      connectMutation.mutate();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isStatusLoading]);
 
   // Disconnect mutation
   const disconnectMutation = useMutation({
