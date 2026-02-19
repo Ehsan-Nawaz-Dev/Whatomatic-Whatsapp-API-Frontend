@@ -80,11 +80,41 @@ const BillingPlan = () => {
     };
 
     const createCharge = async (planId: string) => {
+        setLoadingPlan(planId);
         try {
-            setLoadingPlan(planId);
+            // Case 1: Free Plan -> Direct Backend Activation
+            // Managed Pricing (App Bridge) does not support creating $0 subscriptions,
+            // so we must handle the free plan activation via our backend API.
+            if (planId === 'free') {
+                console.log("[Billing] Activating Free Plan via Backend API...");
+                const headers = await getAuthHeaders();
 
-            // App Bridge 4 provides a global 'shopify' object
-            // We check local window first, then top-level window as a fallback
+                // We need to fetch with the shop param and correct headers
+                const res = await fetch(withShopParam("/billing/create"), {
+                    method: "POST",
+                    headers: { ...headers, "Content-Type": "application/json" },
+                    body: JSON.stringify({ plan: planId }),
+                });
+
+                const data = await res.json();
+
+                if (data.confirmationUrl) {
+                    // Determine correct context for redirect
+                    if (window.top && window.top !== window.self) {
+                        window.top.location.href = data.confirmationUrl;
+                    } else {
+                        window.location.href = data.confirmationUrl;
+                    }
+                } else {
+                    console.error("[Billing] Free activation failed", data);
+                    toast.error(data.message || "Failed to activate free plan");
+                    setLoadingPlan(null);
+                }
+                return;
+            }
+
+            // Case 2: Paid Plans -> Shopify Managed Billing (App Bridge 4)
+            // For paid plans, we delegate to Shopify's native billing modal.
             // @ts-ignore
             const activeShopify = window.shopify || (window.top && (window.top as any).shopify);
 
@@ -102,9 +132,9 @@ const BillingPlan = () => {
                 toast.error("Billing not ready. Please ensure: 1. You are inside Shopify Admin. 2. You have RE-INSTALLED the app after setting Managed Pricing in the Partner Dashboard.");
                 setLoadingPlan(null);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("[Billing] Error in createCharge:", err);
-            toast.error("An error occurred during billing request");
+            toast.error(err.message || "An error occurred during billing request");
             setLoadingPlan(null);
         }
     };
