@@ -39,23 +39,5 @@ redirect_urls = [
   "https://api.whatomatic.com/Api/auth/shopify/callback"
 ]
 
-[billing.free]
-amount = 0.0
-currency_code = "USD"
-interval = "EVERY_30_DAYS"
 
-[billing.starter]
-amount = 4.99
-currency_code = "USD"
-interval = "EVERY_30_DAYS"
-
-[billing.growth]
-amount = 9.99
-currency_code = "USD"
-interval = "EVERY_30_DAYS"
-
-[billing.pro]
-amount = 14.99
-currency_code = "USD"
-interval = "EVERY_30_DAYS"
 
