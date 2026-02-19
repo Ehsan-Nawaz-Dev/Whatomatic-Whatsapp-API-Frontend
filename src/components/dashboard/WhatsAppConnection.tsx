@@ -48,7 +48,8 @@ const WhatsAppConnection = () => {
     queryKey: ["whatsapp-qr", getCurrentShop()],
     queryFn: generateWhatsAppQR,
     enabled: !status?.connected && !isStatusLoading, // Fetch QR if not connected
-    refetchInterval: (query) => (status?.connected ? false : 5000), // Increase interval slightly to avoid congestion
+    refetchInterval: (query) => (status?.connected ? false : 3000), // Fast 3s polling for quick QR display
+    staleTime: 0,
     retry: 1, // Only retry once per interval
   });
 

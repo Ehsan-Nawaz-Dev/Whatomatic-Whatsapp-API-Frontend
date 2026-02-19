@@ -362,83 +362,188 @@ const AutomationsOverview = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* Edit Dialog */}
+            {/* Edit Dialog - Full Template Editor */}
             <Dialog open={editOpen} onOpenChange={setEditOpen}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit {selectedFlow?.title} Template</DialogTitle>
+                        <DialogTitle className="text-lg font-bold">Edit {selectedFlow?.title} Template</DialogTitle>
+                        <p className="text-xs text-muted-foreground">Customize your WhatsApp automation message and delivery settings.</p>
                     </DialogHeader>
-                    <div className="space-y-4 py-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="tmpl-message">Message Content</Label>
-                            <Textarea
-                                id="tmpl-message"
-                                value={editForm.message}
-                                onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
-                                className="min-h-[200px]"
-                                placeholder="Enter your WhatsApp message here..."
-                            />
-                            <p className="text-[10px] text-muted-foreground">
-                                Use placeholders like {"{{customer_name}}"}, {"{{order_number}}"}, etc.
-                            </p>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 py-2">
+                        {/* LEFT: Form Fields */}
+                        <div className="space-y-4">
+                            {/* Template Name */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="tmpl-name" className="text-xs font-semibold">Template Name</Label>
+                                <Input
+                                    id="tmpl-name"
+                                    value={editForm.name}
+                                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                    placeholder="e.g. Order Confirmation"
+                                    className="h-9"
+                                />
+                            </div>
 
-                        {editForm.event !== "admin-order-alert" && (
-                            <div className="space-y-4 pt-2 border-t border-border/50">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <Label className="text-sm font-semibold">Send as Poll</Label>
-                                        <p className="text-[11px] text-muted-foreground">Creates a WhatsApp poll with clickable buttons</p>
-                                    </div>
+                            {/* Enable/Disable Toggle */}
+                            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border/50">
+                                <div>
+                                    <Label className="text-xs font-semibold">Template Status</Label>
+                                    <p className="text-[10px] text-muted-foreground">Enable or disable this template</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-[10px] font-medium ${editForm.enabled !== false ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                                        {editForm.enabled !== false ? '✅ Active' : '⏸️ Paused'}
+                                    </span>
                                     <Switch
-                                        checked={editForm.isPoll}
-                                        onCheckedChange={(checked) => setEditForm({ ...editForm, isPoll: checked })}
+                                        checked={editForm.enabled !== false}
+                                        onCheckedChange={(checked) => setEditForm({ ...editForm, enabled: checked })}
                                     />
                                 </div>
-
-                                {editForm.isPoll && (
-                                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <Label className="text-xs font-medium">Poll Options (maximum 2 recommended)</Label>
-                                        {editForm.pollOptions.map((opt: string, idx: number) => (
-                                            <div key={idx} className="flex gap-2">
-                                                <Input
-                                                    value={opt}
-                                                    onChange={(e) => {
-                                                        const newOpts = [...editForm.pollOptions];
-                                                        newOpts[idx] = e.target.value;
-                                                        setEditForm({ ...editForm, pollOptions: newOpts });
-                                                    }}
-                                                    placeholder={`Option ${idx + 1}`}
-                                                    className="h-9"
-                                                />
-                                                {editForm.pollOptions.length > 2 && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="px-2 text-destructive"
-                                                        onClick={() => setEditForm({ ...editForm, pollOptions: editForm.pollOptions.filter((_: any, i: number) => i !== idx) })}
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        ))}
-                                        {editForm.pollOptions.length < 5 && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="w-full h-8 text-xs border-dashed"
-                                                onClick={() => setEditForm({ ...editForm, pollOptions: [...editForm.pollOptions, ""] })}
-                                            >
-                                                <Plus className="w-3 h-3 mr-1" /> Add Option
-                                            </Button>
-                                        )}
-                                    </div>
-                                )}
                             </div>
-                        )}
+
+                            {/* Message Content */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="tmpl-message" className="text-xs font-semibold">Message Content</Label>
+                                <Textarea
+                                    id="tmpl-message"
+                                    value={editForm.message}
+                                    onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
+                                    className="min-h-[160px] text-sm"
+                                    placeholder="Enter your WhatsApp message here..."
+                                />
+                                <div className="p-2 bg-muted/40 rounded-md border border-border/30">
+                                    <p className="text-[10px] font-semibold text-muted-foreground mb-1">📌 Available Placeholders:</p>
+                                    <div className="flex flex-wrap gap-1">
+                                        {["{{customer_name}}", "{{order_number}}", "{{store_name}}", "{{items_list}}", "{{grand_total}}", "{{shipping_address}}", "{{city}}", "{{price}}", "{{payment_status}}"].map(ph => (
+                                            <button
+                                                key={ph}
+                                                type="button"
+                                                className="text-[9px] px-1.5 py-0.5 bg-primary/10 text-primary rounded font-mono hover:bg-primary/20 transition-colors cursor-pointer"
+                                                onClick={() => setEditForm({ ...editForm, message: editForm.message + ph })}
+                                            >
+                                                {ph}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Poll Settings */}
+                            {editForm.event !== "admin-order-alert" && (
+                                <div className="space-y-3 pt-2 border-t border-border/50">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <Label className="text-xs font-semibold">Send as Poll</Label>
+                                            <p className="text-[10px] text-muted-foreground">Creates a WhatsApp poll with clickable buttons</p>
+                                        </div>
+                                        <Switch
+                                            checked={editForm.isPoll}
+                                            onCheckedChange={(checked) => setEditForm({ ...editForm, isPoll: checked })}
+                                        />
+                                    </div>
+
+                                    {editForm.isPoll && (
+                                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <Label className="text-[10px] font-medium">Poll Options (max 5)</Label>
+                                            {editForm.pollOptions.map((opt: string, idx: number) => (
+                                                <div key={idx} className="flex gap-2">
+                                                    <Input
+                                                        value={opt}
+                                                        onChange={(e) => {
+                                                            const newOpts = [...editForm.pollOptions];
+                                                            newOpts[idx] = e.target.value;
+                                                            setEditForm({ ...editForm, pollOptions: newOpts });
+                                                        }}
+                                                        placeholder={`Option ${idx + 1}`}
+                                                        className="h-8 text-sm"
+                                                    />
+                                                    {editForm.pollOptions.length > 2 && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="px-2 text-destructive h-8"
+                                                            onClick={() => setEditForm({ ...editForm, pollOptions: editForm.pollOptions.filter((_: any, i: number) => i !== idx) })}
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            {editForm.pollOptions.length < 5 && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full h-7 text-[10px] border-dashed"
+                                                    onClick={() => setEditForm({ ...editForm, pollOptions: [...editForm.pollOptions, ""] })}
+                                                >
+                                                    <Plus className="w-3 h-3 mr-1" /> Add Option
+                                                </Button>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* RIGHT: Live WhatsApp Preview */}
+                        <div className="hidden md:block">
+                            <Label className="text-xs font-semibold mb-2 block">📱 Live Preview</Label>
+                            <div className="bg-[#f0f2f5] dark:bg-[#0b141a] rounded-2xl overflow-hidden shadow-lg border border-border/50">
+                                {/* WhatsApp Header */}
+                                <div className="bg-[#008069] px-3 py-2.5 flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                        {selectedFlow && <selectedFlow.icon className="w-4 h-4 text-white" />}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-white font-bold text-xs">{storeName}</h4>
+                                        <p className="text-white/70 text-[10px]">WhatsApp Business</p>
+                                    </div>
+                                </div>
+
+                                {/* Chat Body */}
+                                <div
+                                    className="p-4 min-h-[280px] bg-repeat bg-contain"
+                                    style={{ backgroundImage: "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')" }}
+                                >
+                                    <div className="bg-white dark:bg-[#1f2c33] p-3 rounded-xl rounded-tl-none shadow-sm max-w-[95%] border border-black/5 dark:border-white/5">
+                                        <div className="whitespace-pre-wrap text-[12px] leading-relaxed text-[#111b21] dark:text-[#e9edef]">
+                                            {editForm.message
+                                                ? editForm.message
+                                                    .replace(/{{customer_name}}/g, "John Doe")
+                                                    .replace(/{{order_number}}/g, "#1001")
+                                                    .replace(/{{store_name}}/g, storeName)
+                                                    .replace(/{{items_list}}/g, "1x Wireless Headphones - $199.99")
+                                                    .replace(/{{grand_total}}/g, "$214.99")
+                                                    .replace(/{{shipping_address}}/g, "123 Demo St")
+                                                    .replace(/{{city}}/g, "New York")
+                                                    .replace(/{{price}}/g, "$199.99")
+                                                    .replace(/{{payment_status}}/g, "Paid")
+                                                : <span className="text-muted-foreground italic">Type your message to see preview...</span>
+                                            }
+                                        </div>
+                                        <div className="text-[9px] text-[#667781] dark:text-[#8696a0] text-right mt-1">
+                                            12:45 PM ✓✓
+                                        </div>
+                                    </div>
+
+                                    {/* Poll Options Preview */}
+                                    {editForm.isPoll && editForm.pollOptions?.filter((o: string) => o.trim()).length > 0 && (
+                                        <div className="space-y-1.5 mt-3">
+                                            {editForm.pollOptions.filter((o: string) => o.trim()).map((option: string, i: number) => (
+                                                <div
+                                                    key={i}
+                                                    className="px-4 py-1.5 bg-white dark:bg-[#1f2c33] rounded-full text-[#008069] dark:text-[#53bdeb] text-[11px] font-bold shadow-sm border border-black/5 dark:border-white/5 text-center"
+                                                >
+                                                    {option}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="gap-2 sm:gap-0">
                         <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
                         <Button
                             variant="hero"
