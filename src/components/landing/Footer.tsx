@@ -8,14 +8,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link to="/" className="flex items-center mb-4">
+            <Link to="/" className="flex items-center justify-center md:justify-start mb-4">
               <img
                 src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
                 alt="Whatomatic"
                 className="h-14 w-auto object-contain"
               />
             </Link>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground text-center md:text-left">
               Automate your Shopify store's WhatsApp communication and boost customer engagement.
             </p>
           </div>

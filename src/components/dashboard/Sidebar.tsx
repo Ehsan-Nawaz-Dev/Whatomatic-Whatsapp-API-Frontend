@@ -51,7 +51,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
     <>
       {/* Logo */}
       <div className="px-5 py-6 border-b border-border flex items-center justify-between">
-        <div className="transition-transform duration-300 hover:scale-[1.02] flex-1 min-w-0">
+        <div className="transition-transform duration-300 hover:scale-[1.02] flex-1 min-w-0 flex justify-center">
           <img
             src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
             alt="Whatomatic"
