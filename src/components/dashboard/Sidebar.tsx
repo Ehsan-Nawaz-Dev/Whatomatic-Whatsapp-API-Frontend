@@ -53,7 +53,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
       <div className="px-5 py-6 border-b border-border flex items-center justify-between">
         <div className="transition-transform duration-300 hover:scale-[1.02] flex-1 min-w-0">
           <img
-            src="/whatomatic-logo.svg"
+            src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
             alt="Whatomatic"
             className="w-full h-auto max-h-11 object-contain block"
           />
