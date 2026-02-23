@@ -181,16 +181,35 @@ const WhatsAppConnection = () => {
                       <span>Link via QR Code</span>
                     </div>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] })}
-                      disabled={isStatusLoading}
-                      className="text-[10px] h-7 px-3"
-                    >
-                      <RefreshCw className={`w-3 h-3 mr-1 ${isStatusLoading ? "animate-spin" : ""}`} />
-                      Check Connection Status
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] })}
+                        disabled={isStatusLoading}
+                        className="text-[10px] h-7 px-3"
+                      >
+                        <RefreshCw className={`w-3 h-3 mr-1 ${isStatusLoading ? "animate-spin" : ""}`} />
+                        Check Connection Status
+                      </Button>
+
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          disconnectMutation.mutate();
+                          setTimeout(() => {
+                            connectMutation.mutate();
+                            queryClient.invalidateQueries({ queryKey: ["whatsapp-qr", getCurrentShop()] });
+                          }, 1000);
+                        }}
+                        disabled={isQrLoading || disconnectMutation.isPending || connectMutation.isPending}
+                        className="text-[10px] h-7 px-3"
+                      >
+                        <QrCode className={`w-3 h-3 mr-1 ${isQrLoading ? "animate-pulse" : ""}`} />
+                        Get New QR Code
+                      </Button>
+                    </div>
                   </div>
 
                   <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
