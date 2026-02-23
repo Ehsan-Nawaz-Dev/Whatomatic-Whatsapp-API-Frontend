@@ -30,6 +30,7 @@ interface TemplateFormState {
   enabled: boolean;
   isPoll: boolean;
   pollOptions: string[];
+  sendingDelay: number;
 }
 
 const emptyForm: TemplateFormState = {
@@ -39,6 +40,7 @@ const emptyForm: TemplateFormState = {
   enabled: true,
   isPoll: false,
   pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
+  sendingDelay: 0,
 };
 
 const MessageTemplates = () => {
@@ -51,6 +53,7 @@ const MessageTemplates = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState<TemplateFormState>(emptyForm);
   const [isEdit, setIsEdit] = useState(false);
+  const [isCustomDelayMode, setIsCustomDelayMode] = useState(false);
 
   const createMut = useMutation({
     mutationFn: createTemplate,
@@ -93,12 +96,15 @@ const MessageTemplates = () => {
 
   const openNewDialog = () => {
     setIsEdit(false);
+    setIsCustomDelayMode(false);
     setForm(emptyForm);
     setDialogOpen(true);
   };
 
   const openEditDialog = (template: any) => {
     setIsEdit(true);
+    const existingDelay = template.sendingDelay || 0;
+    setIsCustomDelayMode(![0, 1, 5, 15, 30, 60, 120, 360, 720, 1440].includes(existingDelay));
     setForm({
       id: template._id,
       name: template.name,
@@ -107,6 +113,7 @@ const MessageTemplates = () => {
       enabled: template.enabled,
       isPoll: template.isPoll || false,
       pollOptions: template.pollOptions || ["✅Yes, Confirm✅", "❌No, Cancel❌"],
+      sendingDelay: existingDelay,
     });
     setDialogOpen(true);
   };
@@ -371,6 +378,51 @@ const MessageTemplates = () => {
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 className="min-h-[200px]"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tmpl-delay">Sending Time</Label>
+              <div className="flex gap-2">
+                <select
+                  id="tmpl-delay"
+                  className="flex-1 h-10 rounded-md border border-border bg-background px-3 text-sm"
+                  value={isCustomDelayMode ? "custom" : form.sendingDelay.toString()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "custom") {
+                      setIsCustomDelayMode(true);
+                      setForm({ ...form, sendingDelay: form.sendingDelay || 1 });
+                    } else {
+                      setIsCustomDelayMode(false);
+                      setForm({ ...form, sendingDelay: parseInt(val) });
+                    }
+                  }}
+                >
+                  <option value="0">Default (App Safe Guard Limit)</option>
+                  <option value="1">1 Minute</option>
+                  <option value="5">5 Minutes</option>
+                  <option value="15">15 Minutes</option>
+                  <option value="30">30 Minutes</option>
+                  <option value="60">1 Hour</option>
+                  <option value="120">2 Hours</option>
+                  <option value="360">6 Hours</option>
+                  <option value="720">12 Hours</option>
+                  <option value="1440">24 Hours</option>
+                  <option value="custom">Custom Time...</option>
+                </select>
+                {isCustomDelayMode && (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min="0"
+                      className="w-20 h-10"
+                      value={form.sendingDelay.toString()}
+                      onChange={(e) => setForm({ ...form, sendingDelay: parseInt(e.target.value) || 0 })}
+                    />
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">min</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {form.event !== "admin-order-alert" && (
