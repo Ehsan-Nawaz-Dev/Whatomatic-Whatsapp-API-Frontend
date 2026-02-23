@@ -81,7 +81,9 @@ const AutomationsOverview = () => {
         message: "",
         isPoll: false,
         pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
+        sendingDelay: 0,
     });
+    const [isCustomDelayMode, setIsCustomDelayMode] = useState(false);
 
     const queryClient = useQueryClient();
     const { data: statsData, isLoading: isStatsLoading } = useQuery({
@@ -146,6 +148,8 @@ const AutomationsOverview = () => {
     const handleEditClick = (flow: any) => {
         setSelectedFlow(flow);
         if (flow.template) {
+            const existingDelay = flow.template.sendingDelay || 0;
+            setIsCustomDelayMode(![0, 1, 5, 15, 30, 60, 120, 360, 720, 1440].includes(existingDelay));
             setEditForm({
                 id: flow.template._id,
                 name: flow.template.name || flow.title,
@@ -153,7 +157,8 @@ const AutomationsOverview = () => {
                 isPoll: flow.template.isPoll || false,
                 pollOptions: flow.template.pollOptions || ["✅Yes, Confirm✅", "❌No, Cancel❌"],
                 event: flow.template.event,
-                enabled: flow.template.enabled
+                enabled: flow.template.enabled,
+                sendingDelay: existingDelay
             });
         } else {
             // Mapping flow.id to event keys
@@ -166,13 +171,15 @@ const AutomationsOverview = () => {
                 "cancellation": "orders/cancelled",
                 "cancellation-verify": "orders/cancel_verify",
             };
+            setIsCustomDelayMode(false);
             setEditForm({
                 name: flow.title,
                 message: "",
                 isPoll: flow.id === "order-confirmation" || flow.id === "cancellation-verify",
                 pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
                 event: eventMap[flow.id],
-                enabled: true
+                enabled: true,
+                sendingDelay: 0
             });
         }
         setEditOpen(true);
@@ -425,6 +432,52 @@ const AutomationsOverview = () => {
                                             </button>
                                         ))}
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Sending Time */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="tmpl-delay" className="text-xs font-semibold">Sending Time</Label>
+                                <div className="flex gap-2">
+                                    <select
+                                        id="tmpl-delay"
+                                        className="flex-1 h-9 rounded-md border border-border bg-background px-3 text-xs"
+                                        value={isCustomDelayMode ? "custom" : (editForm.sendingDelay || 0).toString()}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === "custom") {
+                                                setIsCustomDelayMode(true);
+                                                setEditForm({ ...editForm, sendingDelay: editForm.sendingDelay || 1 });
+                                            } else {
+                                                setIsCustomDelayMode(false);
+                                                setEditForm({ ...editForm, sendingDelay: parseInt(val) });
+                                            }
+                                        }}
+                                    >
+                                        <option value="0">Default (App Safe Guard Limit)</option>
+                                        <option value="1">1 Minute</option>
+                                        <option value="5">5 Minutes</option>
+                                        <option value="15">15 Minutes</option>
+                                        <option value="30">30 Minutes</option>
+                                        <option value="60">1 Hour</option>
+                                        <option value="120">2 Hours</option>
+                                        <option value="360">6 Hours</option>
+                                        <option value="720">12 Hours</option>
+                                        <option value="1440">24 Hours</option>
+                                        <option value="custom">Custom Time...</option>
+                                    </select>
+                                    {isCustomDelayMode && (
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                className="w-16 h-9 text-xs"
+                                                value={(editForm.sendingDelay || 0).toString()}
+                                                onChange={(e) => setEditForm({ ...editForm, sendingDelay: parseInt(e.target.value) || 0 })}
+                                            />
+                                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">min</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
