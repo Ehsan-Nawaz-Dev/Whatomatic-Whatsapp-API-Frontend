@@ -15,8 +15,8 @@ import BulkMessenger from "@/components/dashboard/BulkMessenger";
 import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { withShopParam, getCurrentShop, getAuthUrl, getAuthHeaders } from "@/lib/api";
-import { Loader2 } from "lucide-react";
+import { withShopParam, getCurrentShop, getAuthUrl, getAuthHeaders, fetchWhatsAppStatus } from "@/lib/api";
+import { Loader2, AlertCircle } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import HelpSupport from "@/components/dashboard/HelpSupport";
@@ -149,6 +149,11 @@ const Dashboard = () => {
 
   const [isJustActivated, setIsJustActivated] = useState(false);
 
+  const { data: whatsappStatus } = useQuery<any>({
+    queryKey: ["whatsapp-status", getCurrentShop()],
+    queryFn: fetchWhatsAppStatus,
+  });
+
   // Handle Billing Success Redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -201,12 +206,27 @@ const Dashboard = () => {
         <main className="flex-1 p-2.5 sm:p-3 lg:p-4 xl:p-6 overflow-y-auto overflow-x-hidden">
           {effectiveTab === "overview" && (
             <div className="space-y-3 lg:space-y-4 xl:space-y-6">
-              <SetupChecklist onNavigate={setActiveTab} />
-              <StatsCards />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 xl:gap-6">
-                <WhatsAppConnection />
-                <RecentActivity />
-              </div>
+              {whatsappStatus?.connected === false ? (
+                <div className="space-y-4">
+                  <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-xl flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-bold">WhatsApp Not Connected</h3>
+                      <p className="text-sm mt-1 opacity-90">Please connect your WhatsApp account to enable automations and start sending messages.</p>
+                    </div>
+                  </div>
+                  <WhatsAppConnection />
+                </div>
+              ) : (
+                <>
+                  <SetupChecklist onNavigate={setActiveTab} />
+                  <StatsCards />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 xl:gap-6">
+                    <WhatsAppConnection />
+                    <RecentActivity />
+                  </div>
+                </>
+              )}
             </div>
           )}
 

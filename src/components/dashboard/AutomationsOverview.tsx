@@ -20,7 +20,7 @@ const automations = [
         description: "Notify the admin immediately when a new order is received.",
         icon: Bell,
         stats: { sent: 0, recovered: null, revenue: null },
-        enabled: true,
+        enabled: false,
     },
     {
         id: "abandoned_cart",
@@ -28,7 +28,7 @@ const automations = [
         description: "Send reminders to customers who leave items in their cart.",
         icon: ShoppingCart,
         stats: { sent: 0, recovered: 0, revenue: "$0" },
-        enabled: true,
+        enabled: false,
     },
     {
         id: "order-confirmation",
@@ -36,7 +36,7 @@ const automations = [
         description: "Ask customers to confirm their order details via WhatsApp.",
         icon: MessageSquare,
         stats: { sent: 0, recovered: null, revenue: null },
-        enabled: true,
+        enabled: false,
     },
     {
         id: "order-confirmed-reply",
@@ -44,7 +44,7 @@ const automations = [
         description: "Send a beautiful thank you message after confirmation.",
         icon: Zap,
         stats: { sent: 0, recovered: null, revenue: null },
-        enabled: true,
+        enabled: false,
     },
     {
         id: "fulfillment_update",
@@ -60,7 +60,7 @@ const automations = [
         description: "Automatically inform customers if their order is cancelled.",
         icon: XCircle,
         stats: { sent: 0, recovered: null, revenue: null },
-        enabled: true,
+        enabled: false,
     },
     {
         id: "cancellation-verify",
@@ -68,7 +68,7 @@ const automations = [
         description: "Ask customers to confirm before processing a cancellation.",
         icon: XCircle,
         stats: { sent: 0, recovered: null, revenue: null },
-        enabled: true,
+        enabled: false,
     },
 ];
 
