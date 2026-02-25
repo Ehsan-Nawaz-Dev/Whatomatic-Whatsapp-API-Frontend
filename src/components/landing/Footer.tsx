@@ -12,7 +12,7 @@ const Footer = () => {
               <img
                 src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
                 alt="Whatomatic"
-                className="h-14 w-auto object-contain"
+                className="h-24 w-auto object-contain mix-blend-multiply"
               />
             </Link>
             <p className="text-sm text-muted-foreground text-center md:text-left">
