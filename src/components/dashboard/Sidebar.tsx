@@ -108,10 +108,10 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
       {/* Mobile hamburger button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-[3px] left-3 z-50 p-2.5 bg-card border border-border rounded-xl shadow-lg hover:bg-muted transition-colors"
+        className="lg:hidden fixed top-2 left-3 z-50 p-2 bg-card border border-border rounded-lg shadow-sm hover:bg-muted transition-colors"
         aria-label="Open menu"
       >
-        <Menu className="w-5 h-5 text-foreground" />
+        <Menu className="w-4 h-4 text-foreground" />
       </button>
 
       {/* Mobile overlay */}
