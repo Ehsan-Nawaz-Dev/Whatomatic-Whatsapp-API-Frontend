@@ -20,9 +20,9 @@ const DashboardHeader = ({ billing, onNavigateNotifications }: DashboardHeaderPr
   const remaining = limit - usage;
 
   return (
-    <header className="h-12 lg:h-14 xl:h-16 bg-card border-b border-border px-3 lg:px-4 xl:px-6 flex items-center justify-between">
+    <header className="h-12 lg:h-14 xl:h-16 bg-card border-b border-border px-3 lg:px-4 xl:px-6 flex items-center justify-end">
       {/* Search - push right on mobile to make room for hamburger */}
-      <div className="flex-1 max-w-xs lg:max-w-md ml-10 lg:ml-0">
+      <div className="hidden flex-1 max-w-xs lg:max-w-md ml-10 lg:ml-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 lg:w-4 lg:h-4 text-muted-foreground" />
           <input
