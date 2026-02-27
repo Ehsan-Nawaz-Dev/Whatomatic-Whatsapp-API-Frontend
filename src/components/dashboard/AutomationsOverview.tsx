@@ -178,7 +178,7 @@ const AutomationsOverview = () => {
                 isPoll: flow.id === "order-confirmation" || flow.id === "cancellation-verify",
                 pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
                 event: eventMap[flow.id],
-                enabled: true,
+                enabled: false,
                 sendingDelay: 0
             });
         }
