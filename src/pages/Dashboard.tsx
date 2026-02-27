@@ -20,6 +20,8 @@ import { Loader2, AlertCircle } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import HelpSupport from "@/components/dashboard/HelpSupport";
+import OnboardingWalkthrough from "@/components/dashboard/OnboardingWalkthrough";
+import { fetchAutomationsStats } from "@/lib/api";
 
 
 const Dashboard = () => {
@@ -149,9 +151,20 @@ const Dashboard = () => {
 
   const [isJustActivated, setIsJustActivated] = useState(false);
 
+  const [isOnboardingDone, setIsOnboardingDone] = useState(() => {
+    const shop = getCurrentShop();
+    return localStorage.getItem(`whatflow_onboarding_done_${shop}`) === "true";
+  });
+
   const { data: whatsappStatus } = useQuery<any>({
     queryKey: ["whatsapp-status", getCurrentShop()],
     queryFn: fetchWhatsAppStatus,
+  });
+
+  const { data: statsData } = useQuery({
+    queryKey: ["automations-stats", getCurrentShop()],
+    queryFn: fetchAutomationsStats,
+    enabled: !!whatsappStatus?.connected,
   });
 
   // Handle Billing Success Redirect
@@ -174,6 +187,31 @@ const Dashboard = () => {
 
   const isActive = billing?.status === "active" || isJustActivated; // FORCE ACTIVE if just redirected
 
+  // Onboarding logic
+  const isPlanChosen = isActive;
+  const isWhatsAppConnected = !!whatsappStatus?.connected;
+  const hasAutomations = Array.isArray(statsData) && statsData.some((s: any) => s.enabled);
+
+  let onboardingStep = 1;
+  if (!isPlanChosen) {
+    onboardingStep = 1;
+  } else if (!isWhatsAppConnected) {
+    onboardingStep = 2;
+  } else {
+    onboardingStep = 3;
+    // Auto-finish if they have automations and they refreshed?
+    // Optionally we can auto-finish here if we want.
+  }
+
+  const handleFinishOnboarding = () => {
+    const shop = getCurrentShop();
+    localStorage.setItem(`whatflow_onboarding_done_${shop}`, "true");
+    setIsOnboardingDone(true);
+    setActiveTab("overview");
+  };
+
+  const showOnboarding = !isOnboardingDone && !isBillingLoading;
+
   // Force billing tab for new/unpaid users, but allow settings for setup
   const effectiveTab = (!isActive && activeTab !== "settings") ? "billing" : activeTab;
 
@@ -189,7 +227,14 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden relative">
+      {showOnboarding && (
+        <OnboardingWalkthrough
+          currentStep={onboardingStep}
+          hasAutomations={hasAutomations}
+          onComplete={handleFinishOnboarding}
+        />
+      )}
       <Sidebar
         activeTab={effectiveTab}
         setActiveTab={setActiveTab}
