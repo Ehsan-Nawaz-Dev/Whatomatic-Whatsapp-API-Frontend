@@ -50,12 +50,13 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="px-5 py-6 border-b border-border flex items-center justify-between">
+      <div className="px-3 py-4 border-b border-border flex items-center justify-between">
         <div className="transition-transform duration-300 hover:scale-[1.05] flex-1 flex justify-center">
           <img
             src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
             alt="Whatomatic"
-            className="w-40 lg:w-48 xl:w-56 h-auto object-contain mix-blend-multiply"
+            style={{ width: '100%', maxWidth: '200px', height: 'auto' }}
+            className="object-contain mix-blend-multiply"
           />
         </div>
         {/* Close button for mobile */}
@@ -127,7 +128,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
         className={`
           fixed lg:relative z-50 lg:z-auto
           top-0 left-0 h-full
-          w-[260px] lg:w-48 xl:w-56 2xl:w-64
+          w-[260px] lg:w-56 xl:w-64 2xl:w-72
           bg-card border-r border-border flex flex-col shrink-0
           transform transition-transform duration-300 ease-in-out
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
