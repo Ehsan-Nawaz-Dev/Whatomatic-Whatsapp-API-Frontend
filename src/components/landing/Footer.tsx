@@ -8,11 +8,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link to="/" className="flex items-center justify-center md:justify-start mb-4">
+            <Link to="/" className="flex items-center justify-center md:justify-start mb-4 overflow-hidden h-[80px] w-full md:w-[200px] mx-auto md:mx-0">
               <img
                 src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
                 alt="Whatomatic"
-                style={{ width: '250px', height: 'auto' }}
+                style={{ width: '100%', maxWidth: '200px', height: 'auto', transform: 'scale(2.2)' }}
+                className="object-contain mix-blend-multiply origin-center"
               />
             </Link>
             <p className="text-sm text-muted-foreground text-center md:text-left">
