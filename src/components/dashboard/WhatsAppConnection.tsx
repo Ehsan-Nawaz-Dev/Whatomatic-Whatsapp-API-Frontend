@@ -35,11 +35,17 @@ const WhatsAppConnection = () => {
     refetchOnWindowFocus: true,
   });
 
-  // Watch for connection status changes and refresh merchant settings
+  // Watch for connection status changes and refresh data
   useEffect(() => {
     if (status?.connected) {
       // Invalidate merchant settings to reload the WhatsApp number
       queryClient.invalidateQueries({ queryKey: ["merchant-settings", getCurrentShop()] });
+      // Re-fetch whatsapp status after a short delay to get the updated phone number
+      // (the DB may not have the new number yet when the first "connected" response arrives)
+      const timer = setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, [status?.connected, queryClient]);
 
