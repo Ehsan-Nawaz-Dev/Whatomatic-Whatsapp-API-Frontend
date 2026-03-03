@@ -20,7 +20,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
-              src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
+              src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
               alt="Whatomatic"
               className="w-36 sm:w-44 md:w-48 h-auto object-contain mix-blend-multiply origin-left"
             />

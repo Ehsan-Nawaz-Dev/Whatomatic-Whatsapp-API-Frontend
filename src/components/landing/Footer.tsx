@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center justify-center md:justify-start mb-4">
               <img
-                src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
+                src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
                 alt="Whatomatic"
                 className="h-32 w-auto object-contain mix-blend-multiply"
               />
