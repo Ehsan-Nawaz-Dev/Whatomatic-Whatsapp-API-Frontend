@@ -50,13 +50,12 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="px-3 py-3 border-b border-border flex items-center justify-between">
-        <div className="transition-transform duration-300 hover:scale-[1.05] flex-1 flex justify-center overflow-hidden" style={{ height: '50px' }}>
+      <div className="px-2 py-2 border-b border-border flex items-center justify-between">
+        <div className="transition-transform duration-300 hover:scale-[1.05] flex-1 flex justify-center">
           <img
             src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
             alt="Whatomatic"
-            style={{ width: '500px', maxWidth: 'none', height: 'auto', transform: 'scale(1)', marginTop: '-38%' }}
-            className="object-contain mix-blend-multiply"
+            style={{ width: '100%', height: 'auto' }}
           />
         </div>
         {/* Close button for mobile */}
