@@ -55,7 +55,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
           <img
             src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
             alt="Whatomatic"
-            className="h-32 w-auto max-w-none object-contain mix-blend-multiply"
+            className="w-[180px] sm:w-[200px] lg:w-[160px] xl:w-[200px] h-auto object-contain mix-blend-multiply"
           />
         </div>
         {/* Close button for mobile */}
