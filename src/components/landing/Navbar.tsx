@@ -18,11 +18,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center overflow-hidden" style={{ height: '45px' }}>
             <img
               src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
               alt="Whatomatic"
-              className="w-36 md:w-48 lg:w-56 h-auto object-contain mix-blend-multiply origin-left"
+              style={{ width: '400px', maxWidth: 'none', height: 'auto', marginTop: '-38%' }}
+              className="object-contain mix-blend-multiply"
             />
           </Link>
 
