@@ -22,7 +22,7 @@ const Navbar = () => {
             <img
               src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
               alt="Whatomatic"
-              className="w-36 sm:w-44 md:w-48 h-auto object-contain mix-blend-multiply origin-left"
+              className="w-[180px] sm:w-[220px] md:w-[240px] lg:w-[260px] h-auto object-contain mix-blend-multiply origin-left"
             />
           </Link>
 
