@@ -56,7 +56,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
           aria-label="Whatomatic"
           style={{
             backgroundImage: 'url(https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png)',
-            backgroundSize: '100% auto',
+            backgroundSize: '95% auto',
             backgroundPosition: 'center 42%',
             backgroundRepeat: 'no-repeat',
             width: '100%',
