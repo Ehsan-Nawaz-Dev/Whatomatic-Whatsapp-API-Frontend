@@ -50,19 +50,23 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="px-1 py-2 border-b border-border flex items-center justify-center overflow-hidden h-[120px]">
-        <div className="w-[300px] flex justify-center items-center">
-          <img
-            src="https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png"
-            alt="Whatomatic"
-            style={{ width: '400px', maxWidth: 'none', height: 'auto', transform: 'scale(1.8)' }}
-            className="object-contain mix-blend-multiply origin-center"
-          />
-        </div>
+      <div className="border-b border-border flex items-center justify-between">
+        <div
+          role="img"
+          aria-label="Whatomatic"
+          style={{
+            backgroundImage: 'url(https://whatomatic.com/assets/whatomatic-logo-PNG-01-BqPUWPyW.png)',
+            backgroundSize: '200% auto',
+            backgroundPosition: 'center 42%',
+            backgroundRepeat: 'no-repeat',
+            width: '100%',
+            height: '80px',
+          }}
+        />
         {/* Close button for mobile */}
         <button
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden ml-3 p-1.5 rounded-lg hover:bg-muted text-muted-foreground"
+          className="lg:hidden absolute top-2 right-2 p-1.5 rounded-lg hover:bg-muted text-muted-foreground z-10"
         >
           <X className="w-5 h-5" />
         </button>
