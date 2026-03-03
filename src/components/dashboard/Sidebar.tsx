@@ -51,11 +51,11 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
     <>
       {/* Logo */}
       <div className="px-5 py-6 border-b border-border flex items-center justify-between">
-        <div className="transition-transform duration-300 hover:scale-[1.05] flex-1 min-w-0 flex justify-center">
+        <div className="transition-transform duration-300 hover:scale-[1.05] flex-1 flex justify-center">
           <img
             src="https://whatomatic.com/assets/whatomatic-logo-D75c-fbv.png"
             alt="Whatomatic"
-            className="h-32 w-auto object-contain mix-blend-multiply"
+            className="h-32 w-auto max-w-none object-contain mix-blend-multiply"
           />
         </div>
         {/* Close button for mobile */}
