@@ -151,18 +151,24 @@ const Dashboard = () => {
 
   const [isJustActivated, setIsJustActivated] = useState(false);
 
-  const [isOnboardingDone, setIsOnboardingDone] = useState(() => {
+  const [isOnboardingDone, setIsOnboardingDone] = useState(true); // default true to avoid flash, use effect evaluates
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const shop = getCurrentShop() || params.get('shop');
 
     // Clear cache if this is a fresh install redirect from Shopify
-    if (params.get('installed') === "true") {
+    if (params.get('installed') === "true" || params.get('hmac')) {
+      // We also check 'hmac' because fresh loads from app index contain hmac initially
       if (shop) localStorage.removeItem(`whatflow_onboarding_done_${shop}`);
-      return false;
     }
 
-    return shop ? localStorage.getItem(`whatflow_onboarding_done_${shop}`) === "true" : false;
-  });
+    if (shop) {
+      setIsOnboardingDone(localStorage.getItem(`whatflow_onboarding_done_${shop}`) === "true");
+    } else {
+      setIsOnboardingDone(false);
+    }
+  }, []);
 
   const { data: whatsappStatus } = useQuery<any>({
     queryKey: ["whatsapp-status", getCurrentShop()],
@@ -199,7 +205,8 @@ const Dashboard = () => {
   const isPaidPlan = billing?.plan && billing?.plan !== "free" && billing?.plan !== "none";
   let isPlanChosen = isPaidPlan || isJustActivated || !!whatsappStatus?.connected;
 
-  if (isOnboardingDone || isPlanChosen) {
+  // If the backend explicitly says this is a new installation, override any leftover local browser cache
+  if (!billing?.isNewlyInstalled && (isOnboardingDone || isPlanChosen)) {
     isPlanChosen = true;
   }
   const isWhatsAppConnected = !!whatsappStatus?.connected;
@@ -216,14 +223,21 @@ const Dashboard = () => {
     // Optionally we can auto-finish here if we want.
   }
 
+  const [isSessionFinished, setIsSessionFinished] = useState(false);
+
   const handleFinishOnboarding = () => {
     const shop = getCurrentShop();
     localStorage.setItem(`whatflow_onboarding_done_${shop}`, "true");
     setIsOnboardingDone(true);
+    setIsSessionFinished(true);
     setActiveTab("overview");
   };
 
-  const showOnboarding = !isOnboardingDone && !isBillingLoading;
+  const forceShowOnboarding = billing?.isNewlyInstalled && !isSessionFinished;
+
+  // Very aggressive visibility: If local storage says it isn't done, show it.
+  // If backend says it's newly installed, force show it.
+  const shouldRenderOnboarding = !isBillingLoading && (!isOnboardingDone || forceShowOnboarding) && !isSessionFinished;
 
   // Force billing tab for new/unpaid users, but allow settings for setup
   const effectiveTab = (!isActive && activeTab !== "settings") ? "billing" : activeTab;
@@ -241,7 +255,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden relative">
-      {showOnboarding && (
+      {shouldRenderOnboarding && (
         <OnboardingWalkthrough
           currentStep={onboardingStep}
           hasAutomations={hasAutomations}
