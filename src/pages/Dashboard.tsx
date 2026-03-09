@@ -152,8 +152,16 @@ const Dashboard = () => {
   const [isJustActivated, setIsJustActivated] = useState(false);
 
   const [isOnboardingDone, setIsOnboardingDone] = useState(() => {
-    const shop = getCurrentShop();
-    return localStorage.getItem(`whatflow_onboarding_done_${shop}`) === "true";
+    const params = new URLSearchParams(window.location.search);
+    const shop = getCurrentShop() || params.get('shop');
+
+    // Clear cache if this is a fresh install redirect from Shopify
+    if (params.get('installed') === "true") {
+      if (shop) localStorage.removeItem(`whatflow_onboarding_done_${shop}`);
+      return false;
+    }
+
+    return shop ? localStorage.getItem(`whatflow_onboarding_done_${shop}`) === "true" : false;
   });
 
   const { data: whatsappStatus } = useQuery<any>({
@@ -187,8 +195,13 @@ const Dashboard = () => {
 
   const isActive = billing?.status === "active" || isJustActivated; // FORCE ACTIVE if just redirected
 
-  // Onboarding logic
-  const isPlanChosen = isActive;
+  // Onboarding logic: Prevent bypassing step 1 for new users despite the 'free' default backend state
+  const isPaidPlan = billing?.plan && billing?.plan !== "free" && billing?.plan !== "none";
+  let isPlanChosen = isPaidPlan || isJustActivated || !!whatsappStatus?.connected;
+
+  if (isOnboardingDone || isPlanChosen) {
+    isPlanChosen = true;
+  }
   const isWhatsAppConnected = !!whatsappStatus?.connected;
   const hasAutomations = Array.isArray(statsData) && statsData.some((s: any) => s.enabled);
 
