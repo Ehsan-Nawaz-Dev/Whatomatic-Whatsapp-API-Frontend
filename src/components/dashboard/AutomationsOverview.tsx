@@ -36,7 +36,7 @@ const automations = [
         description: "Ask customers to confirm their order details via WhatsApp.",
         icon: MessageSquare,
         stats: { sent: 0, recovered: null, revenue: null },
-        enabled: false,
+        enabled: true,
     },
     {
         id: "order-confirmed-reply",
