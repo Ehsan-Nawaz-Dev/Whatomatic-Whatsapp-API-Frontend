@@ -29,8 +29,6 @@ const App = () => (
           <a href="/dashboard?tab=automations">Automations</a>
           <a href="/dashboard?tab=contacts">Contacts</a>
           <a href="/dashboard?tab=analytics">Analytics</a>
-          <a href="/dashboard?tab=chat-button">Chat Button</a>
-          <a href="/dashboard?tab=bulk-messenger">Bulk Messenger</a>
           <a href="/dashboard?tab=settings">Settings</a>
           <a href="/dashboard?tab=billing">Plans & Billing</a>
           <a href="/dashboard?tab=help">Help & Support</a>
