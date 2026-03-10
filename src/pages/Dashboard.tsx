@@ -157,9 +157,8 @@ const Dashboard = () => {
     const params = new URLSearchParams(window.location.search);
     const shop = getCurrentShop() || params.get('shop');
 
-    // Clear cache if this is a fresh install redirect from Shopify
-    if (params.get('installed') === "true" || params.get('hmac')) {
-      // We also check 'hmac' because fresh loads from app index contain hmac initially
+    // Clear cache only if this is an explicit fresh install redirect from Shopify
+    if (params.get('installed') === "true") {
       if (shop) localStorage.removeItem(`whatflow_onboarding_done_${shop}`);
     }
 
