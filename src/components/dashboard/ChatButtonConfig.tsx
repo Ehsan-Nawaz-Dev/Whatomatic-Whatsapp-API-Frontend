@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MessageCircle, Settings, Eye, Smartphone, Save, Loader2 } from "lucide-react";
+import { MessageCircle, Settings, Eye, Smartphone, Save, Loader2, Info, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,6 +105,44 @@ const ChatButtonConfig = () => {
                     <p className="text-muted-foreground mt-1 text-sm">
                         Let customers start a conversation directly from your website.
                     </p>
+                </div>
+            </div>
+
+            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6">
+                <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0 mt-1">
+                        <Info className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="space-y-4 flex-1">
+                        <div>
+                            <h3 className="text-lg font-bold">Action Required: Enable Theme App Extension</h3>
+                            <p className="text-sm opacity-90 mt-1">
+                                For the chat button to appear on your storefront, you must enable its Theme App Extension in your Shopify Theme Settings. By default, it is deactivated to allow you to preview and edit before showing it to customers.
+                            </p>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Setup Instructions:</h4>
+                            <ol className="list-decimal list-inside space-y-1.5 text-sm opacity-90">
+                                <li>Click the <strong>Open Theme Editor</strong> button below.</li>
+                                <li>In the left sidebar, click on the <strong>App embeds</strong> tab (third icon).</li>
+                                <li>Locate the Chat Button extension and toggle it to the <strong>ON</strong> position.</li>
+                                <li>Click the <strong>Save</strong> button in the top right corner of the Shopify theme editor.</li>
+                            </ol>
+                        </div>
+                        <Button 
+                            variant="default"
+                            className="mt-2"
+                            onClick={() => {
+                                const shop = getCurrentShop();
+                                if (shop) {
+                                    window.open(`https://${shop}/admin/themes/current/editor?context=apps`, '_blank');
+                                }
+                            }}
+                        >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Open Theme Editor
+                        </Button>
+                    </div>
                 </div>
             </div>
 

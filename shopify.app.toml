@@ -43,6 +43,10 @@ label = "Automations"
 path = "/dashboard?tab=automations"
 
 [[navigation.links]]
+label = "Storefront Chat"
+path = "/dashboard?tab=chat-button"
+
+[[navigation.links]]
 label = "Contacts"
 path = "/dashboard?tab=contacts"
 

@@ -33,6 +33,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
   const menuItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "automations", label: "Automations", icon: Zap, locked: !isSubscribed },
+    { id: "chat-button", label: "Storefront Chat", icon: MessageCircle, locked: !isSubscribed },
     { id: "contacts", label: "Contacts", icon: Users, locked: !isSubscribed },
     { id: "analytics", label: "Analytics", icon: BarChart3, locked: !isSubscribed },
     { id: "settings", label: "Settings", icon: Settings },
