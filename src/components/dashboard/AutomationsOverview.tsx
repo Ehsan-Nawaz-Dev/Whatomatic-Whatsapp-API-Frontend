@@ -158,7 +158,8 @@ const AutomationsOverview = () => {
                 pollOptions: flow.template.pollOptions || ["✅Yes, Confirm✅", "❌No, Cancel❌"],
                 event: flow.template.event,
                 enabled: flow.template.enabled,
-                sendingDelay: existingDelay
+                sendingDelay: existingDelay,
+                targetOrderStatus: flow.template.targetOrderStatus || "all"
             });
         } else {
             // Mapping flow.id to event keys
@@ -179,7 +180,8 @@ const AutomationsOverview = () => {
                 pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
                 event: eventMap[flow.id],
                 enabled: false,
-                sendingDelay: 0
+                sendingDelay: 0,
+                targetOrderStatus: "all"
             });
         }
         setEditOpen(true);
@@ -480,6 +482,24 @@ const AutomationsOverview = () => {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Target Order Status (Only for Order Confirmation) */}
+                            {editForm.event === "orders/create" && (
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="tmpl-target-status" className="text-xs font-semibold">Target Orders</Label>
+                                    <select
+                                        id="tmpl-target-status"
+                                        className="w-full h-9 rounded-md border border-border bg-background px-3 text-xs"
+                                        value={editForm.targetOrderStatus || "all"}
+                                        onChange={(e) => setEditForm({ ...editForm, targetOrderStatus: e.target.value })}
+                                    >
+                                        <option value="all">Send to ALL New Orders</option>
+                                        <option value="pending">Send ONLY to Pending/COD Orders</option>
+                                        <option value="paid">Send ONLY to Paid Orders</option>
+                                    </select>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Filters based on the order's financial status in Shopify.</p>
+                                </div>
+                            )}
 
                             {/* Poll Settings */}
                             {editForm.event !== "admin-order-alert" && (
