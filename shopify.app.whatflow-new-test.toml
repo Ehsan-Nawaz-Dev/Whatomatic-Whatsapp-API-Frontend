@@ -6,7 +6,7 @@ application_url = "https://whatflow-alpha.vercel.app"
 embedded = true
 
 [webhooks]
-api_version = "2024-01"
+api_version = "2026-01"
 
   [webhooks.privacy_compliance]
   customer_deletion_url = "https://api.whatomatic.com/Api/webhooks/shopify/gdpr/customers_redact"
