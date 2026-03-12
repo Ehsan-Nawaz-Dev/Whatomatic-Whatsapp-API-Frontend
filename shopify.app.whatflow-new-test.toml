@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "b38fbae62634999b1afac49bbf951878"
-name = "Ehsan_Whatomatic"
+client_id = "b535ffa5e6f072666d301bb620ee64aa"
+name = "whatomatic-whatsapp-automation"
 application_url = "https://whatflow-alpha.vercel.app"
 embedded = true
 
@@ -10,7 +10,7 @@ api_version = "2024-01"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_checkouts,write_checkouts,read_customers,write_customers,read_fulfillments,write_fulfillments,read_orders,write_orders,write_script_tags,read_script_tags"
+scopes = "read_checkouts,write_checkouts,read_customers,write_customers,read_fulfillments,write_fulfillments,read_orders,write_orders"
 optional_scopes = [ ]
 use_legacy_install_flow = false
 
