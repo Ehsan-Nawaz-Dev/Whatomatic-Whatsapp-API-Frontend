@@ -19,18 +19,10 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
         queryFn: fetchWhatsAppStatus,
     });
 
-    const { data: chatButton, isLoading: chatLoading } = useQuery({
-        queryKey: ["chat-button-settings", getCurrentShop()],
-        queryFn: fetchChatButtonSettings,
-    });
-
-    const isLoading = settingsLoading || whatsappLoading || chatLoading;
+    const isLoading = settingsLoading || whatsappLoading;
 
     // Use a refined check for Step 2 completion
     const isStep2Completed = !!(settings?.whatsappNumber || settings?.adminPhoneNumber || settings?.phone);
-
-    // Step 3 is completed if it's explicitly enabled in settings (it defaults to true, so it usually starts completed)
-    const isStep3Completed = !!chatButton?.enabled;
 
     const steps = [
         {
@@ -48,14 +40,6 @@ const SetupChecklist = ({ onNavigate }: SetupChecklistProps) => {
             completed: isStep2Completed,
             tab: "settings",
             icon: Zap
-        },
-        {
-            id: "chat-button",
-            title: "Enable Chat Button",
-            description: "Optional: Add a WhatsApp button to your storefront.",
-            completed: !!chatButton?.enabled,
-            tab: "chat-button",
-            icon: MessageSquare
         }
     ];
 

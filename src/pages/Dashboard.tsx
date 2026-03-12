@@ -12,7 +12,6 @@ import ContactsManagement from "@/components/dashboard/ContactsManagement";
 import WhatsAppCloudSettings from "@/components/dashboard/WhatsAppCloudSettings";
 import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
 import BulkMessenger from "@/components/dashboard/BulkMessenger";
-import ChatButtonConfig from "@/components/dashboard/ChatButtonConfig";
 import BillingPlan from "@/components/dashboard/BillingPlan";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { withShopParam, getCurrentShop, getAuthUrl, getAuthHeaders, fetchWhatsAppStatus } from "@/lib/api";
@@ -317,9 +316,7 @@ const Dashboard = () => {
             <NotificationsList />
           )}
 
-          {effectiveTab === "chat-button" && (
-            <ChatButtonConfig />
-          )}
+
 
           {effectiveTab === "billing" && (
             <div className="space-y-3 lg:space-y-4 xl:space-y-6">
