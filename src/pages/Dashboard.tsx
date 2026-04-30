@@ -51,11 +51,15 @@ const Dashboard = () => {
           if (res.status === 401) {
             console.warn(`[Dashboard] Token MISSING (401) for ${shop}. Breaking out to OAuth...`);
             const authUrl = getAuthUrl(shop);
-
-            if (window.top && window.top !== window.self) {
-              window.top.location.replace(authUrl);
-            } else {
-              window.location.replace(authUrl);
+            
+            try {
+              if (window.top && window.top !== window.self) {
+                window.open(authUrl, "_top");
+              } else {
+                window.location.assign(authUrl);
+              }
+            } catch (e) {
+              window.open(authUrl, "_top");
             }
             return;
           }
@@ -65,10 +69,14 @@ const Dashboard = () => {
           // Handle cases where merchant doesn't exist at all or needs token
           if (data.needsToken || (data.plan === 'none' && data.status === 'none')) {
             const authUrl = getAuthUrl(shop);
-            if (window.top && window.top !== window.self) {
-              window.top.location.replace(authUrl);
-            } else {
-              window.location.replace(authUrl);
+            try {
+              if (window.top && window.top !== window.self) {
+                window.open(authUrl, "_top");
+              } else {
+                window.location.assign(authUrl);
+              }
+            } catch (e) {
+              window.open(authUrl, "_top");
             }
             return;
           }
@@ -77,10 +85,14 @@ const Dashboard = () => {
           if (data.needsToken) {
             console.warn(`[Dashboard] Plan active but token missing for ${shop}. Redirecting to OAuth to get token...`);
             const authUrl = getAuthUrl(shop);
-            if (window.top && window.top !== window.self) {
-              window.top.location.replace(authUrl);
-            } else {
-              window.location.replace(authUrl);
+            try {
+              if (window.top && window.top !== window.self) {
+                window.open(authUrl, "_top");
+              } else {
+                window.location.assign(authUrl);
+              }
+            } catch (e) {
+              window.open(authUrl, "_top");
             }
             return;
           }
@@ -111,7 +123,6 @@ const Dashboard = () => {
         const headers = await getAuthHeaders();
         const res = await fetch(withShopParam("/billing/status"), { headers });
 
-        // --- LAZY AUTH CHECK ---
         // If 401/403 or network error with 'shop' param, we might need to install
         if (res.status === 401 || res.status === 403) {
           const params = new URLSearchParams(window.location.search);
@@ -120,10 +131,14 @@ const Dashboard = () => {
             const redirectUrl = getAuthUrl(shop);
             console.log("Redirecting to Install/Re-auth...", shop);
 
-            if (window.top) {
-              window.top.location.href = redirectUrl;
-            } else {
-              window.location.href = redirectUrl;
+            try {
+              if (window.top && window.top !== window.self) {
+                window.open(redirectUrl, "_top");
+              } else {
+                window.location.assign(redirectUrl);
+              }
+            } catch (e) {
+              window.open(redirectUrl, "_top");
             }
             return { plan: "loading", status: "redirecting" };
           }
