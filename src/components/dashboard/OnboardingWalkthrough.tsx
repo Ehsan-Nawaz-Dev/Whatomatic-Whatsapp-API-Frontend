@@ -31,7 +31,7 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
             <div className="w-full max-w-5xl flex flex-col gap-4 lg:gap-6 h-[95vh] lg:h-[88vh]">
                 <div className="text-center shrink-0 pt-2">
                     <h1 className="text-2xl lg:text-3xl font-extrabold mb-1 bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
-                        Welcome to WhatFlow!
+                        Welcome to Whatomatic!
                     </h1>
                     <p className="text-muted-foreground text-xs lg:text-sm">Let's get your store set up in 3 simple steps.</p>
                 </div>
