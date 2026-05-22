@@ -132,19 +132,9 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
 
                                 {activeStep === 3 && (
                                     <div className="flex flex-col h-full bg-card p-4 lg:p-6 pb-10">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-border shrink-0">
-                                            <div className="flex-1">
+                                        <div className="mb-4 pb-4 border-b border-border shrink-0">
                                                 <h2 className="text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400">Start Automation</h2>
-                                                <p className="text-xs lg:text-sm text-muted-foreground mb-4 sm:mb-0">Enable at least one automation to complete your setup.</p>
-                                            </div>
-                                            <Button
-                                                onClick={onComplete}
-                                                variant={hasAutomations ? "hero" : "outline"}
-                                                className="px-6 h-10 w-full sm:w-auto"
-                                            >
-                                                {hasAutomations ? "Complete Setup" : "Skip for now"}
-                                                <ArrowRight className="w-4 h-4 ml-2" />
-                                            </Button>
+                                                <p className="text-xs lg:text-sm text-muted-foreground">Enable at least one automation to complete your setup.</p>
                                         </div>
                                         <div className="flex-1 w-full max-w-5xl mx-auto flex flex-col">
                                             <AutomationsOverview />
