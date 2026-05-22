@@ -322,6 +322,31 @@ const MerchantSettings = () => {
           </div>
         </div>
       </div>
+
+      {isDirty && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-end items-center gap-3 p-4 bg-card border rounded-lg shadow-sm mt-6"
+        >
+          <span className="text-sm text-muted-foreground mr-auto">
+            You have unsaved changes.
+          </span>
+          <Button
+            variant="outline"
+            onClick={handleDiscard}
+            disabled={mutation.isPending}
+          >
+            Discard
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Saving..." : "Save Settings"}
+          </Button>
+        </motion.div>
+      )}
     </motion.div >
   );
 };
