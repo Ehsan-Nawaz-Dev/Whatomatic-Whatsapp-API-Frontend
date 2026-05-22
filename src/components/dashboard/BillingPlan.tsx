@@ -145,7 +145,7 @@ const BillingPlan = () => {
                 {isPlansLoading ? (
                     <div className="text-center py-12 lg:py-20 text-slate-500 animate-pulse">Loading plans...</div>
                 ) : (
-                    <div className="grid grid-cols-4 gap-2 lg:gap-3 xl:gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-3 xl:gap-4">
                         {displayPlans.map((plan: any) => {
                             const isCurrent = plan.id === currentPlanId || (isTrial && plan.id === 'trial');
                             const Icon = plan.icon;

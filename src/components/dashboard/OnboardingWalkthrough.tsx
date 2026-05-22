@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CreditCard, Smartphone, Zap, ArrowRight, Check } from "lucide-react";
+import { CreditCard, Smartphone, Zap, ArrowRight, ArrowLeft, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import BillingPlan from "@/components/dashboard/BillingPlan";
 import WhatsAppConnection from "@/components/dashboard/WhatsAppConnection";
 import AutomationsOverview from "@/components/dashboard/AutomationsOverview";
@@ -118,6 +118,42 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                             </div>
                         </motion.div>
                     </AnimatePresence>
+                </div>
+
+                {/* Previous / Next Navigation */}
+                <div className="flex items-center justify-between shrink-0 pt-2 pb-1">
+                    {activeStep > 1 ? (
+                        <Button
+                            variant="outline"
+                            onClick={() => setActiveStep(activeStep - 1)}
+                            className="h-9 px-4 gap-1.5 text-xs"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                            Previous
+                        </Button>
+                    ) : (
+                        <div /> /* spacer */
+                    )}
+
+                    {activeStep < 3 ? (
+                        <Button
+                            variant="hero"
+                            onClick={() => setActiveStep(activeStep + 1)}
+                            className="h-9 px-5 gap-1.5 text-xs"
+                        >
+                            Next
+                            <ChevronRight className="w-4 h-4" />
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={onComplete}
+                            variant={hasAutomations ? "hero" : "outline"}
+                            className="h-9 px-5 gap-1.5 text-xs"
+                        >
+                            {hasAutomations ? "Complete Setup" : "Skip for now"}
+                            <ArrowRight className="w-4 h-4" />
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>
