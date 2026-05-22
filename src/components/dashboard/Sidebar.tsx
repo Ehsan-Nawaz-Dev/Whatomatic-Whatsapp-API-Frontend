@@ -108,7 +108,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
       {/* Footer Area with Socials, Rate & Support */}
       <div className="p-4 border-t border-border mt-auto shrink-0 bg-background/50">
         <a
-          href="https://apps.shopify.com/whatomatic-whatsapp-automation-1"
+          href="https://apps.shopify.com/whatomatic-whatsapp-automation-1#modal-show=WriteReviewModal"
           target="_blank"
           rel="noopener noreferrer"
           className="w-full flex items-center justify-center gap-2 mb-3 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-semibold transition-colors shadow-sm"
