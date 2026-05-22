@@ -451,7 +451,7 @@ const AutomationsOverview = () => {
                                 <div className="p-2 bg-muted/40 rounded-md border border-border/30">
                                     <p className="text-[10px] font-semibold text-muted-foreground mb-1">📌 Available Placeholders:</p>
                                     <div className="flex flex-wrap gap-1">
-                                        {["{{customer_name}}", "{{order_number}}", "{{store_name}}", "{{items_list}}", "{{grand_total}}", "{{shipping_address}}", "{{city}}", "{{price}}", "{{payment_status}}"].map(ph => (
+                                        {["{{customer_name}}", "{{order_number}}", "{{store_name}}", "{{items_list}}", "{{grand_total}}", "{{shipping_address}}", "{{city}}", "{{price}}", "{{payment_status}}", "{{tracking_link}}", "{{tracking_number}}", "{{courier}}"].map(ph => (
                                             <button
                                                 key={ph}
                                                 type="button"
