@@ -492,28 +492,44 @@ export const fetchNotifications = async (): Promise<Notification[]> => {
   if (!res.ok) throw new Error("Failed to fetch notifications");
   const data = await res.json();
 
+  const shop = getCurrentShop();
+  const readKey = `whatomatic_read_notifications_${shop}`;
+  const deletedKey = `whatomatic_deleted_notifications_${shop}`;
+  
+  let readIds: string[] = [];
+  let deletedIds: string[] = [];
+  try {
+    readIds = JSON.parse(localStorage.getItem(readKey) || "[]");
+  } catch (e) {}
+  try {
+    deletedIds = JSON.parse(localStorage.getItem(deletedKey) || "[]");
+  } catch (e) {}
+
   // Map ActivityLog & GlobalBroadcasts to Notification interface
-  return data.map((log: any) => {
-    if (log.isBroadcast) {
+  return data
+    .filter((log: any) => !deletedIds.includes(log._id))
+    .map((log: any) => {
+      const isRead = readIds.includes(log._id);
+      if (log.isBroadcast) {
+        return {
+          id: log._id,
+          title: log.title || "📢 System Announcement",
+          message: log.message,
+          type: (log.type === 'error' ? 'error' : (log.type === 'warning' ? 'warning' : (log.type === 'success' ? 'success' : 'info'))) as any,
+          read: isRead,
+          createdAt: log.createdAt
+        };
+      }
+
       return {
         id: log._id,
-        title: log.title || "📢 System Announcement",
-        message: log.message,
-        type: (log.type === 'error' ? 'error' : (log.type === 'warning' ? 'warning' : (log.type === 'success' ? 'success' : 'info'))) as any,
-        read: false,
+        title: log.type.charAt(0).toUpperCase() + log.type.slice(1) + " Alert",
+        message: log.message || `${log.type} event for order ${log.orderId || 'N/A'}`,
+        type: log.type === 'failed' ? 'error' : ((log.type === 'confirmed' || log.type === 'shipped' || log.type === 'fulfilled') ? 'success' : 'info'),
+        read: isRead,
         createdAt: log.createdAt
       };
-    }
-
-    return {
-      id: log._id,
-      title: log.type.charAt(0).toUpperCase() + log.type.slice(1) + " Alert",
-      message: log.message || `${log.type} event for order ${log.orderId || 'N/A'}`,
-      type: log.type === 'failed' ? 'error' : (log.type === 'confirmed' ? 'success' : 'info'),
-      read: false, // Activity logs don't have read status yet, default to false
-      createdAt: log.createdAt
-    };
-  });
+    });
 };
 
 export const createNotification = async (payload: NotificationPayload): Promise<Notification> => {
@@ -528,24 +544,51 @@ export const createNotification = async (payload: NotificationPayload): Promise<
 };
 
 export const updateNotification = async (id: string, payload: Partial<Notification>): Promise<Notification> => {
-  const headers = await getAuthHeaders();
-  const res = await fetch(withShopParam(`/notifications/${id}`), {
-    method: "PUT",
-    headers,
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error("Failed to update notification");
-  return res.json();
+  const shop = getCurrentShop();
+  const readKey = `whatomatic_read_notifications_${shop}`;
+  
+  if (payload.read !== undefined) {
+    let readIds: string[] = [];
+    try {
+      readIds = JSON.parse(localStorage.getItem(readKey) || "[]");
+    } catch (e) {}
+    
+    if (payload.read) {
+      if (!readIds.includes(id)) {
+        readIds.push(id);
+      }
+    } else {
+      readIds = readIds.filter(x => x !== id);
+    }
+    localStorage.setItem(readKey, JSON.stringify(readIds));
+  }
+  
+  return {
+    id,
+    title: "",
+    message: "",
+    type: "info",
+    read: !!payload.read,
+    createdAt: new Date().toISOString(),
+    ...payload
+  };
 };
 
 export const deleteNotification = async (id: string) => {
-  const headers = await getAuthHeaders();
-  const res = await fetch(withShopParam(`/notifications/${id}`), {
-    method: "DELETE",
-    headers,
-  });
-  if (!res.ok) throw new Error("Failed to delete notification");
-  return res.json();
+  const shop = getCurrentShop();
+  const deletedKey = `whatomatic_deleted_notifications_${shop}`;
+  
+  let deletedIds: string[] = [];
+  try {
+    deletedIds = JSON.parse(localStorage.getItem(deletedKey) || "[]");
+  } catch (e) {}
+  
+  if (!deletedIds.includes(id)) {
+    deletedIds.push(id);
+    localStorage.setItem(deletedKey, JSON.stringify(deletedIds));
+  }
+  
+  return { success: true };
 };
 
 // Activity Logging API

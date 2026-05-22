@@ -82,54 +82,28 @@ const BillingPlan = () => {
     const createCharge = async (planId: string) => {
         setLoadingPlan(planId);
         try {
-            // Case 1: Free Plan -> Direct Backend Activation
-            // Managed Pricing (App Bridge) does not support creating $0 subscriptions,
-            // so we must handle the free plan activation via our backend API.
-            if (planId === 'free') {
-                console.log("[Billing] Activating Free Plan via Backend API...");
-                const headers = await getAuthHeaders();
+            console.log(`[Billing] Activating plan '${planId}' via Backend API...`);
+            const headers = await getAuthHeaders();
 
-                // We need to fetch with the shop param and correct headers
-                const res = await fetch(withShopParam("/billing/create"), {
-                    method: "POST",
-                    headers: { ...headers, "Content-Type": "application/json" },
-                    body: JSON.stringify({ plan: planId }),
-                });
+            // Fetch with the shop param and correct headers
+            const res = await fetch(withShopParam("/billing/create"), {
+                method: "POST",
+                headers: { ...headers, "Content-Type": "application/json" },
+                body: JSON.stringify({ plan: planId }),
+            });
 
-                const data = await res.json();
+            const data = await res.json();
 
-                if (data.confirmationUrl) {
-                    // Determine correct context for redirect
-                    if (window.top && window.top !== window.self) {
-                        window.top.location.href = data.confirmationUrl;
-                    } else {
-                        window.location.href = data.confirmationUrl;
-                    }
+            if (data.confirmationUrl) {
+                // Determine correct context for redirect
+                if (window.top && window.top !== window.self) {
+                    window.top.location.href = data.confirmationUrl;
                 } else {
-                    console.error("[Billing] Free activation failed", data);
-                    toast.error(data.message || "Failed to activate free plan");
-                    setLoadingPlan(null);
+                    window.location.href = data.confirmationUrl;
                 }
-                return;
-            }
-
-            // Case 2: Paid Plans -> Shopify Managed Billing (App Bridge 4)
-            // For paid plans, we delegate to Shopify's native billing modal.
-            // @ts-ignore
-            const activeShopify = window.shopify || (window.top && (window.top as any).shopify);
-
-            console.log("[Billing] App Bridge (activeShopify):", activeShopify);
-
-            if (activeShopify && activeShopify.billing && typeof activeShopify.billing.request === 'function') {
-                console.log(`[Billing] Requesting Shopify Managed Billing for plan: ${planId}`);
-                // @ts-ignore
-                await activeShopify.billing.request({
-                    plan: planId,
-                    isTest: true
-                });
             } else {
-                console.error("[Billing] Shopify billing API not found. activeShopify:", activeShopify);
-                toast.error("Billing not ready. Please ensure: 1. You are inside Shopify Admin. 2. You have RE-INSTALLED the app after setting Managed Pricing in the Partner Dashboard.");
+                console.error(`[Billing] Activation for plan '${planId}' failed`, data);
+                toast.error(data.message || "Failed to initiate plan activation");
                 setLoadingPlan(null);
             }
         } catch (err: any) {

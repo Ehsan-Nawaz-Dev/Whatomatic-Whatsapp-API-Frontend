@@ -9,10 +9,11 @@ interface DashboardHeaderProps {
     limit?: number;
     shopName?: string;
   };
+  hasUnread?: boolean;
   onNavigateNotifications?: () => void;
 }
 
-const DashboardHeader = ({ billing, onNavigateNotifications }: DashboardHeaderProps) => {
+const DashboardHeader = ({ billing, hasUnread, onNavigateNotifications }: DashboardHeaderProps) => {
   const isTrial = billing?.plan === 'trial';
   const isActive = billing?.status === 'active';
   const usage = billing?.usage || 0;
@@ -49,7 +50,7 @@ const DashboardHeader = ({ billing, onNavigateNotifications }: DashboardHeaderPr
           className="relative p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0"
         >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+          {hasUnread && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />}
         </button>
       </div>
     </header>

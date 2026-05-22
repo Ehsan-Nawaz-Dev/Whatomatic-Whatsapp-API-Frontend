@@ -37,6 +37,25 @@ const NotificationsList = () => {
         },
     });
 
+    const clearAllNotifications = () => {
+        const shop = getCurrentShop();
+        const deletedKey = `whatomatic_deleted_notifications_${shop}`;
+        let deletedIds: string[] = [];
+        try {
+            deletedIds = JSON.parse(localStorage.getItem(deletedKey) || "[]");
+        } catch (e) {}
+        
+        notifications.forEach(notif => {
+            if (!deletedIds.includes(notif.id)) {
+                deletedIds.push(notif.id);
+            }
+        });
+        
+        localStorage.setItem(deletedKey, JSON.stringify(deletedIds));
+        queryClient.invalidateQueries({ queryKey: ["notifications", getCurrentShop()] });
+        toast.success("All notifications cleared");
+    };
+
     const getTypeIcon = (type: Notification["type"]) => {
         switch (type) {
             case "info": return <Info className="w-4 h-4 text-blue-500" />;
@@ -145,7 +164,7 @@ const NotificationsList = () => {
 
             {notifications.length > 0 && (
                 <div className="pt-4 flex justify-center">
-                    <Button variant="link" className="text-xs text-muted-foreground">
+                    <Button onClick={clearAllNotifications} variant="link" className="text-xs text-muted-foreground">
                         Clear all notifications
                     </Button>
                 </div>

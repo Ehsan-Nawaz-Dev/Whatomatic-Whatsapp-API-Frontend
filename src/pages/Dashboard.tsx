@@ -20,7 +20,7 @@ import { useSearchParams } from "react-router-dom";
 import SetupChecklist from "@/components/dashboard/SetupChecklist";
 import HelpSupport from "@/components/dashboard/HelpSupport";
 import OnboardingWalkthrough from "@/components/dashboard/OnboardingWalkthrough";
-import { fetchAutomationsStats } from "@/lib/api";
+import { fetchAutomationsStats, fetchNotifications } from "@/lib/api";
 
 
 const Dashboard = () => {
@@ -194,6 +194,14 @@ const Dashboard = () => {
     enabled: !!whatsappStatus?.connected,
   });
 
+  // Fetch notifications to compute unread status
+  const { data: notifications = [] } = useQuery({
+    queryKey: ["notifications", getCurrentShop()],
+    queryFn: fetchNotifications,
+  });
+
+  const hasUnread = notifications.some((n: any) => !n.read);
+
   // Handle Billing Success Redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -284,6 +292,7 @@ const Dashboard = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <DashboardHeader
           billing={billing}
+          hasUnread={hasUnread}
           onNavigateNotifications={() => setActiveTab("notifications")}
         />
 

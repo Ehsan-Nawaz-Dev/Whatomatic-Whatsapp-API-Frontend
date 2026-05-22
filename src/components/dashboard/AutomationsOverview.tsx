@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye, Edit2, Trash2, Plus } from "lucide-react";
+import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye, Edit2, Trash2, Plus, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -307,18 +307,26 @@ const AutomationsOverview = () => {
 
             {/* Preview Dialog */}
             <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-transparent border-none">
+                <DialogContent hideClose className="sm:max-w-[450px] p-0 overflow-hidden bg-transparent border-none">
                     {selectedFlow && (
                         <div className="bg-[#f0f2f5] dark:bg-[#0b141a] rounded-3xl overflow-hidden shadow-2xl border border-border/50">
                             {/* WhatsApp Header */}
-                            <div className="bg-[#008069] p-4 flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                    <selectedFlow.icon className="w-6 h-6 text-white" />
+                            <div className="bg-[#008069] p-4 flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                        <selectedFlow.icon className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-white font-bold">{selectedFlow.title}</h3>
+                                        <p className="text-white/70 text-xs">Automation Service</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-white font-bold">{selectedFlow.title}</h3>
-                                    <p className="text-white/70 text-xs">Automation Service</p>
-                                </div>
+                                <button
+                                    onClick={() => setPreviewOpen(false)}
+                                    className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-all duration-200"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
                             </div>
 
                             {/* Chat Body */}
