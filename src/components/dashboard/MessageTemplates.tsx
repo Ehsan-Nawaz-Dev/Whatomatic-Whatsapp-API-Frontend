@@ -13,8 +13,10 @@ import { toast } from "sonner";
 const iconMap = {
   "orders/create": MessageSquare,
   "admin-order-alert": Bell,
+  "admin-confirmed-alert": Bell,
   "checkouts/abandoned": ShoppingCart,
   "fulfillments/update": Truck,
+  "fulfillments/delivered": Truck,
   "orders/cancelled": XCircle,
   "orders/confirmed": Bell,
   "orders/cancel_verify": XCircle,
@@ -311,15 +313,17 @@ const MessageTemplates = () => {
                   setForm({
                     ...form,
                     event: newEvent,
-                    isPoll: newEvent === "admin-order-alert" ? false : form.isPoll
+                    isPoll: (newEvent === "admin-order-alert" || newEvent === "admin-confirmed-alert") ? false : form.isPoll
                   });
                 }}
               >
                 <option value="orders/create">Customer Order Confirmation (Poll)</option>
                 <option value="orders/confirmed">Post-Confirmation Thank You</option>
                 <option value="admin-order-alert">Admin New Order Alert</option>
+                <option value="admin-confirmed-alert">Admin Order Confirmed Alert</option>
                 <option value="checkouts/abandoned">Abandoned checkout</option>
                 <option value="fulfillments/update">Fulfillment update</option>
+                <option value="fulfillments/delivered">Delivery update</option>
                 <option value="orders/cancelled">Order cancelled</option>
                 <option value="orders/cancel_verify">Order Cancellation Verification (Poll)</option>
               </select>
@@ -327,7 +331,7 @@ const MessageTemplates = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="tmpl-message">Message</Label>
-                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert" || form.event === "orders/cancel_verify" || form.event === "orders/cancelled") && (
+                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert" || form.event === "admin-confirmed-alert" || form.event === "orders/cancel_verify" || form.event === "orders/cancelled" || form.event === "fulfillments/delivered") && (
                   <button
                     type="button"
                     className="h-auto p-0 text-xs text-primary font-bold decoration-primary/30 hover:decoration-primary transition-all underline shrink-0"
@@ -359,10 +363,22 @@ const MessageTemplates = () => {
                           message: `Your order *{{order_number}}* has been cancelled as requested. ❌\n\nIf you have any questions or would like to place a new order, we're here to help!`,
                           isPoll: false
                         });
-                      } else {
+                      } else if (form.event === "fulfillments/delivered") {
+                        setForm({
+                          ...form,
+                          message: `🎉 *Order Delivered!*\n\nHi {{customer_name}}! 🚚\n\nWe're excited to let you know that your order *{{order_number}}* has been successfully delivered! \n\nWe hope you love your new purchase! If you have any questions or need assistance, feel free to reply to this message. 💬\n\nThank you for shopping with {{store_name}}!`,
+                          isPoll: false
+                        });
+                      } else if (form.event === "admin-order-alert") {
                         setForm({
                           ...form,
                           message: `🔔 *New Order Alert!*\n\nA new order {{order_number}} has been received at {{store_name}}.\n\n*Customer:* {{customer_name}}\n*Product Price:* {{price}}\n*Grand Total:* {{grand_total}}\n\n*Items:*\n{{items_list}}\n\n*Shipping to:*\n{{shipping_address}}\n{{city}}\n\nPayment status: {{payment_status}}`,
+                          isPoll: false
+                        });
+                      } else if (form.event === "admin-confirmed-alert") {
+                        setForm({
+                          ...form,
+                          message: `🔔 *Order Confirmed by Customer!*\n\nOrder {{order_number}} has been confirmed by customer {{customer_name}}! ✅\n\n*Items:*\n{{items_list}}\n\n*Grand Total:* {{grand_total}}\n\n*Shipping Address:*\n{{shipping_address}}\n{{city}}`,
                           isPoll: false
                         });
                       }
@@ -425,7 +441,7 @@ const MessageTemplates = () => {
               </div>
             </div>
 
-            {form.event !== "admin-order-alert" && (
+            {form.event !== "admin-order-alert" && form.event !== "admin-confirmed-alert" && (
               <div className="space-y-4 pt-2 border-t border-border/50">
                 <div className="flex items-center justify-between">
                   <div>

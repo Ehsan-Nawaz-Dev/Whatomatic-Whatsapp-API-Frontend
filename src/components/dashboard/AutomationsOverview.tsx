@@ -23,6 +23,14 @@ const automations = [
         enabled: false,
     },
     {
+        id: "admin-confirmed-alert",
+        title: "Admin Order Confirmed Alert",
+        description: "Notify the admin immediately when a customer confirms an order.",
+        icon: Bell,
+        stats: { sent: 0, recovered: null, revenue: null },
+        enabled: false,
+    },
+    {
         id: "abandoned_cart",
         title: "Abandoned Cart Recovery",
         description: "Send reminders to customers who leave items in their cart.",
@@ -50,6 +58,14 @@ const automations = [
         id: "fulfillment_update",
         title: "Shipping Alerts",
         description: "Notify customers when their order is shipped or out for delivery.",
+        icon: Truck,
+        stats: { sent: 0, recovered: null, revenue: null },
+        enabled: false,
+    },
+    {
+        id: "fulfillment_delivered",
+        title: "Delivery Alerts",
+        description: "Notify customers when their order is marked as delivered.",
         icon: Truck,
         stats: { sent: 0, recovered: null, revenue: null },
         enabled: false,
@@ -165,10 +181,12 @@ const AutomationsOverview = () => {
             // Mapping flow.id to event keys
             const eventMap: Record<string, string> = {
                 "admin-order-alert": "admin-order-alert",
+                "admin-confirmed-alert": "admin-confirmed-alert",
                 "abandoned_cart": "checkouts/abandoned",
                 "order-confirmation": "orders/create",
                 "order-confirmed-reply": "orders/confirmed",
                 "fulfillment_update": "fulfillments/update",
+                "fulfillment_delivered": "fulfillments/delivered",
                 "cancellation": "orders/cancelled",
                 "cancellation-verify": "orders/cancel_verify",
             };
@@ -209,10 +227,12 @@ const AutomationsOverview = () => {
         // Mapping flow.id to event keys
         const eventMap: Record<string, string> = {
             "admin-order-alert": "admin-order-alert",
+            "admin-confirmed-alert": "admin-confirmed-alert",
             "abandoned_cart": "checkouts/abandoned",
             "order-confirmation": "orders/create",
             "order-confirmed-reply": "orders/confirmed",
             "fulfillment_update": "fulfillments/update",
+            "fulfillment_delivered": "fulfillments/delivered",
             "cancellation": "orders/cancelled",
             "cancellation-verify": "orders/cancel_verify",
         };
@@ -510,7 +530,7 @@ const AutomationsOverview = () => {
                             )}
 
                             {/* Poll Settings */}
-                            {editForm.event !== "admin-order-alert" && (
+                            {editForm.event !== "admin-order-alert" && editForm.event !== "admin-confirmed-alert" && (
                                 <div className="space-y-3 pt-2 border-t border-border/50">
                                     <div className="flex items-center justify-between">
                                         <div>
