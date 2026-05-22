@@ -325,11 +325,11 @@ const MerchantSettings = () => {
 
       {isDirty && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-end items-center gap-3 p-4 bg-card border rounded-lg shadow-sm mt-6"
+          className="fixed bottom-6 left-6 right-6 md:left-[270px] z-50 flex justify-end items-center gap-3 p-4 bg-card border rounded-lg shadow-xl"
         >
-          <span className="text-sm text-muted-foreground mr-auto">
+          <span className="text-sm font-medium text-foreground mr-auto">
             You have unsaved changes.
           </span>
           <Button
