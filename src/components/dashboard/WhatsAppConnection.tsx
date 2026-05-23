@@ -136,34 +136,34 @@ const WhatsAppConnection = () => {
       {!status?.connected ? (
         <div className="text-center py-4">
           {/* Method Selector */}
-          <div className="flex p-1 bg-muted/50 rounded-lg max-w-[320px] mx-auto mb-8 border border-border">
+          <div className="flex p-0.5 bg-muted/50 rounded-lg max-w-[280px] mx-auto mb-3 border border-border">
             <button
               onClick={() => setConnectionMethod("qr")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${connectionMethod === "qr"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md transition-all ${connectionMethod === "qr"
                 ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
                 }`}
             >
-              <QrCode className="w-4 h-4" />
+              <QrCode className="w-3.5 h-3.5" />
               QR Code
             </button>
             <button
               onClick={() => setConnectionMethod("phone")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${connectionMethod === "phone"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md transition-all ${connectionMethod === "phone"
                 ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
                 }`}
             >
-              <Smartphone className="w-4 h-4" />
+              <Smartphone className="w-3.5 h-3.5" />
               Pairing Code
             </button>
           </div>
 
-          <div className="space-y-4 max-w-xs mx-auto">
+          <div className="space-y-2 max-w-xs mx-auto">
             {connectionMethod === "qr" ? (
               <>
                 {/* QR Code Display */}
-                <div className="w-64 h-64 mx-auto mb-6 bg-white rounded-2xl flex items-center justify-center border-2 border-border p-4 overflow-hidden relative group">
+                <div className="w-48 h-48 mx-auto mb-3 bg-white rounded-xl flex items-center justify-center border border-border p-2 overflow-hidden relative group">
                   {currentQr ? (
                     <img
                       src={currentQr}
@@ -172,31 +172,31 @@ const WhatsAppConnection = () => {
                     />
                   ) : (
                     <div className="text-center px-4">
-                      <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
-                      <p className="text-xs text-muted-foreground">
+                      <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-2"></div>
+                      <p className="text-[10px] text-muted-foreground">
                         {qrError ? qrError.message : (connectMutation.isPending ? "Starting server..." : "Loading QR code...")}
                       </p>
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-4 mb-6">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
-                      <QrCode className="w-4 h-4" />
+                <div className="space-y-2 mb-3">
+                  <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex items-center justify-center gap-1.5 text-xs font-medium text-foreground">
+                      <QrCode className="w-3.5 h-3.5" />
                       <span>Link via QR Code</span>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] })}
                         disabled={isStatusLoading}
-                        className="text-[10px] h-7 px-3"
+                        className="text-[9px] h-6 px-2"
                       >
-                        <RefreshCw className={`w-3 h-3 mr-1 ${isStatusLoading ? "animate-spin" : ""}`} />
-                        Check Connection Status
+                        <RefreshCw className={`w-2.5 h-2.5 mr-0.5 ${isStatusLoading ? "animate-spin" : ""}`} />
+                        Check Status
                       </Button>
 
                       <Button
@@ -210,23 +210,23 @@ const WhatsAppConnection = () => {
                           }, 1000);
                         }}
                         disabled={isQrLoading || disconnectMutation.isPending || connectMutation.isPending}
-                        className="text-[10px] h-7 px-3"
+                        className="text-[9px] h-6 px-2"
                       >
-                        <QrCode className={`w-3 h-3 mr-1 ${isQrLoading ? "animate-pulse" : ""}`} />
-                        Get New QR Code
+                        <QrCode className={`w-2.5 h-2.5 mr-0.5 ${isQrLoading ? "animate-pulse" : ""}`} />
+                        New QR Code
                       </Button>
                     </div>
                   </div>
 
-                  <ol className="text-xs text-muted-foreground space-y-2 text-left max-w-[240px] mx-auto">
-                    <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded text-[10px] mb-2">
+                  <ol className="text-[11px] text-muted-foreground space-y-1 text-left max-w-[240px] mx-auto">
+                    <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded text-[9px] mb-1">
                       {isStatusLoading ? "Checking status..." : "Waiting for scan..."}
                     </p>
-                    <li className="flex gap-2">
+                    <li className="flex gap-1.5">
                       <span className="font-semibold text-primary">1.</span>
                       Open WhatsApp → Settings → Linked Devices
                     </li>
-                    <li className="flex gap-2">
+                    <li className="flex gap-1.5">
                       <span className="font-semibold text-primary">2.</span>
                       Tap "Link a Device" and scan this code
                     </li>
