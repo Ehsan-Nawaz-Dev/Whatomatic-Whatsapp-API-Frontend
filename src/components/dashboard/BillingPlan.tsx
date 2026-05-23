@@ -17,7 +17,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const BillingPlan = () => {
+interface BillingPlanProps {
+    hideHeader?: boolean;
+}
+
+const BillingPlan = ({ hideHeader = false }: BillingPlanProps) => {
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
     const [showTrialDialog, setShowTrialDialog] = useState(false);
     const [trialDetails, setTrialDetails] = useState({ name: "", email: "", phone: "" });
@@ -134,13 +138,15 @@ const BillingPlan = () => {
     });
 
     return (
-        <div className="space-y-4 lg:space-y-6 xl:space-y-8 max-w-6xl mx-auto">
+        <div className={`${hideHeader ? 'space-y-1' : 'space-y-4 lg:space-y-6 xl:space-y-8'} max-w-6xl mx-auto`}>
             {/* Plans Grid */}
             <div>
-                <div className="text-center mb-4 lg:mb-6 xl:mb-10">
-                    <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-black mb-1 lg:mb-2">Choose Your Plan</h2>
-                    <p className="text-xs lg:text-sm xl:text-base text-black/70 italic px-4">Scale your business with the power of WhatsApp automation</p>
-                </div>
+                {!hideHeader && (
+                    <div className="text-center mb-4 lg:mb-6 xl:mb-10">
+                        <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-black mb-1 lg:mb-2">Choose Your Plan</h2>
+                        <p className="text-xs lg:text-sm xl:text-base text-black/70 italic px-4">Scale your business with the power of WhatsApp automation</p>
+                    </div>
+                )}
 
                 {isPlansLoading ? (
                     <div className="text-center py-12 lg:py-20 text-slate-500 animate-pulse">Loading plans...</div>
