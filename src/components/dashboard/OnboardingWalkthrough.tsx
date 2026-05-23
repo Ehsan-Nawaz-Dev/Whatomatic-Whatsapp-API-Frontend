@@ -28,7 +28,7 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
 
     return (
         <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden">
-            <div className="w-full max-w-5xl flex flex-col gap-4 sm:gap-6 h-[95vh] lg:h-[92vh] max-h-[900px]">
+            <div className="w-full max-w-5xl flex flex-col gap-2 sm:gap-3 h-[95vh] lg:h-[92vh] max-h-[900px]">
                 <div className="text-center shrink-0 pt-1">
                     <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-1 bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
                         Welcome to Whatomatic!
@@ -80,25 +80,25 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                             className="absolute inset-0 flex flex-col overflow-hidden"
                         >
                             {/* Internal scrollable area for whichever component is rendered */}
-                            <div className={`flex-1 overflow-y-auto ${activeStep === 3 ? 'p-0' : 'p-3 sm:p-4 lg:p-6'}`}>
+                            <div className={`flex-1 overflow-y-auto ${activeStep === 3 ? 'p-0' : 'px-3 sm:px-4 lg:px-6 pt-1 sm:pt-1.5 pb-3 sm:pb-4'}`}>
 
                                 {activeStep === 1 && (
-                                    <div className="max-w-5xl mx-auto h-full pb-4 sm:pb-6">
+                                    <div className="max-w-5xl mx-auto h-full pb-3 sm:pb-4">
                                         <BillingPlan hideHeader />
                                     </div>
                                 )}
 
                                 {activeStep === 2 && (
-                                    <div className="max-w-4xl mx-auto flex flex-col items-center pt-3 sm:pt-4 lg:pt-6 h-full pb-4 sm:pb-6">
+                                    <div className="max-w-4xl mx-auto flex flex-col items-center pt-1.5 sm:pt-2 h-full pb-3 sm:pb-4">
                                         <WhatsAppConnection />
                                     </div>
                                 )}
 
                                 {activeStep === 3 && (
-                                    <div className="flex flex-col h-full p-3 sm:p-4 lg:p-6 pb-4">
-                                        <div className="mb-3 pb-3 border-b border-border shrink-0">
+                                    <div className="flex flex-col h-full px-3 sm:px-4 lg:px-6 pt-1.5 pb-3">
+                                        <div className="mb-2 pb-2 border-b border-border shrink-0">
                                                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400">Start Automation</h2>
-                                                <p className="text-sm sm:text-base text-muted-foreground mt-1">Enable at least one automation to complete your setup.</p>
+                                                <p className="text-sm sm:text-base text-muted-foreground mt-0.5">Enable at least one automation to complete your setup.</p>
                                         </div>
                                         <div className="flex-1 w-full max-w-5xl mx-auto flex flex-col">
                                             <AutomationsOverview />
