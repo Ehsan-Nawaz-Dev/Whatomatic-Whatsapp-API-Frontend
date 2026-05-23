@@ -121,49 +121,49 @@ const WhatsAppConnection = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-3 lg:p-4 xl:p-6 bg-card rounded-xl border border-border shadow-card"
+      className="p-4 sm:p-6 lg:p-8 bg-card rounded-2xl border border-border shadow-card max-w-xl mx-auto"
     >
-      <div className="flex items-center justify-between mb-3 lg:mb-4 xl:mb-6">
-        <h2 className="text-sm lg:text-base xl:text-lg font-semibold text-foreground">WhatsApp Connection</h2>
+      <div className="flex items-center justify-between mb-4 lg:mb-6">
+        <h2 className="text-base sm:text-lg lg:text-xl font-bold text-foreground">WhatsApp Connection</h2>
         {status?.connected && (
-          <span className="flex items-center gap-1.5 text-xs font-medium text-success bg-success/10 px-2.5 py-1 rounded-full">
-            <CheckCircle2 className="w-3.5 h-3.5" />
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-success bg-success/10 px-3 py-1 rounded-full">
+            <CheckCircle2 className="w-4 h-4" />
             Connected
           </span>
         )}
       </div>
 
       {!status?.connected ? (
-        <div className="text-center py-4">
+        <div className="text-center py-2">
           {/* Method Selector */}
-          <div className="flex p-0.5 bg-muted/50 rounded-lg max-w-[280px] mx-auto mb-3 border border-border">
+          <div className="flex p-0.5 bg-muted/50 rounded-lg max-w-[300px] mx-auto mb-4 border border-border">
             <button
               onClick={() => setConnectionMethod("qr")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md transition-all ${connectionMethod === "qr"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-md transition-all ${connectionMethod === "qr"
                 ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
                 }`}
             >
-              <QrCode className="w-3.5 h-3.5" />
+              <QrCode className="w-4 h-4" />
               QR Code
             </button>
             <button
               onClick={() => setConnectionMethod("phone")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md transition-all ${connectionMethod === "phone"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-md transition-all ${connectionMethod === "phone"
                 ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
                 }`}
             >
-              <Smartphone className="w-3.5 h-3.5" />
+              <Smartphone className="w-4 h-4" />
               Pairing Code
             </button>
           </div>
 
-          <div className="space-y-2 max-w-xs mx-auto">
+          <div className="space-y-3 max-w-sm mx-auto">
             {connectionMethod === "qr" ? (
               <>
                 {/* QR Code Display */}
-                <div className="w-48 h-48 mx-auto mb-3 bg-white rounded-xl flex items-center justify-center border border-border p-2 overflow-hidden relative group">
+                <div className="w-56 h-56 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center border border-border p-3 overflow-hidden relative group shadow-sm">
                   {currentQr ? (
                     <img
                       src={currentQr}
@@ -172,30 +172,30 @@ const WhatsAppConnection = () => {
                     />
                   ) : (
                     <div className="text-center px-4">
-                      <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-2"></div>
-                      <p className="text-[10px] text-muted-foreground">
-                        {qrError ? qrError.message : (connectMutation.isPending ? "Starting server..." : "Loading QR code...")}
+                      <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+                      <p className="text-xs text-muted-foreground">
+                        {qrError ? qrError.message : (connectMutation.isPending ? "Starting server..." : "Loading QR...")}
                       </p>
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-2 mb-3">
-                  <div className="flex flex-col items-center gap-1.5">
-                    <div className="flex items-center justify-center gap-1.5 text-xs font-medium text-foreground">
-                      <QrCode className="w-3.5 h-3.5" />
+                <div className="space-y-3 mb-4">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center justify-center gap-2 text-sm font-semibold text-foreground">
+                      <QrCode className="w-4 h-4" />
                       <span>Link via QR Code</span>
                     </div>
 
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] })}
                         disabled={isStatusLoading}
-                        className="text-[9px] h-6 px-2"
+                        className="text-xs h-8 px-3"
                       >
-                        <RefreshCw className={`w-2.5 h-2.5 mr-0.5 ${isStatusLoading ? "animate-spin" : ""}`} />
+                        <RefreshCw className={`w-3 h-3 mr-1 ${isStatusLoading ? "animate-spin" : ""}`} />
                         Check Status
                       </Button>
 
@@ -210,23 +210,23 @@ const WhatsAppConnection = () => {
                           }, 1000);
                         }}
                         disabled={isQrLoading || disconnectMutation.isPending || connectMutation.isPending}
-                        className="text-[9px] h-6 px-2"
+                        className="text-xs h-8 px-3"
                       >
-                        <QrCode className={`w-2.5 h-2.5 mr-0.5 ${isQrLoading ? "animate-pulse" : ""}`} />
+                        <QrCode className={`w-3 h-3 mr-1 ${isQrLoading ? "animate-pulse" : ""}`} />
                         New QR Code
                       </Button>
                     </div>
                   </div>
 
-                  <ol className="text-[11px] text-muted-foreground space-y-1 text-left max-w-[240px] mx-auto">
-                    <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded text-[9px] mb-1">
+                  <ol className="text-xs sm:text-sm text-muted-foreground space-y-1.5 text-left max-w-[260px] mx-auto">
+                    <p className="text-center text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded text-[10px] sm:text-xs mb-2 font-medium">
                       {isStatusLoading ? "Checking status..." : "Waiting for scan..."}
                     </p>
-                    <li className="flex gap-1.5">
+                    <li className="flex gap-2">
                       <span className="font-semibold text-primary">1.</span>
                       Open WhatsApp → Settings → Linked Devices
                     </li>
-                    <li className="flex gap-1.5">
+                    <li className="flex gap-2">
                       <span className="font-semibold text-primary">2.</span>
                       Tap "Link a Device" and scan this code
                     </li>
@@ -294,7 +294,7 @@ const WhatsAppConnection = () => {
                         size="sm"
                         onClick={() => queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] })}
                         disabled={isStatusLoading}
-                        className="text-[10px] h-7 px-3"
+                        className="text-xs h-8 px-3"
                       >
                         <RefreshCw className={`w-3 h-3 mr-1 ${isStatusLoading ? "animate-spin" : ""}`} />
                         Check Connection Status

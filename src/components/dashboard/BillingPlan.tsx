@@ -138,7 +138,7 @@ const BillingPlan = ({ hideHeader = false }: BillingPlanProps) => {
     });
 
     return (
-        <div className={`${hideHeader ? 'space-y-1' : 'space-y-4 lg:space-y-6 xl:space-y-8'} max-w-6xl mx-auto`}>
+        <div className={`${hideHeader ? 'space-y-4' : 'space-y-4 lg:space-y-6 xl:space-y-8'} max-w-6xl mx-auto`}>
             {/* Plans Grid */}
             <div>
                 {!hideHeader && (
@@ -151,7 +151,7 @@ const BillingPlan = ({ hideHeader = false }: BillingPlanProps) => {
                 {isPlansLoading ? (
                     <div className="text-center py-12 lg:py-20 text-slate-500 animate-pulse">Loading plans...</div>
                 ) : (
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-3">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         {displayPlans.map((plan: any) => {
                             const isCurrent = plan.id === currentPlanId || (isTrial && plan.id === 'trial');
                             const Icon = plan.icon;
@@ -160,34 +160,34 @@ const BillingPlan = ({ hideHeader = false }: BillingPlanProps) => {
                                 <motion.div
                                     key={plan.id}
                                     whileHover={{ y: -3 }}
-                                    className={`relative bg-card text-card-foreground rounded-xl border ${plan.popular ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border'} ${hideHeader ? 'p-1.5 lg:p-2 gap-0.5' : 'p-2.5 lg:p-3 xl:p-4'} flex flex-col`}
+                                    className={`relative bg-card text-card-foreground rounded-2xl border ${plan.popular ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-border'} p-3.5 sm:p-5 gap-1.5 flex flex-col`}
                                 >
                                     {plan.popular && (
-                                        <div className={`absolute left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[8px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-lg whitespace-nowrap ${hideHeader ? '-top-1.5' : '-top-2'}`}>
-                                            <Star size={8} fill="currentColor" /> POPULAR
+                                        <div className="absolute left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-lg whitespace-nowrap -top-2.5">
+                                            <Star size={9} fill="currentColor" /> POPULAR
                                         </div>
                                     )}
 
-                                    <div className={`${hideHeader ? 'w-5 h-5 lg:w-6 lg:h-6 mb-1' : 'w-7 h-7 lg:w-8 lg:h-8 xl:w-10 xl:h-10 mb-1.5 lg:mb-2 xl:mb-3'} rounded-lg flex items-center justify-center ${plan.bgColor} ${plan.color}`}>
-                                        <Icon className={`${hideHeader ? 'w-3 h-3 lg:w-3.5 lg:h-3.5' : 'w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-5 xl:h-5'}`} />
+                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 mb-2 rounded-xl flex items-center justify-center ${plan.bgColor} ${plan.color}`}>
+                                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </div>
 
-                                    <h3 className={`${hideHeader ? 'text-[11px] lg:text-xs' : 'text-xs lg:text-sm xl:text-base'} font-bold mb-0.5`}>{plan.name}</h3>
-                                    <div className={`flex items-baseline gap-0.5 ${hideHeader ? 'mb-1 lg:mb-1.5' : 'mb-2 lg:mb-3 xl:mb-4'}`}>
-                                        <span className={`font-bold ${hideHeader ? 'text-sm lg:text-base' : 'text-base lg:text-lg xl:text-2xl'}`}>${plan.price}</span>
-                                        <span className="text-muted-foreground text-[8px] lg:text-[10px]">/mo</span>
+                                    <h3 className="text-sm sm:text-base font-bold mb-0.5">{plan.name}</h3>
+                                    <div className="flex items-baseline gap-0.5 mb-2 sm:mb-3">
+                                        <span className="font-bold text-lg sm:text-2xl">${plan.price}</span>
+                                        <span className="text-muted-foreground text-[10px] sm:text-xs">/mo</span>
                                     </div>
 
-                                    <ul className={`space-y-0.5 ${hideHeader ? 'mb-2 lg:mb-3' : 'space-y-1 lg:space-y-1.5 xl:space-y-2 mb-3 lg:mb-4 xl:mb-6'} flex-1`}>
-                                        <li className="flex items-center gap-1 text-[9px] lg:text-[10px] xl:text-xs">
+                                    <ul className="space-y-1.5 sm:space-y-2 mb-4 flex-1">
+                                        <li className="flex items-center gap-1.5 text-xs sm:text-sm">
                                             <div className={`p-0.5 rounded-full ${plan.bgColor} ${plan.color}`}>
-                                                <Check className="w-1.5 h-1.5 lg:w-2 lg:h-2" />
+                                                <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                             </div>
                                             <span className="font-bold truncate">{plan.messageLimit} Msgs</span>
                                         </li>
                                         {plan.features.map((feature: string, i: number) => (
-                                            <li key={i} className="flex items-center gap-1 text-[8px] lg:text-[9px] text-muted-foreground">
-                                                <Check className="w-2 h-2 text-green-500 shrink-0" />
+                                            <li key={i} className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground">
+                                                <Check className="w-3 h-3 text-green-500 shrink-0" />
                                                 <span className="truncate">{feature}</span>
                                             </li>
                                         ))}
@@ -204,7 +204,7 @@ const BillingPlan = ({ hideHeader = false }: BillingPlanProps) => {
                                             }
                                         }}
                                         disabled={(plan.id === currentPlanId && status?.status === 'active') || !!loadingPlan}
-                                        className={`w-full ${hideHeader ? 'h-6 lg:h-7 text-[9px]' : 'h-7 lg:h-8 xl:h-9 text-[10px] lg:text-xs'}`}
+                                        className="w-full h-8 sm:h-9 text-xs sm:text-sm font-medium rounded-lg"
                                         variant={plan.btnVariant as any}
                                     >
                                         {loadingPlan === plan.id ? (
