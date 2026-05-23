@@ -331,7 +331,7 @@ const MessageTemplates = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="tmpl-message">Message</Label>
-                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert" || form.event === "admin-confirmed-alert" || form.event === "orders/cancel_verify" || form.event === "orders/cancelled" || form.event === "fulfillments/delivered") && (
+                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert" || form.event === "admin-confirmed-alert" || form.event === "orders/cancel_verify" || form.event === "orders/cancelled" || form.event === "fulfillments/delivered" || form.event === "fulfillments/update") && (
                   <button
                     type="button"
                     className="h-auto p-0 text-xs text-primary font-bold decoration-primary/30 hover:decoration-primary transition-all underline shrink-0"
@@ -367,6 +367,13 @@ const MessageTemplates = () => {
                         setForm({
                           ...form,
                           message: `🎉 *Order Delivered!*\n\nHi {{customer_name}}! 🚚\n\nWe're excited to let you know that your order *{{order_number}}* has been successfully delivered! \n\nWe hope you love your new purchase! If you have any questions or need assistance, feel free to reply to this message. 💬\n\nThank you for shopping with {{store_name}}!`,
+                          isPoll: false
+                        });
+                      } else if (form.event === "fulfillments/update") {
+                        setForm({
+                          ...form,
+                          name: "Shipment Update",
+                          message: `Hi {{customer_name}}! 🚚\n\nGreat news! Your order {{order_number}} has been shipped via {{courier}}!\n\n📦 Tracking Number: {{tracking_number}}\n📍 Track your package: {{tracking_link}}\n\nThank you for shopping with {{store_name}}!`,
                           isPoll: false
                         });
                       } else if (form.event === "admin-order-alert") {

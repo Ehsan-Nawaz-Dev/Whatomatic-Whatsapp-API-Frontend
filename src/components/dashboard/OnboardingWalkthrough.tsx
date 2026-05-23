@@ -113,10 +113,10 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -15 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute inset-0 bg-card rounded-2xl lg:rounded-3xl shadow-xl border border-primary/20 flex flex-col overflow-hidden"
+                            className="absolute inset-0 flex flex-col overflow-hidden"
                         >
                             {/* Internal scrollable area for whichever component is rendered */}
-                            <div className={`flex-1 overflow-y-auto ${activeStep === 3 ? 'p-0' : 'p-4 lg:p-6'} bg-gradient-to-br from-background via-card to-background`}>
+                            <div className={`flex-1 overflow-y-auto ${activeStep === 3 ? 'p-0' : 'p-4 lg:p-6'}`}>
 
                                 {activeStep === 1 && (
                                     <div className="max-w-4xl mx-auto h-full pb-10">
@@ -131,7 +131,7 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                                 )}
 
                                 {activeStep === 3 && (
-                                    <div className="flex flex-col h-full bg-card p-4 lg:p-6 pb-10">
+                                    <div className="flex flex-col h-full p-4 lg:p-6 pb-10">
                                         <div className="mb-4 pb-4 border-b border-border shrink-0">
                                                 <h2 className="text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400">Start Automation</h2>
                                                 <p className="text-xs lg:text-sm text-muted-foreground">Enable at least one automation to complete your setup.</p>
