@@ -218,6 +218,42 @@ const Dashboard = () => {
     }
   }, []);
 
+  // Auto-Upgrade Redirect: If free plan crossed limit, go directly to Starter checkout page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hasDeclined = params.get("billing") === "declined";
+
+    if (
+      billing &&
+      billing.plan === "free" &&
+      billing.usage >= billing.limit &&
+      !hasDeclined &&
+      !isJustActivated
+    ) {
+      console.log(`[Dashboard] Free plan limit reached (${billing.usage}/${billing.limit}). Auto-redirecting to Starter plan upgrade...`);
+      (async () => {
+        try {
+          const headers = await getAuthHeaders();
+          const res = await fetch(withShopParam("/billing/create"), {
+            method: "POST",
+            headers: { ...headers, "Content-Type": "application/json" },
+            body: JSON.stringify({ plan: "starter" }),
+          });
+          const data = await res.json();
+          if (data.confirmationUrl) {
+            if (window.top && window.top !== window.self) {
+              window.top.location.href = data.confirmationUrl;
+            } else {
+              window.location.href = data.confirmationUrl;
+            }
+          }
+        } catch (err) {
+          console.error("Auto upgrade redirect failed:", err);
+        }
+      })();
+    }
+  }, [billing, isJustActivated]);
+
   // ... (rest of logic)
 
   const isActive = billing?.status === "active" || isJustActivated; // FORCE ACTIVE if just redirected
