@@ -151,12 +151,13 @@ export const fetchActivity = async () => {
 };
 
 export const submitContact = async (payload: { name: string; email: string; message?: string }) => {
-  const res = await fetch(`${API_BASE_URL}/contact`, {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/tickets"), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error("Failed to submit contact form");
+  if (!res.ok) throw new Error("Failed to submit support ticket");
   return res.json();
 };
 

@@ -73,7 +73,7 @@ const HelpSupport = () => {
                             </div>
                             <div>
                                 <h3 className="font-bold text-sm">Phone Support</h3>
-                                <p className="text-xs text-muted-foreground">+92 310-5878854</p>
+                                <p className="text-xs text-muted-foreground">+1 (40) 63160653</p>
                             </div>
                         </div>
 

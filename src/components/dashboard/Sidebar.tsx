@@ -120,7 +120,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSubscribed = false }: SidebarProps
         </a>
 
         <a
-          href="https://wa.me/923105878854"
+          href="https://wa.me/14063160653"
           target="_blank"
           rel="noopener noreferrer"
           className="w-full flex items-center justify-center gap-2 mb-4 px-4 py-2 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] rounded-lg text-sm font-semibold transition-colors shadow-sm"

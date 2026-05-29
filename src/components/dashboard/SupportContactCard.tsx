@@ -43,7 +43,7 @@ const SupportContactCard = () => {
                     <Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">Phone Number</p>
-                        <p className="text-sm font-medium text-foreground">+92 310-5878854</p>
+                        <p className="text-sm font-medium text-foreground">+1 (40) 63160653</p>
                     </div>
                 </div>
 
