@@ -225,8 +225,9 @@ const Dashboard = () => {
 
     if (
       billing &&
-      billing.plan === "free" &&
+      billing.plan !== "pro" &&
       billing.usage >= billing.limit &&
+      !billing.hasUsagePlan &&
       !hasDeclined &&
       !isJustActivated
     ) {
