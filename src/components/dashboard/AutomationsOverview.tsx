@@ -15,6 +15,30 @@ import { toast } from "sonner";
 
 const automations = [
     {
+        id: "order-confirmation",
+        title: "Order Confirmation",
+        description: "Ask customers to confirm their order details via WhatsApp.",
+        icon: MessageSquare,
+        stats: { sent: 0, recovered: null, revenue: null },
+        enabled: true,
+    },
+    {
+        id: "order-confirmed-reply",
+        title: "Post-Confirmation Reply",
+        description: "Send a beautiful thank you message after confirmation.",
+        icon: Zap,
+        stats: { sent: 0, recovered: null, revenue: null },
+        enabled: false,
+    },
+    {
+        id: "cancellation",
+        title: "Order Cancellation",
+        description: "Automatically inform customers if their order is cancelled.",
+        icon: XCircle,
+        stats: { sent: 0, recovered: null, revenue: null },
+        enabled: false,
+    },
+    {
         id: "admin-order-alert",
         title: "Admin Order Alert",
         description: "Notify the admin immediately when a new order is received.",
@@ -39,22 +63,6 @@ const automations = [
         enabled: false,
     },
     {
-        id: "order-confirmation",
-        title: "Order Confirmation",
-        description: "Ask customers to confirm their order details via WhatsApp.",
-        icon: MessageSquare,
-        stats: { sent: 0, recovered: null, revenue: null },
-        enabled: true,
-    },
-    {
-        id: "order-confirmed-reply",
-        title: "Post-Confirmation Reply",
-        description: "Send a beautiful thank you message after confirmation.",
-        icon: Zap,
-        stats: { sent: 0, recovered: null, revenue: null },
-        enabled: false,
-    },
-    {
         id: "fulfillment_update",
         title: "Shipping Alerts",
         description: "Notify customers when their order is shipped or out for delivery.",
@@ -67,14 +75,6 @@ const automations = [
         title: "Delivery Alerts",
         description: "Notify customers when their order is marked as delivered.",
         icon: Truck,
-        stats: { sent: 0, recovered: null, revenue: null },
-        enabled: false,
-    },
-    {
-        id: "cancellation",
-        title: "Order Cancellation",
-        description: "Automatically inform customers if their order is cancelled.",
-        icon: XCircle,
         stats: { sent: 0, recovered: null, revenue: null },
         enabled: false,
     },

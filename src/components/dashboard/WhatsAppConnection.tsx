@@ -93,11 +93,15 @@ const WhatsAppConnection = () => {
 
   // Disconnect mutation
   const disconnectMutation = useMutation({
-    mutationFn: disconnectWhatsApp,
-    onSuccess: () => {
+    mutationFn: (variables?: { silent?: boolean }) => disconnectWhatsApp(),
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
       queryClient.invalidateQueries({ queryKey: ["whatsapp-qr", getCurrentShop()] });
-      toast.success("WhatsApp disconnected successfully");
+      if (variables?.silent) {
+        toast.success("New QR code generated successfully");
+      } else {
+        toast.success("WhatsApp disconnected successfully");
+      }
     },
     onError: () => {
       toast.error("Failed to disconnect WhatsApp");
@@ -203,7 +207,7 @@ const WhatsAppConnection = () => {
                         variant="secondary"
                         size="sm"
                         onClick={() => {
-                          disconnectMutation.mutate();
+                          disconnectMutation.mutate({ silent: true });
                           setTimeout(() => {
                             connectMutation.mutate();
                             queryClient.invalidateQueries({ queryKey: ["whatsapp-qr", getCurrentShop()] });

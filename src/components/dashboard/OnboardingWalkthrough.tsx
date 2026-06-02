@@ -39,7 +39,9 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                 {/* Stepper Header */}
                 <div className="flex flex-row items-center justify-center gap-4 sm:gap-8 lg:gap-12 w-full shrink-0">
                     {steps.map((step, index) => {
-                        const isCompleted = currentStep > step.id; // true progress
+                        const isCompleted = step.id === 1 ? currentStep > 1 :
+                                            step.id === 2 ? currentStep > 2 :
+                                            step.id === 3 ? hasAutomations : false;
                         const isCurrent = activeStep === step.id;
 
                         return (
@@ -48,14 +50,18 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                                 className={`flex items-center gap-2.5 sm:gap-3 transition-all duration-300 cursor-pointer rounded-full p-1.5 sm:p-2 sm:pr-4 hover:bg-muted/50 ${isCurrent || isCompleted ? 'opacity-100' : 'opacity-60'}`}
                                 onClick={() => setActiveStep(step.id)}
                             >
-                                <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 shrink-0 rounded-full flex items-center justify-center border transition-transform duration-200 ${isCurrent ? 'bg-primary/10 border-primary text-primary shadow-sm scale-105' :
-                                        isCompleted ? 'bg-success/10 border-success text-success' :
-                                            'bg-muted border-muted-foreground/30 text-muted-foreground'
+                                <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 shrink-0 rounded-full flex items-center justify-center border transition-transform duration-200 ${
+                                    isCompleted ? 
+                                        isCurrent ? 'bg-success/20 border-success text-success shadow-sm scale-105' : 'bg-success/10 border-success text-success' :
+                                    isCurrent ? 'bg-primary/10 border-primary text-primary shadow-sm scale-105' :
+                                        'bg-muted border-muted-foreground/30 text-muted-foreground'
                                     }`}>
-                                    {isCompleted && !isCurrent ? <Check className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" /> : <step.icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
+                                    {isCompleted ? <Check className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" /> : <step.icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
                                 </div>
                                 <div className="hidden sm:block text-left">
-                                    <h3 className={`font-bold text-xs sm:text-sm lg:text-base ${isCurrent ? 'text-primary' : isCompleted ? 'text-success' : 'text-muted-foreground'}`}>
+                                    <h3 className={`font-bold text-xs sm:text-sm lg:text-base ${
+                                        isCompleted ? 'text-success' : isCurrent ? 'text-primary' : 'text-muted-foreground'
+                                        }`}>
                                         {step.title}
                                     </h3>
                                     <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground line-clamp-1">{step.description}</p>
