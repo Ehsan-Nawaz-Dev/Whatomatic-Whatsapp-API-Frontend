@@ -27,8 +27,8 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden">
-            <div className="w-full max-w-5xl flex flex-col gap-2 sm:gap-3 h-[95vh] lg:h-[92vh] max-h-[900px]">
+        <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm overflow-y-auto p-4 sm:p-6 lg:p-8 flex items-start justify-center">
+            <div className="w-full max-w-5xl flex flex-col gap-4 py-4 sm:py-6 lg:py-8 min-h-fit my-auto">
                 <div className="text-center shrink-0 pt-1">
                     <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-1 bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
                         Welcome to Whatomatic!
@@ -75,7 +75,7 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                 </div>
 
                 {/* Content Container */}
-                <div className="flex-1 min-h-0 relative w-full">
+                <div className="w-full">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeStep}
@@ -83,10 +83,10 @@ export default function OnboardingWalkthrough({ currentStep, onComplete, hasAuto
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -15 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute inset-0 flex flex-col overflow-hidden"
+                            className="w-full flex flex-col"
                         >
-                            {/* Internal scrollable area for whichever component is rendered */}
-                            <div className={`flex-1 overflow-y-auto ${activeStep === 3 ? 'p-0' : 'px-3 sm:px-4 lg:px-6 pt-1 sm:pt-1.5 pb-3 sm:pb-4'}`}>
+                            {/* Internal content area */}
+                            <div className={`${activeStep === 3 ? 'p-0' : 'px-3 sm:px-4 lg:px-6 pt-1 sm:pt-1.5 pb-3 sm:pb-4'}`}>
 
                                 {activeStep === 1 && (
                                     <div className="max-w-5xl mx-auto h-full pb-3 sm:pb-4">

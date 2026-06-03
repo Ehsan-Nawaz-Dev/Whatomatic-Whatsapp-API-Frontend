@@ -35,9 +35,7 @@ const Dashboard = () => {
 
   const queryClient = useQueryClient();
 
-  // (Redundant block removed)
 
-  // AUTO-DETECT: If shop in URL but merchant doesn't exist or token is missing, trigger OAuth
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const shop = params.get('shop');
@@ -51,7 +49,7 @@ const Dashboard = () => {
           if (res.status === 401) {
             console.warn(`[Dashboard] Token MISSING (401) for ${shop}. Breaking out to OAuth...`);
             const authUrl = getAuthUrl(shop);
-            
+
             try {
               if (window.top && window.top !== window.self) {
                 window.open(authUrl, "_top");
@@ -293,9 +291,9 @@ const Dashboard = () => {
 
   const forceShowOnboarding = billing?.isNewlyInstalled && !isSessionFinished;
 
-  // Very aggressive visibility: If local storage says it isn't done, show it.
-  // If backend says it's newly installed, force show it.
-  const shouldRenderOnboarding = !isBillingLoading && (!isOnboardingDone || forceShowOnboarding) && !isSessionFinished;
+  // Render onboarding only if it has not been completed yet (local storage is not set to true)
+  // and the current session has not marked it as completed.
+  const shouldRenderOnboarding = !isBillingLoading && !isOnboardingDone && !isSessionFinished;
 
   // Force billing tab for new/unpaid users, but allow settings for setup
   const effectiveTab = (!isActive && activeTab !== "settings") ? "billing" : activeTab;
