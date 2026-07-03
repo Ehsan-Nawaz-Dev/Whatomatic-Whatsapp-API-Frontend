@@ -487,7 +487,7 @@ const AutomationsOverview = () => {
                                 <div className="p-2 bg-muted/40 rounded-md border border-border/30">
                                     <p className="text-[10px] font-semibold text-muted-foreground mb-1">📌 Available Placeholders:</p>
                                     <div className="flex flex-wrap gap-1">
-                                        {["{{customer_name}}", "{{order_number}}", "{{store_name}}", "{{items_list}}", "{{grand_total}}", "{{shipping_address}}", "{{city}}", "{{price}}", "{{payment_status}}", "{{tracking_link}}", "{{tracking_number}}", "{{courier}}"].map(ph => (
+                                        {["{{customer_name}}", "{{first_name}}", "{{customer_first_name}}", "{{order_number}}", "{{store_name}}", "{{items_list}}", "{{grand_total}}", "{{shipping_address}}", "{{city}}", "{{price}}", "{{payment_status}}", "{{tracking_link}}", "{{tracking_number}}", "{{courier}}"].map(ph => (
                                             <button
                                                 key={ph}
                                                 type="button"
@@ -647,6 +647,8 @@ const AutomationsOverview = () => {
                                             {editForm.message
                                                 ? editForm.message
                                                     .replace(/{{customer_name}}/g, "John Doe")
+                                                    .replace(/{{first_name}}/g, "John")
+                                                    .replace(/{{customer_first_name}}/g, "John")
                                                     .replace(/{{order_number}}/g, "#1001")
                                                     .replace(/{{store_name}}/g, storeName)
                                                     .replace(/{{items_list}}/g, "1x Wireless Headphones - $199.99")
