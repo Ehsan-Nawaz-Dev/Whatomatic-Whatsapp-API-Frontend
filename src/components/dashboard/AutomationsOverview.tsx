@@ -381,10 +381,25 @@ const AutomationsOverview = () => {
                                     className="bg-white dark:bg-[#1f2c33] p-4 rounded-xl rounded-tl-none shadow-sm max-w-[90%] border border-black/5 dark:border-white/5"
                                 >
                                     <div className="whitespace-pre-wrap text-[14.5px] leading-relaxed text-[#111b21] dark:text-[#e9edef]">
-                                        {selectedFlow.template ? (
-                                            // Show the actual user-created template
-                                            selectedFlow.template.message
+                                        {(() => {
+                                            const defaultMessages: Record<string, string> = {
+                                                "order-confirmation": `Hi {{customer_name}}! 👋\n\nThank you for your order from {{store_name}}!\n\n📦 *Order:* {{order_number}}\n🛒 *Items:* {{items_list}}\n💰 *Total:* {{grand_total}}\n📍 *Address:* {{shipping_address}}, {{city}}\n\nPlease confirm if these details are correct.`,
+                                                "bank-transfer-confirmation": `🏦 *Bank Transfer Instructions!*\n\nHi {{customer_name}},\n\nThank you for your order *{{order_number}}*. 🛍️\n\nTo complete your order, please transfer *{{grand_total}}* to our bank account:\n\n*Bank:* [Bank Name]\n*Account Title:* [Account Title]\n*Account/IBAN:* [Account Number]\n\nOnce transferred, please reply to this message with a screenshot/receipt of the transfer so we can confirm your order immediately! 📲\n\nThank you!\n- {{store_name}} Team`,
+                                                "order-confirmed-reply": `🎉 *Thank You, {{customer_name}}!*\n\nYour order *{{order_number}}* is now being processed by *{{store_name}}*! 🚀\n\n✨ *What's next?*\n1. Our team is hand-picking your items. 📦\n2. We'll pack them with care. 🎀\n3. You'll get a tracking link via WhatsApp as soon as it ships! 🚚\n\nWe appreciate your business! If you have any questions, just reply to this message. 💬`,
+                                                "cancellation": `Hi {{customer_name}},\n\nYour order {{order_number}} has been cancelled.\n\nIf this was a mistake, please contact us.\n\nThank you for shopping with {{store_name}}!`,
+                                                "cancellation-verify": `Are you sure you want to cancel your order? ❌\n\nThis will stop your order from being processed immediately.`,
+                                                "fulfillment_update": `Hi {{customer_name}}! 🚚\n\nGreat news! Your order {{order_number}} has been shipped via {{courier}}!\n\n📦 Tracking Number: {{tracking_number}}\n📍 Track your package: {{tracking_link}}\n\nThank you for shopping with {{store_name}}!`,
+                                                "fulfillment_delivered": `Hi {{customer_name}}! 🚚\n\nYour order {{order_number}} has been delivered!\n\nThank you for shopping with {{store_name}}!`,
+                                                "admin-order-alert": `🔔 *New Order Alert!*\n\nOrder: {{order_number}}\nCustomer: {{customer_name}}\nTotal: {{grand_total}}\nItems: {{items_list}}\nAddress: {{shipping_address}}, {{city}}`,
+                                                "admin-confirmed-alert": `🔔 *Order Confirmed by Customer!*\n\nOrder {{order_number}} has been confirmed by customer {{customer_name}}! ✅\n\n*Items:*\n{{items_list}}\n\n*Grand Total:* {{grand_total}}\n\n*Shipping Address:*\n{{shipping_address}}, {{city}}`,
+                                                "abandoned_cart": `Hi {{customer_name}}, you left something in your cart! 🛒\n\nClick here to finish your purchase: {{cart_link}}\n\nThank you for visiting {{store_name}}!`,
+                                            };
+                                            
+                                            const messageText = selectedFlow.template?.message || defaultMessages[selectedFlow.id] || "";
+                                            return messageText
                                                 .replace(/{{customer_name}}/g, "John Doe")
+                                                .replace(/{{first_name}}/g, "John")
+                                                .replace(/{{customer_first_name}}/g, "John")
                                                 .replace(/{{order_number}}/g, "#1001")
                                                 .replace(/{{store_name}}/g, storeName)
                                                 .replace(/{{items_list}}/g, "1x Wireless Headphones - $199.99")
@@ -392,11 +407,8 @@ const AutomationsOverview = () => {
                                                 .replace(/{{shipping_address}}/g, "123 Demo St")
                                                 .replace(/{{city}}/g, "New York")
                                                 .replace(/{{price}}/g, "$199.99")
-                                                .replace(/{{payment_status}}/g, "Paid")
-                                        ) : (
-                                            // Fallback if no template is found
-                                            "No template created yet for this automation. Please go to the Templates tab to create one."
-                                        )}
+                                                .replace(/{{payment_status}}/g, "Paid");
+                                        })()}
                                     </div>
                                     <div className="text-[11px] text-[#667781] dark:text-[#8696a0] text-right mt-1">
                                         12:45 PM
