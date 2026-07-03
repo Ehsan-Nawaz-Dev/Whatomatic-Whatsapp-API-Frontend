@@ -262,6 +262,8 @@ const MessageTemplates = () => {
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 lg:gap-2 xl:gap-3">
           {[
             "{{customer_name}}",
+            "{{first_name}}",
+            "{{customer_first_name}}",
             "{{order_id}}",
             "{{order_number}}",
             "{{grand_total}}",
