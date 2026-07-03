@@ -199,10 +199,24 @@ const AutomationsOverview = () => {
                 "cancellation": "orders/cancelled",
                 "cancellation-verify": "orders/cancel_verify",
             };
+
+            const defaultMessages: Record<string, string> = {
+                "order-confirmation": `Hi {{customer_name}}! 👋\n\nThank you for your order from {{store_name}}!\n\n📦 *Order:* {{order_number}}\n🛒 *Items:* {{items_list}}\n💰 *Total:* {{grand_total}}\n📍 *Address:* {{shipping_address}}, {{city}}\n\nPlease confirm if these details are correct.`,
+                "bank-transfer-confirmation": `🏦 *Bank Transfer Instructions!*\n\nHi {{customer_name}},\n\nThank you for your order *{{order_number}}*. 🛍️\n\nTo complete your order, please transfer *{{grand_total}}* to our bank account:\n\n*Bank:* [Bank Name]\n*Account Title:* [Account Title]\n*Account/IBAN:* [Account Number]\n\nOnce transferred, please reply to this message with a screenshot/receipt of the transfer so we can confirm your order immediately! 📲\n\nThank you!\n- {{store_name}} Team`,
+                "order-confirmed-reply": `🎉 *Thank You, {{customer_name}}!*\n\nYour order *{{order_number}}* is now being processed by *{{store_name}}*! 🚀\n\n✨ *What's next?*\n1. Our team is hand-picking your items. 📦\n2. We'll pack them with care. 🎀\n3. You'll get a tracking link via WhatsApp as soon as it ships! 🚚\n\nWe appreciate your business! If you have any questions, just reply to this message. 💬`,
+                "cancellation": `Hi {{customer_name}},\n\nYour order {{order_number}} has been cancelled.\n\nIf this was a mistake, please contact us.\n\nThank you for shopping with {{store_name}}!`,
+                "cancellation-verify": `Are you sure you want to cancel your order? ❌\n\nThis will stop your order from being processed immediately.`,
+                "fulfillment_update": `Hi {{customer_name}}! 🚚\n\nGreat news! Your order {{order_number}} has been shipped via {{courier}}!\n\n📦 Tracking Number: {{tracking_number}}\n📍 Track your package: {{tracking_link}}\n\nThank you for shopping with {{store_name}}!`,
+                "fulfillment_delivered": `Hi {{customer_name}}! 🚚\n\nYour order {{order_number}} has been delivered!\n\nThank you for shopping with {{store_name}}!`,
+                "admin-order-alert": `🔔 *New Order Alert!*\n\nOrder: {{order_number}}\nCustomer: {{customer_name}}\nTotal: {{grand_total}}\nItems: {{items_list}}\nAddress: {{shipping_address}}, {{city}}`,
+                "admin-confirmed-alert": `🔔 *Order Confirmed by Customer!*\n\nOrder {{order_number}} has been confirmed by customer {{customer_name}}! ✅\n\n*Items:*\n{{items_list}}\n\n*Grand Total:* {{grand_total}}\n\n*Shipping Address:*\n{{shipping_address}}, {{city}}`,
+                "abandoned_cart": `Hi {{customer_name}}, you left something in your cart! 🛒\n\nClick here to finish your purchase: {{cart_link}}\n\nThank you for visiting {{store_name}}!`,
+            };
+
             setIsCustomDelayMode(false);
             setEditForm({
                 name: flow.title,
-                message: "",
+                message: defaultMessages[flow.id] || "",
                 isPoll: flow.id === "order-confirmation" || flow.id === "cancellation-verify",
                 pollOptions: ["✅Yes, Confirm✅", "❌No, Cancel❌"],
                 event: eventMap[flow.id],
