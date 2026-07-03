@@ -343,14 +343,14 @@ const MessageTemplates = () => {
                       if (form.event === "orders/create") {
                         setForm({
                           ...form,
-                          message: `✅ *Order Confirmed!*\n\nHi {{customer_name}},\n\nGreat news! Your order *{{order_number}}* has been officially confirmed by {{store_name}}. 🛍️\n\n---\n📦 *Order Summary:*\n{{items_list}}\n\n💰 *Grand Total:* {{grand_total}}\n---\n\n📍 *Shipping to:*\n{{shipping_address}}\n{{city}}\n\nWe are getting your package ready for shipping. We'll send you another message with the tracking details as soon as it's on the way! 🚚\n\nThank you for shopping with us!\n- {{store_name}} Team`,
+                          message: `✅ *Order Confirmed!*\n\nHi {{first_name}},\n\nGreat news! Your order *{{order_number}}* has been officially confirmed by {{store_name}}. 🛍️\n\n---\n📦 *Order Summary:*\n{{items_list}}\n\n💰 *Grand Total:* {{grand_total}}\n---\n\n📍 *Shipping to:*\n{{shipping_address}}\n{{city}}\n\nWe are getting your package ready for shipping. We'll send you another message with the tracking details as soon as it's on the way! 🚚\n\nThank you for shopping with us!\n- {{store_name}} Team`,
                           isPoll: true,
                           pollOptions: ["✅ Yes, Confirm ✅", "❌ No, Cancel ❌"]
                         });
                       } else if (form.event === "orders/create/bank_transfer") {
                         setForm({
                           ...form,
-                          message: `🏦 *Bank Transfer Instructions!*\n\nHi {{customer_name}},\n\nThank you for your order *{{order_number}}*. 🛍️\n\nTo complete your order, please transfer *{{grand_total}}* to our bank account:\n\n*Bank:* [Bank Name]\n*Account Title:* [Account Title]\n*Account/IBAN:* [Account Number]\n\nOnce transferred, please reply to this message with a screenshot/receipt of the transfer so we can confirm your order immediately! 📲\n\nThank you!\n- {{store_name}} Team`,
+                          message: `🏦 *Bank Transfer Instructions!*\n\nHi {{first_name}},\n\nThank you for your order *{{order_number}}*. 🛍️\n\nTo complete your order, please transfer *{{grand_total}}* to our bank account:\n\n*Bank:* [Bank Name]\n*Account Title:* [Account Title]\n*Account/IBAN:* [Account Number]\n\nOnce transferred, please reply to this message with a screenshot/receipt of the transfer so we can confirm your order immediately! 📲\n\nThank you!\n- {{store_name}} Team`,
                           isPoll: false,
                           pollOptions: []
                         });
@@ -358,7 +358,7 @@ const MessageTemplates = () => {
                         setForm({
                           ...form,
                           name: "Thank You Message",
-                          message: `🎉 *Thank You, {{customer_name}}!*\n\nYour order *{{order_number}}* is now being processed by *{{store_name}}*! 🚀\n\n✨ *What's next?*\n1. Our team is hand-picking your items. 📦\n2. We'll pack them with care. 🎀\n3. You'll get a tracking link via WhatsApp as soon as it ships! 🚚\n\nWe appreciate your business! If you have any questions, just reply to this message. 💬`,
+                          message: `🎉 *Thank You, {{first_name}}!*\n\nYour order *{{order_number}}* is now being processed by *{{store_name}}*! 🚀\n\n✨ *What's next?*\n1. Our team is hand-picking your items. 📦\n2. We'll pack them with care. 🎀\n3. You'll get a tracking link via WhatsApp as soon as it ships! 🚚\n\nWe appreciate your business! If you have any questions, just reply to this message. 💬`,
                           isPoll: false
                         });
                       } else if (form.event === "orders/cancel_verify") {
@@ -377,14 +377,14 @@ const MessageTemplates = () => {
                       } else if (form.event === "fulfillments/delivered") {
                         setForm({
                           ...form,
-                          message: `🎉 *Order Delivered!*\n\nHi {{customer_name}}! 🚚\n\nWe're excited to let you know that your order *{{order_number}}* has been successfully delivered! \n\nWe hope you love your new purchase! If you have any questions or need assistance, feel free to reply to this message. 💬\n\nThank you for shopping with {{store_name}}!`,
+                          message: `🎉 *Order Delivered!*\n\nHi {{first_name}}! 🚚\n\nWe're excited to let you know that your order *{{order_number}}* has been successfully delivered! \n\nWe hope you love your new purchase! If you have any questions or need assistance, feel free to reply to this message. 💬\n\nThank you for shopping with {{store_name}}!`,
                           isPoll: false
                         });
                       } else if (form.event === "fulfillments/update") {
                         setForm({
                           ...form,
                           name: "Shipment Update",
-                          message: `Hi {{customer_name}}! 🚚\n\nGreat news! Your order {{order_number}} has been shipped via {{courier}}!\n\n📦 Tracking Number: {{tracking_number}}\n📍 Track your package: {{tracking_link}}\n\nThank you for shopping with {{store_name}}!`,
+                          message: `Hi {{first_name}}! 🚚\n\nGreat news! Your order {{order_number}} has been shipped via {{courier}}!\n\n📦 Tracking Number: {{tracking_number}}\n📍 Track your package: {{tracking_link}}\n\nThank you for shopping with {{store_name}}!`,
                           isPoll: false
                         });
                       } else if (form.event === "admin-order-alert") {
