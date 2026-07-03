@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 const iconMap = {
   "orders/create": MessageSquare,
+  "orders/create/bank_transfer": MessageSquare,
   "admin-order-alert": Bell,
   "admin-confirmed-alert": Bell,
   "checkouts/abandoned": ShoppingCart,
@@ -318,6 +319,7 @@ const MessageTemplates = () => {
                 }}
               >
                 <option value="orders/create">Customer Order Confirmation (Poll)</option>
+                <option value="orders/create/bank_transfer">Customer Bank Transfer Confirmation (Poll)</option>
                 <option value="orders/confirmed">Post-Confirmation Thank You</option>
                 <option value="admin-order-alert">Admin New Order Alert</option>
                 <option value="admin-confirmed-alert">Admin Order Confirmed Alert</option>
@@ -331,7 +333,7 @@ const MessageTemplates = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="tmpl-message">Message</Label>
-                {(form.event === "orders/create" || form.event === "orders/confirmed" || form.event === "admin-order-alert" || form.event === "admin-confirmed-alert" || form.event === "orders/cancel_verify" || form.event === "orders/cancelled" || form.event === "fulfillments/delivered" || form.event === "fulfillments/update") && (
+                {(form.event === "orders/create" || form.event === "orders/create/bank_transfer" || form.event === "orders/confirmed" || form.event === "admin-order-alert" || form.event === "admin-confirmed-alert" || form.event === "orders/cancel_verify" || form.event === "orders/cancelled" || form.event === "fulfillments/delivered" || form.event === "fulfillments/update") && (
                   <button
                     type="button"
                     className="h-auto p-0 text-xs text-primary font-bold decoration-primary/30 hover:decoration-primary transition-all underline shrink-0"
@@ -342,6 +344,13 @@ const MessageTemplates = () => {
                           message: `✅ *Order Confirmed!*\n\nHi {{customer_name}},\n\nGreat news! Your order *{{order_number}}* has been officially confirmed by {{store_name}}. 🛍️\n\n---\n📦 *Order Summary:*\n{{items_list}}\n\n💰 *Grand Total:* {{grand_total}}\n---\n\n📍 *Shipping to:*\n{{shipping_address}}\n{{city}}\n\nWe are getting your package ready for shipping. We'll send you another message with the tracking details as soon as it's on the way! 🚚\n\nThank you for shopping with us!\n- {{store_name}} Team`,
                           isPoll: true,
                           pollOptions: ["✅ Yes, Confirm ✅", "❌ No, Cancel ❌"]
+                        });
+                      } else if (form.event === "orders/create/bank_transfer") {
+                        setForm({
+                          ...form,
+                          message: `🏦 *Bank Transfer Instructions!*\n\nHi {{customer_name}},\n\nThank you for your order *{{order_number}}*. 🛍️\n\nTo complete your order, please transfer *{{grand_total}}* to our bank account:\n\n*Bank:* [Bank Name]\n*Account Title:* [Account Title]\n*Account/IBAN:* [Account Number]\n\nOnce transferred, please reply to this message with a screenshot/receipt of the transfer so we can confirm your order immediately! 📲\n\nThank you!\n- {{store_name}} Team`,
+                          isPoll: false,
+                          pollOptions: []
                         });
                       } else if (form.event === "orders/confirmed") {
                         setForm({
