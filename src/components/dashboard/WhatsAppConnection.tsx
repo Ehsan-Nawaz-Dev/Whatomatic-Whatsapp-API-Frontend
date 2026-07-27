@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Zap, Key } from "lucide-react";
+import { CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchWhatsAppStatus,
@@ -21,22 +21,19 @@ declare global {
 
 const WhatsAppConnection = () => {
   const queryClient = useQueryClient();
-  const [customAppId, setCustomAppId] = useState(() => localStorage.getItem("whatflow_meta_app_id") || "");
-  const [customConfigId, setCustomConfigId] = useState(() => localStorage.getItem("whatflow_meta_config_id") || "");
 
-  const envAppId = import.meta.env.VITE_META_APP_ID || "";
-  const envConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
-
-  const activeAppId = /^\d+$/.test(customAppId) ? customAppId : (/^\d+$/.test(envAppId) ? envAppId : "");
-  const activeConfigId = customConfigId || envConfigId;
+  const metaAppId = import.meta.env.VITE_META_APP_ID || "";
+  const metaConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
 
   // Load Meta Facebook JavaScript SDK for Embedded Signup
   useEffect(() => {
-    if (activeAppId && !document.getElementById("facebook-jssdk")) {
+    const isNumericAppId = /^\d+$/.test(metaAppId);
+
+    if (isNumericAppId && !document.getElementById("facebook-jssdk")) {
       window.fbAsyncInit = function () {
         if (window.FB) {
           window.FB.init({
-            appId: activeAppId,
+            appId: metaAppId,
             cookie: true,
             xfbml: true,
             version: "v21.0"
@@ -49,7 +46,7 @@ const WhatsAppConnection = () => {
       js.src = "https://connect.facebook.net/en_US/sdk.js";
       document.body.appendChild(js);
     }
-  }, [activeAppId]);
+  }, [metaAppId]);
 
   // Fetch WhatsApp connection status
   const { data: status, isLoading: isStatusLoading } = useQuery<WhatsAppStatusResponse>({
@@ -93,15 +90,13 @@ const WhatsAppConnection = () => {
 
   // Trigger Meta Official Embedded Signup Popup via Facebook Login
   const launchMetaEmbeddedSignup = () => {
-    if (!activeAppId) {
-      toast.error("Please enter a valid numeric Meta App ID below first.");
+    const isNumericAppId = /^\d+$/.test(metaAppId);
+
+    if (!isNumericAppId) {
+      toast.error("VITE_META_APP_ID is not configured yet on Vercel.");
       return;
     }
 
-    // Save to local storage for persistence
-    if (customAppId) localStorage.setItem("whatflow_meta_app_id", customAppId);
-    if (customConfigId) localStorage.setItem("whatflow_meta_config_id", customConfigId);
-    
     if (typeof window.FB !== "undefined" && window.FB.login) {
       try {
         window.FB.login(
@@ -120,7 +115,7 @@ const WhatsAppConnection = () => {
             }
           },
           {
-            config_id: activeConfigId,
+            config_id: metaConfigId,
             response_type: "code",
             override_default_response_type: true,
             extras: {
@@ -130,10 +125,10 @@ const WhatsAppConnection = () => {
         );
       } catch (err) {
         console.error("FB.login error, trying fallback window...", err);
-        openOAuthFallbackWindow(activeAppId, activeConfigId);
+        openOAuthFallbackWindow(metaAppId, metaConfigId);
       }
     } else {
-      openOAuthFallbackWindow(activeAppId, activeConfigId);
+      openOAuthFallbackWindow(metaAppId, metaConfigId);
     }
   };
 
@@ -231,41 +226,6 @@ const WhatsAppConnection = () => {
                   Log in with Facebook to select your WhatsApp Business Account and connect automatically.
                 </p>
               </div>
-
-              {!envAppId && (
-                <div className="space-y-3 pt-2 text-left bg-background/80 p-4 rounded-xl border border-border">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-                    <Key className="w-3.5 h-3.5" />
-                    Enter Meta App Details
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-semibold text-foreground">
-                      Meta App ID <span className="text-destructive">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={customAppId}
-                      onChange={(e) => setCustomAppId(e.target.value)}
-                      placeholder="e.g. 981240182401928"
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-semibold text-foreground">
-                      Configuration ID (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={customConfigId}
-                      onChange={(e) => setCustomConfigId(e.target.value)}
-                      placeholder="e.g. 1234567890123456"
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono"
-                    />
-                  </div>
-                </div>
-              )}
 
               <Button
                 variant="hero"
