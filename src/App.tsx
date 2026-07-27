@@ -13,6 +13,7 @@ import Careers from "./pages/Careers";
 import HelpCenter from "./pages/HelpCenter";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import DataDeletion from "./pages/DataDeletion";
 import OrderConfirmationDemo from "./pages/OrderConfirmationDemo";
 import BillingSuccess from "./pages/BillingSuccess";
 
@@ -42,7 +43,11 @@ const App = () => (
           <Route path="/careers" element={<Careers />} />
           <Route path="/help" element={<HelpCenter />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/data-deletion" element={<DataDeletion />} />
+          <Route path="/user-data-deletion" element={<DataDeletion />} />
           <Route path="/order-confirmation" element={<OrderConfirmationDemo />} />
           <Route path="/billing-success" element={<BillingSuccess />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
