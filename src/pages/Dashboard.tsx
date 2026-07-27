@@ -255,11 +255,11 @@ const Dashboard = () => {
 
   // ... (rest of logic)
 
-  const isActive = billing?.status === "active" || isJustActivated; // FORCE ACTIVE if just redirected
+  const isActive = billing?.status === "active" || isJustActivated || billing?.packagesDisabled || billing?.plan === "enterprise"; // Always active in testing mode
 
   // Onboarding logic: Prevent bypassing step 1 for new users despite the 'free' default backend state
   const isPaidPlan = billing?.plan && billing?.plan !== "free" && billing?.plan !== "none";
-  let isPlanChosen = isPaidPlan || isJustActivated || !!whatsappStatus?.connected;
+  let isPlanChosen = isPaidPlan || isJustActivated || !!whatsappStatus?.connected || true;
 
   // If the backend explicitly says this is a new installation, override any leftover local browser cache
   if (!billing?.isNewlyInstalled && (isOnboardingDone || isPlanChosen)) {
@@ -295,8 +295,8 @@ const Dashboard = () => {
   // and the current session has not marked it as completed.
   const shouldRenderOnboarding = !isBillingLoading && !isOnboardingDone && !isSessionFinished;
 
-  // Force billing tab for new/unpaid users, but allow settings for setup
-  const effectiveTab = (!isActive && activeTab !== "settings") ? "billing" : activeTab;
+  // Keep active tab as chosen by merchant
+  const effectiveTab = activeTab;
 
   if (isBillingLoading) {
     return (

@@ -1,6 +1,6 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "7e94b35087138bd2aef3082993b954dd"
+client_id = "f89bab1b3e9044eae648188ba2712eec"
 name = "whatomatic-whatsapp-automation"
 application_url = "https://whatomatic-whatsapp-api-frontend.vercel.app"
 embedded = true
