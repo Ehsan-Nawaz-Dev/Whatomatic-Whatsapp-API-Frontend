@@ -27,11 +27,16 @@ const WhatsAppConnection = () => {
   const [wabaId, setWabaId] = useState("");
   const [accessToken, setAccessToken] = useState("");
 
-  // Load Meta Facebook JavaScript SDK for Embedded Signup
+  // Load Meta Facebook JavaScript SDK for Embedded Signup (requires numeric Meta App ID)
   useEffect(() => {
-    const metaAppId = import.meta.env.VITE_META_APP_ID || import.meta.env.VITE_SHOPIFY_API_KEY || "";
+    const metaAppId = import.meta.env.VITE_META_APP_ID || "";
+    const isNumericAppId = /^\d+$/.test(metaAppId);
+
+    if (!isNumericAppId && !connectMode) {
+      setConnectMode("manual");
+    }
     
-    if (metaAppId && !document.getElementById("facebook-jssdk")) {
+    if (isNumericAppId && !document.getElementById("facebook-jssdk")) {
       window.fbAsyncInit = function () {
         if (window.FB) {
           window.FB.init({
@@ -108,12 +113,13 @@ const WhatsAppConnection = () => {
 
   // Trigger Meta Official Embedded Signup Popup
   const launchMetaEmbeddedSignup = () => {
-    const metaAppId = import.meta.env.VITE_META_APP_ID || import.meta.env.VITE_SHOPIFY_API_KEY || "";
+    const rawAppId = import.meta.env.VITE_META_APP_ID || "";
+    const metaAppId = /^\d+$/.test(rawAppId) ? rawAppId : "";
     const metaConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
     
-    // If no Config ID is provided yet, switch to manual token tab automatically
-    if (!metaConfigId && !metaAppId) {
-      toast.info("Switching to Manual Token Setup...");
+    // If no valid numeric Meta App ID or Config ID is provided yet, switch to manual token tab automatically
+    if (!metaAppId || !metaConfigId) {
+      toast.info("Please enter your Phone Number ID & System Access Token below.");
       setConnectMode("manual");
       return;
     }
