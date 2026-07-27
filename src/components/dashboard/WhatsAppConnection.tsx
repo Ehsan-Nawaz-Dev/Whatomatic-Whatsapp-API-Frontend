@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, RefreshCw, AlertCircle, Key, ShieldCheck, ExternalLink, Zap, Settings2 } from "lucide-react";
+import { CheckCircle2, RefreshCw, AlertCircle, Key, ShieldCheck, Zap, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -31,7 +31,7 @@ const WhatsAppConnection = () => {
   useEffect(() => {
     const metaAppId = import.meta.env.VITE_META_APP_ID || import.meta.env.VITE_SHOPIFY_API_KEY || "";
     
-    if (!document.getElementById("facebook-jssdk")) {
+    if (metaAppId && !document.getElementById("facebook-jssdk")) {
       window.fbAsyncInit = function () {
         if (window.FB) {
           window.FB.init({
@@ -108,37 +108,59 @@ const WhatsAppConnection = () => {
 
   // Trigger Meta Official Embedded Signup Popup
   const launchMetaEmbeddedSignup = () => {
+    const metaAppId = import.meta.env.VITE_META_APP_ID || import.meta.env.VITE_SHOPIFY_API_KEY || "";
     const metaConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
     
-    if (typeof window.FB !== "undefined") {
-      window.FB.login(
-        (response: any) => {
-          if (response.authResponse) {
-            const code = response.authResponse.code;
-            console.log("[Meta Embedded Signup] Auth Code Received:", code);
+    // If no Config ID is provided yet, switch to manual token tab automatically
+    if (!metaConfigId && !metaAppId) {
+      toast.info("Switching to Manual Token Setup...");
+      setConnectMode("manual");
+      return;
+    }
 
-            embeddedSignupMutation.mutate({
-              code,
-              accessToken: response.authResponse.accessToken
-            });
-          } else {
-            console.log("[Meta Embedded Signup] User cancelled or login failed.");
-            toast.error("Meta signup was cancelled before completion.");
+    if (typeof window.FB !== "undefined" && window.FB.login) {
+      try {
+        window.FB.login(
+          (response: any) => {
+            if (response?.authResponse) {
+              const code = response.authResponse.code;
+              console.log("[Meta Embedded Signup] Auth Code Received:", code);
+
+              embeddedSignupMutation.mutate({
+                code,
+                accessToken: response.authResponse.accessToken
+              });
+            } else {
+              console.log("[Meta Embedded Signup] Login window closed or cancelled.");
+              toast.error("Meta signup window was closed.");
+            }
+          },
+          {
+            config_id: metaConfigId,
+            response_type: "code",
+            override_default_response_type: true,
+            extras: {
+              setup: {}
+            }
           }
-        },
-        {
-          config_id: metaConfigId,
-          response_type: "code",
-          override_default_response_type: true,
-          extras: {
-            setup: {}
-          }
-        }
-      );
+        );
+      } catch (err) {
+        console.error("FB.login error, trying fallback window...", err);
+        openOAuthFallbackWindow(metaAppId, metaConfigId);
+      }
     } else {
-      // Fallback message if FB SDK is blocked by adblocker
-      toast.info("Opening Meta Business setup fallback...");
-      embeddedSignupMutation.mutate({});
+      openOAuthFallbackWindow(metaAppId, metaConfigId);
+    }
+  };
+
+  const openOAuthFallbackWindow = (appId: string, configId: string) => {
+    const redirectUri = `${window.location.origin}/dashboard`;
+    const oauthUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${appId}&config_id=${configId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    
+    const popup = window.open(oauthUrl, "MetaWhatsAppConnect", "width=600,height=700,scrollbars=yes");
+    if (!popup) {
+      toast.error("Popup was blocked by your browser. Please allow popups or use Manual Token Setup.");
+      setConnectMode("manual");
     }
   };
 
@@ -161,8 +183,8 @@ const WhatsAppConnection = () => {
     >
       <div className="flex items-center justify-between mb-4 lg:mb-6">
         <div>
-          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-foreground">WhatsApp Official Meta API</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Meta Business Solution Provider Flow</p>
+          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-foreground">WhatsApp Business API</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Meta Official Cloud Platform Connection</p>
         </div>
         {status?.connected ? (
           <span className="flex items-center gap-1.5 text-xs font-semibold text-success bg-success/10 px-3 py-1 rounded-full border border-success/20">
@@ -357,18 +379,6 @@ const WhatsAppConnection = () => {
               </div>
             </div>
           )}
-
-          <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-            <a
-              href="https://developers.facebook.com/apps/"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center hover:text-primary transition-colors text-[11px]"
-            >
-              Meta Developer Portal <ExternalLink className="w-3 h-3 ml-1" />
-            </a>
-            <span className="text-[11px]">Vercel Serverless Ready ✅</span>
-          </div>
         </div>
       )}
     </motion.div>
