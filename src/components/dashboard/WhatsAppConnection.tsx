@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchWhatsAppStatus,
+  fetchWhatsAppConfig,
   disconnectWhatsApp,
   connectEmbeddedSignup,
   WhatsAppStatusResponse,
@@ -22,18 +23,28 @@ declare global {
 const WhatsAppConnection = () => {
   const queryClient = useQueryClient();
 
-  const metaAppId = import.meta.env.VITE_META_APP_ID || "";
-  const metaConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
+  // Fetch dynamic Meta App ID configuration from backend
+  const { data: remoteConfig } = useQuery({
+    queryKey: ["whatsapp-config"],
+    queryFn: fetchWhatsAppConfig,
+    staleTime: 60000,
+  });
+
+  const staticAppId = import.meta.env.VITE_META_APP_ID || "";
+  const staticConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
+
+  const resolvedAppId = /^\d+$/.test(staticAppId) ? staticAppId : (remoteConfig?.metaAppId || "");
+  const resolvedConfigId = staticConfigId || remoteConfig?.metaConfigId || "";
 
   // Load Meta Facebook JavaScript SDK for Embedded Signup
   useEffect(() => {
-    const isNumericAppId = /^\d+$/.test(metaAppId);
+    const isNumericAppId = /^\d+$/.test(resolvedAppId);
 
     if (isNumericAppId && !document.getElementById("facebook-jssdk")) {
       window.fbAsyncInit = function () {
         if (window.FB) {
           window.FB.init({
-            appId: metaAppId,
+            appId: resolvedAppId,
             cookie: true,
             xfbml: true,
             version: "v21.0"
@@ -46,7 +57,7 @@ const WhatsAppConnection = () => {
       js.src = "https://connect.facebook.net/en_US/sdk.js";
       document.body.appendChild(js);
     }
-  }, [metaAppId]);
+  }, [resolvedAppId]);
 
   // Fetch WhatsApp connection status
   const { data: status, isLoading: isStatusLoading } = useQuery<WhatsAppStatusResponse>({
@@ -90,10 +101,10 @@ const WhatsAppConnection = () => {
 
   // Trigger Meta Official Embedded Signup Popup via Facebook Login
   const launchMetaEmbeddedSignup = () => {
-    const isNumericAppId = /^\d+$/.test(metaAppId);
+    const isNumericAppId = /^\d+$/.test(resolvedAppId);
 
     if (!isNumericAppId) {
-      toast.error("VITE_META_APP_ID is not configured yet on Vercel.");
+      toast.error("META_APP_ID is missing. Please set META_APP_ID in Vercel Environment Variables.");
       return;
     }
 
@@ -115,7 +126,7 @@ const WhatsAppConnection = () => {
             }
           },
           {
-            config_id: metaConfigId,
+            config_id: resolvedConfigId,
             response_type: "code",
             override_default_response_type: true,
             extras: {
@@ -125,10 +136,10 @@ const WhatsAppConnection = () => {
         );
       } catch (err) {
         console.error("FB.login error, trying fallback window...", err);
-        openOAuthFallbackWindow(metaAppId, metaConfigId);
+        openOAuthFallbackWindow(resolvedAppId, resolvedConfigId);
       }
     } else {
-      openOAuthFallbackWindow(metaAppId, metaConfigId);
+      openOAuthFallbackWindow(resolvedAppId, resolvedConfigId);
     }
   };
 

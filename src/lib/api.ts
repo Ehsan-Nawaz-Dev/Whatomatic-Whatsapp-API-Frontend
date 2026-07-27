@@ -61,6 +61,16 @@ export const getAuthHeaders = async (existingHeaders = {}) => {
   return headers;
 };
 
+export const fetchWhatsAppConfig = async (): Promise<{ metaAppId: string; metaConfigId: string }> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/whatsapp/config`);
+    if (!res.ok) return { metaAppId: "", metaConfigId: "" };
+    return res.json();
+  } catch {
+    return { metaAppId: "", metaConfigId: "" };
+  }
+};
+
 export interface MerchantSettingsPayload {
   storeName?: string;
   whatsappNumber?: string;
