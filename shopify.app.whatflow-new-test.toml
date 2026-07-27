@@ -2,16 +2,16 @@
 
 client_id = "7e94b35087138bd2aef3082993b954dd"
 name = "whatomatic-whatsapp-automation"
-application_url = "https://whatflow-alpha.vercel.app"
+application_url = "https://whatomatic-whatsapp-api-frontend.vercel.app"
 embedded = true
 
 [webhooks]
 api_version = "2026-01"
 
   [webhooks.privacy_compliance]
-  customer_deletion_url = "https://api.whatomatic.com/Api/webhooks/shopify/gdpr/customers_redact"
-  customer_data_request_url = "https://api.whatomatic.com/Api/webhooks/shopify/gdpr/customers_data_request"
-  shop_deletion_url = "https://api.whatomatic.com/Api/webhooks/shopify/gdpr/shop_redact"
+  customer_deletion_url = "https://whatomatic-whatsapp-a-pi-backend.vercel.app/api/webhooks/shopify/gdpr/customers_redact"
+  customer_data_request_url = "https://whatomatic-whatsapp-a-pi-backend.vercel.app/api/webhooks/shopify/gdpr/customers_data_request"
+  shop_deletion_url = "https://whatomatic-whatsapp-a-pi-backend.vercel.app/api/webhooks/shopify/gdpr/shop_redact"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -21,7 +21,6 @@ use_legacy_install_flow = false
 
 [auth]
 redirect_urls = [
-  "https://whatflow-alpha.vercel.app/api/auth/callback",
-  "https://whatflow-alpha.vercel.app/api/auth/tokens",
-  "https://api.whatomatic.com/Api/auth/shopify/callback"
+  "https://whatomatic-whatsapp-a-pi-backend.vercel.app/api/auth/shopify/callback",
+  "https://whatomatic-whatsapp-a-pi-backend.vercel.app/Api/auth/shopify/callback"
 ]
