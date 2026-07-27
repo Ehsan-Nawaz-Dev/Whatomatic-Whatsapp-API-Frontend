@@ -1,4 +1,4 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://api.whatomatic.com/api").replace(/\/$/, "");
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://whatomatic-whatsapp-a-pi-backend.vercel.app/api").replace(/\/$/, "");
 
 // Dynamic OAuth URL - derives from API_BASE_URL so it works on any deployment
 // API_BASE_URL = "https://api.whatomatic.com/api" → auth = "https://api.whatomatic.com/api/auth/shopify"
