@@ -227,21 +227,64 @@ export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
   return res.json();
 };
 
-// WhatsApp Web API
-export interface WhatsAppQRCodeResponse {
-  qrCode: string;
-  sessionId: string;
-  expiresAt: string;
+export interface MetaCredentialsPayload {
+  metaPhoneNumberId: string;
+  metaWabaId?: string;
+  metaAccessToken: string;
+  metaWebhookVerifyToken?: string;
 }
 
 export interface WhatsAppStatusResponse {
   connected: boolean;
   phoneNumber?: string;
   deviceName?: string;
+  qualityRating?: string;
   lastConnected?: string;
   dailyUsage?: number;
   dailyLimit?: number;
+  errorMessage?: string;
 }
+
+export interface WhatsAppQRCodeResponse {
+  qrCode?: string;
+  sessionId?: string;
+  expiresAt?: string;
+}
+
+export const saveMetaCredentials = async (payload: MetaCredentialsPayload) => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp/credentials"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to save Meta credentials");
+  }
+  return res.json();
+};
+
+export interface EmbeddedSignupPayload {
+  code?: string;
+  wabaId?: string;
+  phoneNumberId?: string;
+  accessToken?: string;
+}
+
+export const connectEmbeddedSignup = async (payload: EmbeddedSignupPayload) => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp/embedded-signup"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to complete Embedded Signup");
+  }
+  return res.json();
+};
 
 export interface WhatsAppMessagePayload {
   to: string;
