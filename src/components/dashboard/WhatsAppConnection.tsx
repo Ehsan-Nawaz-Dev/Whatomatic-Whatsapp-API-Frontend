@@ -1,12 +1,11 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, RefreshCw, AlertCircle, Key, ShieldCheck, Zap, Settings2 } from "lucide-react";
+import { CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchWhatsAppStatus,
   disconnectWhatsApp,
-  saveMetaCredentials,
   connectEmbeddedSignup,
   WhatsAppStatusResponse,
   getCurrentShop,
@@ -22,20 +21,12 @@ declare global {
 
 const WhatsAppConnection = () => {
   const queryClient = useQueryClient();
-  const [connectMode, setConnectMode] = useState<"embedded" | "manual">("embedded");
-  const [phoneNumberId, setPhoneNumberId] = useState("");
-  const [wabaId, setWabaId] = useState("");
-  const [accessToken, setAccessToken] = useState("");
 
-  // Load Meta Facebook JavaScript SDK for Embedded Signup (requires numeric Meta App ID)
+  // Load Meta Facebook JavaScript SDK for Embedded Signup
   useEffect(() => {
     const metaAppId = import.meta.env.VITE_META_APP_ID || "";
     const isNumericAppId = /^\d+$/.test(metaAppId);
 
-    if (!isNumericAppId && !connectMode) {
-      setConnectMode("manual");
-    }
-    
     if (isNumericAppId && !document.getElementById("facebook-jssdk")) {
       window.fbAsyncInit = function () {
         if (window.FB) {
@@ -83,47 +74,24 @@ const WhatsAppConnection = () => {
     }
   });
 
-  // Manual Credentials Mutation
-  const saveCredentialsMutation = useMutation({
-    mutationFn: saveMetaCredentials,
-    onSuccess: (data) => {
-      toast.success(data.message || "Meta API Connected Successfully!");
-      queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
-      queryClient.invalidateQueries({ queryKey: ["merchant-settings", getCurrentShop()] });
-    },
-    onError: (err: any) => {
-      toast.error(err.message || "Failed to verify & connect Meta credentials");
-    }
-  });
-
   // Disconnect Mutation
   const disconnectMutation = useMutation({
     mutationFn: () => disconnectWhatsApp(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
       toast.success("Meta WhatsApp account disconnected");
-      setPhoneNumberId("");
-      setWabaId("");
-      setAccessToken("");
     },
     onError: () => {
       toast.error("Failed to disconnect WhatsApp");
     },
   });
 
-  // Trigger Meta Official Embedded Signup Popup
+  // Trigger Meta Official Embedded Signup Popup via Facebook Login
   const launchMetaEmbeddedSignup = () => {
     const rawAppId = import.meta.env.VITE_META_APP_ID || "";
     const metaAppId = /^\d+$/.test(rawAppId) ? rawAppId : "";
     const metaConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
     
-    // If no valid numeric Meta App ID or Config ID is provided yet, switch to manual token tab automatically
-    if (!metaAppId || !metaConfigId) {
-      toast.info("Please enter your Phone Number ID & System Access Token below.");
-      setConnectMode("manual");
-      return;
-    }
-
     if (typeof window.FB !== "undefined" && window.FB.login) {
       try {
         window.FB.login(
@@ -165,20 +133,8 @@ const WhatsAppConnection = () => {
     
     const popup = window.open(oauthUrl, "MetaWhatsAppConnect", "width=600,height=700,scrollbars=yes");
     if (!popup) {
-      toast.error("Popup was blocked by your browser. Please allow popups or use Manual Token Setup.");
-      setConnectMode("manual");
+      toast.error("Popup was blocked by your browser. Please allow popups.");
     }
-  };
-
-  const handleManualConnect = () => {
-    if (!phoneNumberId.trim()) return toast.error("Please enter your Meta Phone Number ID");
-    if (!accessToken.trim()) return toast.error("Please enter your Access Token");
-
-    saveCredentialsMutation.mutate({
-      metaPhoneNumberId: phoneNumberId.trim(),
-      metaWabaId: wabaId.trim(),
-      metaAccessToken: accessToken.trim(),
-    });
   };
 
   return (
@@ -254,137 +210,46 @@ const WhatsAppConnection = () => {
         </div>
       ) : (
         <div className="space-y-5">
-          {/* Mode Selector Tabs */}
-          <div className="flex p-0.5 bg-muted/60 rounded-xl border border-border">
-            <button
-              onClick={() => setConnectMode("embedded")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                connectMode === "embedded"
-                  ? "bg-background text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Zap className="w-3.5 h-3.5 text-primary" />
-              1-Click Meta Connect
-            </button>
-            <button
-              onClick={() => setConnectMode("manual")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                connectMode === "manual"
-                  ? "bg-background text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Settings2 className="w-3.5 h-3.5" />
-              Manual Token Setup
-            </button>
+          <div className="space-y-4 py-2">
+            <div className="p-6 bg-gradient-to-br from-primary/5 via-accent/5 to-background rounded-2xl border border-primary/20 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto text-primary">
+                <Zap className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-foreground">Connect with Facebook Login</h3>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
+                  Log in with Facebook to select your WhatsApp Business Account and connect automatically.
+                </p>
+              </div>
+
+              <Button
+                variant="hero"
+                className="w-full text-xs font-bold h-11 shadow-lg shadow-primary/20 bg-[#1877F2] hover:bg-[#166FE5] text-white"
+                onClick={launchMetaEmbeddedSignup}
+                disabled={embeddedSignupMutation.isPending}
+              >
+                {embeddedSignupMutation.isPending ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Connecting with Meta...
+                  </>
+                ) : (
+                  "Connect with Facebook Login"
+                )}
+              </Button>
+            </div>
+
+            <div className="space-y-2 text-[11px] text-muted-foreground pt-1">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
+                <span>Automatic Webhook & API Key registration</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
+                <span>Official Meta Partner SLAs with 99.9% uptime</span>
+              </div>
+            </div>
           </div>
-
-          {connectMode === "embedded" ? (
-            <div className="space-y-4 py-2">
-              <div className="p-5 bg-gradient-to-br from-primary/5 via-accent/5 to-background rounded-2xl border border-primary/20 text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto text-primary">
-                  <Zap className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-foreground">Official Meta 1-Click Setup</h3>
-                  <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
-                    Connect your Facebook Business Manager & WhatsApp profile directly in seconds. No manual token entry required.
-                  </p>
-                </div>
-
-                <Button
-                  variant="hero"
-                  className="w-full text-xs font-bold h-11 shadow-lg shadow-primary/20"
-                  onClick={launchMetaEmbeddedSignup}
-                  disabled={embeddedSignupMutation.isPending}
-                >
-                  {embeddedSignupMutation.isPending ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      Connecting with Meta...
-                    </>
-                  ) : (
-                    "Connect Meta WhatsApp Account"
-                  )}
-                </Button>
-              </div>
-
-              <div className="space-y-2 text-[11px] text-muted-foreground">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
-                  <span>Automatic Webhook & API Key registration</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
-                  <span>Official Meta Partner SLAs with 99.9% uptime</span>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="p-3 bg-muted/40 rounded-xl border border-border text-xs text-muted-foreground">
-                Enter your custom Meta Developer App credentials manually from your Meta Business Manager.
-              </div>
-
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">
-                    Phone Number ID <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={phoneNumberId}
-                    onChange={(e) => setPhoneNumberId(e.target.value)}
-                    placeholder="e.g. 104829104920194"
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">
-                    WABA ID (WhatsApp Business Account ID)
-                  </label>
-                  <input
-                    type="text"
-                    value={wabaId}
-                    onChange={(e) => setWabaId(e.target.value)}
-                    placeholder="e.g. 981240182401928"
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">
-                    System User Access Token <span className="text-destructive">*</span>
-                  </label>
-                  <textarea
-                    value={accessToken}
-                    onChange={(e) => setAccessToken(e.target.value)}
-                    rows={3}
-                    placeholder="EAAG....."
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono resize-none"
-                  />
-                </div>
-
-                <Button
-                  className="w-full text-xs font-semibold h-10"
-                  variant="hero"
-                  onClick={handleManualConnect}
-                  disabled={saveCredentialsMutation.isPending}
-                >
-                  {saveCredentialsMutation.isPending ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      Verifying with Meta...
-                    </>
-                  ) : (
-                    "Save & Verify Credentials"
-                  )}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </motion.div>
