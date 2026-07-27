@@ -33,8 +33,8 @@ const WhatsAppConnection = () => {
   const staticAppId = import.meta.env.VITE_META_APP_ID || "";
   const staticConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
 
-  const resolvedAppId = /^\d+$/.test(staticAppId) ? staticAppId : (remoteConfig?.metaAppId || "");
-  const resolvedConfigId = staticConfigId || remoteConfig?.metaConfigId || "";
+  const resolvedAppId = /^\d+$/.test(staticAppId) ? staticAppId : (remoteConfig?.metaAppId || "1031248766177799");
+  const resolvedConfigId = staticConfigId || remoteConfig?.metaConfigId || "1981964775839147";
 
   // Load Meta Facebook JavaScript SDK for Embedded Signup
   useEffect(() => {
