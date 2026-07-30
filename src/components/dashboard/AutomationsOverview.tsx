@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye, Edit2, Trash2, Plus, X } from "lucide-react";
+import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye, Edit2, Trash2, Plus, X, Send, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings, getCurrentShop, updateTemplate, createTemplate } from "@/lib/api";
+import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings, getCurrentShop, updateTemplate, createTemplate, fetchCloudTemplates, createCloudTemplate } from "@/lib/api";
 import { toast } from "sonner";
 
 
@@ -125,6 +125,50 @@ const AutomationsOverview = () => {
         queryKey: ["merchant-settings", getCurrentShop()],
         queryFn: fetchSettings,
     });
+
+    const { data: cloudTemplates = [] } = useQuery({
+        queryKey: ["cloud-templates", getCurrentShop()],
+        queryFn: fetchCloudTemplates,
+        staleTime: 10000,
+    });
+
+    const submitToMetaMut = useMutation({
+        mutationFn: createCloudTemplate,
+        onSuccess: (data) => {
+            toast.success(data.message || "Template submitted to Meta for approval!");
+            queryClient.invalidateQueries({ queryKey: ["cloud-templates", getCurrentShop()] });
+        },
+        onError: (err: any) => {
+            toast.error(err.message || "Failed to submit template to Meta");
+        }
+    });
+
+    const handleSubmitToMeta = (flow: any) => {
+        const rawMessage = flow.template?.message || defaultMessages[flow.id] || "";
+        let varIndex = 1;
+        const examples: string[] = [];
+        
+        // Convert placeholders like {{customer_name}}, {{order_number}} to {{1}}, {{2}} for Meta Graph API
+        const metaBody = rawMessage.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_: string, varName: string) => {
+            const idx = varIndex++;
+            if (varName.includes("name")) examples.push("John");
+            else if (varName.includes("order") || varName.includes("number")) examples.push("1001");
+            else if (varName.includes("total") || varName.includes("price")) examples.push("$49.99");
+            else if (varName.includes("store")) examples.push(storeName);
+            else examples.push("Sample");
+            return `{{${idx}}}`;
+        });
+
+        const metaName = flow.id.replace(/-/g, "_").toLowerCase();
+
+        submitToMetaMut.mutate({
+            name: metaName,
+            category: flow.id === "abandoned_cart" ? "MARKETING" : "UTILITY",
+            language: "en_US",
+            bodyText: metaBody,
+            examples: examples.length > 0 ? examples : undefined
+        });
+    };
 
     const isLoading = isStatsLoading || isTemplatesLoading;
     const storeName = settings?.storeName || "Your Store";
@@ -245,29 +289,20 @@ const AutomationsOverview = () => {
     const displayAutomations = automations.map(flow => {
         const statsArray = Array.isArray(statsData) ? statsData : [];
         const apiStat = statsArray.find((s: any) => s.id === flow.id);
-
-        // Find the actual template for this flow
-        // Mapping flow.id to event keys
-        const eventMap: Record<string, string> = {
-            "admin-order-alert": "admin-order-alert",
-            "admin-confirmed-alert": "admin-confirmed-alert",
-            "abandoned_cart": "checkouts/abandoned",
-            "order-confirmation": "orders/create",
-            "bank-transfer-confirmation": "orders/create/bank_transfer",
-            "order-confirmed-reply": "orders/confirmed",
-            "fulfillment_update": "fulfillments/update",
-            "fulfillment_delivered": "fulfillments/delivered",
-            "cancellation": "orders/cancelled",
-            "cancellation-verify": "orders/cancel_verify",
-        };
-
         const template = templates.find((t: any) => t.event === eventMap[flow.id]);
         const isEnabled = apiStat?.enabled ?? flow.enabled;
+
+        const metaName = flow.id.replace(/-/g, "_").toLowerCase();
+        const matchedCloudTpl = (cloudTemplates as any[]).find((ct: any) => {
+            const name = (ct.name || "").toLowerCase();
+            return name === metaName || name.includes(metaName);
+        });
 
         return {
             ...flow,
             enabled: isEnabled,
-            template: template, // Include the real template data
+            template: template,
+            matchedCloudTpl: matchedCloudTpl,
             stats: apiStat ? {
                 sent: apiStat.sent || 0,
                 recovered: apiStat.recovered || 0,
@@ -304,11 +339,34 @@ const AutomationsOverview = () => {
                                 }`}>
                                 <flow.icon className={`w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 ${flow.enabled ? "text-primary-foreground" : "text-muted-foreground"}`} />
                             </div>
-                            <div className="min-w-0">
-                                <h3 className="font-bold text-sm lg:text-base xl:text-lg text-foreground flex items-center gap-2 flex-wrap">
-                                    {flow.title}
+                            <div className="min-w-0 space-y-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <h3 className="font-bold text-sm lg:text-base xl:text-lg text-foreground">
+                                        {flow.title}
+                                    </h3>
+                                    {flow.matchedCloudTpl ? (
+                                        <Badge
+                                            variant="outline"
+                                            className={
+                                                flow.matchedCloudTpl.status === "APPROVED"
+                                                    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 font-bold text-[10px]"
+                                                    : flow.matchedCloudTpl.status === "REJECTED"
+                                                    ? "bg-red-500/10 text-red-600 border-red-500/30 font-bold text-[10px]"
+                                                    : "bg-amber-500/10 text-amber-600 border-amber-500/30 font-bold text-[10px] animate-pulse"
+                                            }
+                                        >
+                                            {flow.matchedCloudTpl.status === "APPROVED" && <CheckCircle2 className="w-3 h-3 mr-1 text-emerald-600 inline shrink-0" />}
+                                            {flow.matchedCloudTpl.status === "PENDING" && <Clock className="w-3 h-3 mr-1 text-amber-600 inline animate-spin shrink-0" />}
+                                            {flow.matchedCloudTpl.status === "REJECTED" && <AlertTriangle className="w-3 h-3 mr-1 text-red-600 inline shrink-0" />}
+                                            Meta: {flow.matchedCloudTpl.status}
+                                        </Badge>
+                                    ) : (
+                                        <Badge variant="outline" className="bg-muted text-muted-foreground border-border text-[10px]">
+                                            Meta: Not Submitted
+                                        </Badge>
+                                    )}
                                     {!flow.enabled && <Badge variant="secondary" className="text-[9px] lg:text-[10px] font-normal">Disabled</Badge>}
-                                </h3>
+                                </div>
                                 <p className="text-[11px] lg:text-xs xl:text-sm text-muted-foreground max-w-md line-clamp-2 md:line-clamp-none">{flow.description}</p>
                             </div>
                         </div>
@@ -316,7 +374,27 @@ const AutomationsOverview = () => {
                         {/* Stats removed as per user request */}
 
                         <div className="flex items-center justify-between lg:justify-end gap-2 lg:gap-3 xl:gap-4 mt-1 lg:mt-0 pt-2 lg:pt-0 border-t border-border/50 lg:border-none">
-                            <div className="flex gap-1.5 lg:gap-2">
+                            <div className="flex items-center gap-1.5 lg:gap-2 flex-wrap">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className={`h-7 lg:h-8 xl:h-9 text-[11px] lg:text-xs px-2 lg:px-3 font-bold transition-all ${
+                                        flow.matchedCloudTpl?.status === "APPROVED"
+                                            ? "text-emerald-600 border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10"
+                                            : flow.matchedCloudTpl?.status === "PENDING"
+                                            ? "text-amber-600 border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10"
+                                            : "text-[#1877F2] border-[#1877F2]/40 hover:bg-[#1877F2]/10"
+                                    }`}
+                                    onClick={() => handleSubmitToMeta(flow)}
+                                    disabled={submitToMetaMut.isPending || flow.matchedCloudTpl?.status === "APPROVED"}
+                                >
+                                    <Send className="w-3 h-3 lg:w-3.5 lg:h-3.5 mr-1 lg:mr-1.5" />
+                                    {flow.matchedCloudTpl?.status === "APPROVED"
+                                        ? "Approved ✅"
+                                        : flow.matchedCloudTpl?.status === "PENDING"
+                                        ? "Meta Review Pending ⏳"
+                                        : "Submit to Meta"}
+                                </Button>
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -682,15 +760,30 @@ const AutomationsOverview = () => {
                             </div>
                         </div>
                     </div>
-                    <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+                    <DialogFooter className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-border/50">
                         <Button
-                            variant="hero"
-                            onClick={handleSaveTemplate}
-                            disabled={updateMut.isPending || createMut.isPending}
+                            type="button"
+                            variant="outline"
+                            className="w-full sm:w-auto text-[#1877F2] border-[#1877F2]/40 hover:bg-[#1877F2]/10 font-bold text-xs"
+                            onClick={() => {
+                                if (selectedFlow) handleSubmitToMeta(selectedFlow);
+                            }}
+                            disabled={submitToMetaMut.isPending}
                         >
-                            {updateMut.isPending || createMut.isPending ? "Saving..." : "Save Template"}
+                            <Send className="w-3.5 h-3.5 mr-1.5" />
+                            Submit Template to Meta
                         </Button>
+                        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                            <Button variant="outline" size="sm" onClick={() => setEditOpen(false)}>Cancel</Button>
+                            <Button
+                                variant="hero"
+                                size="sm"
+                                onClick={handleSaveTemplate}
+                                disabled={updateMut.isPending || createMut.isPending}
+                            >
+                                {updateMut.isPending || createMut.isPending ? "Saving..." : "Save Template"}
+                            </Button>
+                        </div>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
