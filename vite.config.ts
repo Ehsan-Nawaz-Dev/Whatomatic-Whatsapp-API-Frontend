@@ -14,13 +14,13 @@ import { componentTagger } from "lovable-tagger";
 const shopifyApiKeyPlugin = (apiKey: string, mode: string): Plugin => ({
   name: "inject-shopify-api-key",
   transformIndexHtml(html) {
-    if (!apiKey) {
-      const message =
-        "VITE_SHOPIFY_API_KEY is not set. The embedded app cannot authenticate with Shopify without it.";
-      if (mode === "production") throw new Error(message);
-      console.warn(`[vite] ${message}`);
+    const key = apiKey || process.env.VITE_SHOPIFY_API_KEY || "";
+    if (!key) {
+      console.warn(
+        "[vite] VITE_SHOPIFY_API_KEY is not set in build environment. App Bridge will read key at runtime."
+      );
     }
-    return html.replace("%VITE_SHOPIFY_API_KEY%", apiKey);
+    return html.replace("%VITE_SHOPIFY_API_KEY%", key);
   },
 });
 
