@@ -87,16 +87,19 @@ const WhatsAppConnection = () => {
     }
   });
 
+  const getCanonicalRedirectUri = () => {
+    return `${window.location.origin}/dashboard`;
+  };
+
   // Listen for OAuth authorization code in URL (for direct URL fallback redirect on Vercel)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
     if (code && !status?.connected) {
       console.log("[Meta OAuth Direct Redirect] Captured code from URL string:", code);
-      const redirectUri = `${window.location.origin}${window.location.pathname}`;
       embeddedSignupMutation.mutate({
         code,
-        redirectUri
+        redirectUri: getCanonicalRedirectUri()
       });
       // Clean code query parameter from browser address bar
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -136,7 +139,7 @@ const WhatsAppConnection = () => {
               embeddedSignupMutation.mutate({
                 code,
                 accessToken,
-                redirectUri: `${window.location.origin}/dashboard`
+                redirectUri: getCanonicalRedirectUri()
               });
             } else {
               console.log("[Meta Embedded Signup] Login window closed or cancelled.");
@@ -160,7 +163,7 @@ const WhatsAppConnection = () => {
   };
 
   const openOAuthFallbackWindow = (appId: string, configId: string) => {
-    const redirectUri = `${window.location.origin}/dashboard`;
+    const redirectUri = getCanonicalRedirectUri();
     const oauthUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${appId}&config_id=${configId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}`;
     
     const popup = window.open(oauthUrl, "MetaWhatsAppConnect", "width=600,height=700,scrollbars=yes");
