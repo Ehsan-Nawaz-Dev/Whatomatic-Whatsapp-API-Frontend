@@ -114,11 +114,12 @@ const WhatsAppConnection = () => {
           (response: any) => {
             if (response?.authResponse) {
               const code = response.authResponse.code;
-              console.log("[Meta Embedded Signup] Auth Code Received:", code);
+              const accessToken = response.authResponse.accessToken;
+              console.log("[Meta Embedded Signup] Auth Response:", { code: !!code, accessToken: !!accessToken });
 
               embeddedSignupMutation.mutate({
                 code,
-                accessToken: response.authResponse.accessToken,
+                accessToken,
                 redirectUri: `${window.location.origin}/dashboard`
               });
             } else {
@@ -128,8 +129,6 @@ const WhatsAppConnection = () => {
           },
           {
             config_id: resolvedConfigId,
-            response_type: "code",
-            override_default_response_type: true,
             extras: {
               setup: {}
             }
