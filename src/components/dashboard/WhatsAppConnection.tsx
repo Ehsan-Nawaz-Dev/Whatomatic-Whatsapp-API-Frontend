@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchWhatsAppStatus,
