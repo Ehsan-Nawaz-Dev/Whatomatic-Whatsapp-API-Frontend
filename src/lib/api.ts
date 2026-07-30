@@ -280,6 +280,7 @@ export interface EmbeddedSignupPayload {
   wabaId?: string;
   phoneNumberId?: string;
   accessToken?: string;
+  redirectUri?: string;
 }
 
 export const connectEmbeddedSignup = async (payload: EmbeddedSignupPayload) => {

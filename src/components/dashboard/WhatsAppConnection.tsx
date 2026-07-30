@@ -118,7 +118,8 @@ const WhatsAppConnection = () => {
 
               embeddedSignupMutation.mutate({
                 code,
-                accessToken: response.authResponse.accessToken
+                accessToken: response.authResponse.accessToken,
+                redirectUri: `${window.location.origin}/dashboard`
               });
             } else {
               console.log("[Meta Embedded Signup] Login window closed or cancelled.");
