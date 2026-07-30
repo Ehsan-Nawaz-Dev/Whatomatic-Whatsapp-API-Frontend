@@ -456,8 +456,48 @@ export const fetchCloudTemplates = async (): Promise<CloudTemplate[]> => {
   const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/whatsapp-cloud/templates"), { headers });
   if (!res.ok) throw new Error("Failed to fetch cloud templates");
+  const data = await res.json();
+  return data.templates || [];
+};
+
+export interface CreateCloudTemplatePayload {
+  name: string;
+  category: "UTILITY" | "MARKETING" | "AUTHENTICATION";
+  language?: string;
+  bodyText: string;
+  headerText?: string;
+  footerText?: string;
+  buttons?: string[];
+  examples?: string[];
+}
+
+export const createCloudTemplate = async (payload: CreateCloudTemplatePayload) => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp-cloud/templates"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to submit template to Meta");
+  }
   return res.json();
 };
+
+export const deleteCloudTemplate = async (templateName: string) => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam(`/whatsapp-cloud/templates/${templateName}`), {
+    method: "DELETE",
+    headers,
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to delete template from Meta");
+  }
+  return res.json();
+};
+
 
 // Contact Management API
 export interface Contact {
