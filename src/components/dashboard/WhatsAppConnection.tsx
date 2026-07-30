@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Zap } from "lucide-react";
+import { CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Zap, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import {
   disconnectWhatsApp,
   connectEmbeddedSignup,
   registerWhatsAppNumber,
+  sendCloudMessage,
   WhatsAppStatusResponse,
   getCurrentShop,
 } from "@/lib/api";
@@ -103,6 +104,33 @@ const WhatsAppConnection = () => {
   });
 
   const [capturedMetaIds, setCapturedMetaIds] = useState<{ wabaId?: string; phoneNumberId?: string }>({});
+
+  const [testPhoneNumber, setTestPhoneNumber] = useState("");
+  const [testMessageText, setTestMessageText] = useState("Hello! 👋 This is a live test message from your Whatomatic Meta WhatsApp Business API.");
+  const [isSendingTest, setIsSendingTest] = useState(false);
+
+  const handleSendTestMessage = async () => {
+    if (!testPhoneNumber.trim()) {
+      toast.error("Please enter a target phone number");
+      return;
+    }
+    setIsSendingTest(true);
+    try {
+      const res = await sendCloudMessage({
+        to: testPhoneNumber.trim(),
+        message: testMessageText.trim()
+      });
+      if (res.success) {
+        toast.success(`Test WhatsApp message sent successfully! ID: ${res.messageId || 'OK'}`);
+      } else {
+        toast.error(res.error || "Failed to send test message");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send test message");
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
 
   // Listen for Meta Embedded Signup postMessage events (emitted by Meta popup)
   useEffect(() => {
@@ -305,6 +333,55 @@ const WhatsAppConnection = () => {
                 <span className="font-semibold text-success uppercase">{status.qualityRating}</span>
               </div>
             )}
+          </div>
+
+          {/* Test Message Component */}
+          <div className="p-4 bg-muted/20 border border-border/80 rounded-xl space-y-3 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <Send className="w-3.5 h-3.5 text-primary" />
+                Send Test WhatsApp Message
+              </span>
+              <span className="text-[10px] font-medium text-muted-foreground bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                Meta Cloud API
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              <input
+                type="text"
+                placeholder="Enter recipient phone number (e.g. +923048799087)"
+                value={testPhoneNumber}
+                onChange={(e) => setTestPhoneNumber(e.target.value)}
+                className="w-full text-xs px-3 py-2 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:outline-none transition-all"
+              />
+              <textarea
+                rows={2}
+                placeholder="Test message text..."
+                value={testMessageText}
+                onChange={(e) => setTestMessageText(e.target.value)}
+                className="w-full text-xs px-3 py-2 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:outline-none resize-none transition-all"
+              />
+            </div>
+
+            <Button
+              size="sm"
+              className="w-full text-xs font-bold gap-1.5 h-9 bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={handleSendTestMessage}
+              disabled={isSendingTest || !testPhoneNumber.trim()}
+            >
+              {isSendingTest ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  Sending Test Message...
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" />
+                  Send Test Message
+                </>
+              )}
+            </Button>
           </div>
 
           <div className="flex gap-3">
