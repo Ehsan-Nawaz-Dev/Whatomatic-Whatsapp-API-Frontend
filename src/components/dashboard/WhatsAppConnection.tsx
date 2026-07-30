@@ -87,6 +87,22 @@ const WhatsAppConnection = () => {
     }
   });
 
+  // Listen for OAuth authorization code in URL (for direct URL fallback redirect on Vercel)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    if (code && !status?.connected) {
+      console.log("[Meta OAuth Direct Redirect] Captured code from URL string:", code);
+      const redirectUri = `${window.location.origin}${window.location.pathname}`;
+      embeddedSignupMutation.mutate({
+        code,
+        redirectUri
+      });
+      // Clean code query parameter from browser address bar
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [status?.connected]);
+
   // Disconnect Mutation
   const disconnectMutation = useMutation({
     mutationFn: () => disconnectWhatsApp(),
