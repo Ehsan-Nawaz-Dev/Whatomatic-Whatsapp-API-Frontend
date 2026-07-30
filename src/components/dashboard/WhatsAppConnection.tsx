@@ -87,6 +87,33 @@ const WhatsAppConnection = () => {
     }
   });
 
+  const [capturedMetaIds, setCapturedMetaIds] = useState<{ wabaId?: string; phoneNumberId?: string }>({});
+
+  // Listen for Meta Embedded Signup postMessage events (emitted by Meta popup)
+  useEffect(() => {
+    const handleMetaMessage = (event: MessageEvent) => {
+      if (event.origin !== "https://www.facebook.com" && event.origin !== "https://web.facebook.com") {
+        return;
+      }
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (data?.type === "WA_EMBEDDED_SIGNUP" || data?.event === "WA_EMBEDDED_SIGNUP") {
+          console.log("[Meta Embedded Signup] postMessage event received:", data);
+          const wabaId = data.data?.waba_id || data.waba_id;
+          const phoneNumberId = data.data?.phone_number_id || data.phone_number_id;
+          if (wabaId || phoneNumberId) {
+            setCapturedMetaIds({ wabaId, phoneNumberId });
+          }
+        }
+      } catch (err) {
+        // Ignore non-JSON postMessage events
+      }
+    };
+
+    window.addEventListener("message", handleMetaMessage);
+    return () => window.removeEventListener("message", handleMetaMessage);
+  }, []);
+
   const getCanonicalRedirectUri = () => {
     return `${window.location.origin}/dashboard`;
   };
@@ -99,6 +126,8 @@ const WhatsAppConnection = () => {
       console.log("[Meta OAuth Direct Redirect] Captured code from URL string:", code);
       embeddedSignupMutation.mutate({
         code,
+        wabaId: capturedMetaIds.wabaId,
+        phoneNumberId: capturedMetaIds.phoneNumberId,
         redirectUri: getCanonicalRedirectUri()
       });
       // Clean code query parameter from browser address bar
@@ -139,6 +168,8 @@ const WhatsAppConnection = () => {
               embeddedSignupMutation.mutate({
                 code,
                 accessToken,
+                wabaId: capturedMetaIds.wabaId,
+                phoneNumberId: capturedMetaIds.phoneNumberId,
                 redirectUri: getCanonicalRedirectUri()
               });
             } else {
