@@ -8,6 +8,7 @@ import {
   fetchWhatsAppConfig,
   disconnectWhatsApp,
   connectEmbeddedSignup,
+  registerWhatsAppNumber,
   WhatsAppStatusResponse,
   getCurrentShop,
 } from "@/lib/api";
@@ -30,11 +31,14 @@ const WhatsAppConnection = () => {
     staleTime: 60000,
   });
 
+  // Meta app identity comes from the backend (or a build-time override). No hardcoded
+  // fallback IDs - a misconfigured deploy must surface, not silently point merchants
+  // at some other Meta app.
   const staticAppId = import.meta.env.VITE_META_APP_ID || "";
   const staticConfigId = import.meta.env.VITE_META_CONFIG_ID || "";
 
-  const resolvedAppId = /^\d+$/.test(staticAppId) ? staticAppId : (remoteConfig?.metaAppId || "1031248766177799");
-  const resolvedConfigId = staticConfigId || remoteConfig?.metaConfigId || "1981964775839147";
+  const resolvedAppId = /^\d+$/.test(staticAppId) ? staticAppId : (remoteConfig?.metaAppId || "");
+  const resolvedConfigId = staticConfigId || remoteConfig?.metaConfigId || "";
 
   // Load Meta Facebook JavaScript SDK for Embedded Signup
   useEffect(() => {
@@ -146,6 +150,18 @@ const WhatsAppConnection = () => {
     }
   }, [status?.connected]);
 
+  // Register Mutation - recovers a connected number that Meta rejects with 133010
+  const registerMutation = useMutation({
+    mutationFn: () => registerWhatsAppNumber(),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
+      toast.success(data?.message || "WhatsApp number registered for messaging");
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || "Failed to register WhatsApp number");
+    },
+  });
+
   // Disconnect Mutation
   const disconnectMutation = useMutation({
     mutationFn: () => disconnectWhatsApp(),
@@ -162,8 +178,9 @@ const WhatsAppConnection = () => {
   const launchMetaEmbeddedSignup = () => {
     const isNumericAppId = /^\d+$/.test(resolvedAppId);
 
-    if (!isNumericAppId) {
-      toast.error("META_APP_ID is missing. Please set META_APP_ID in Vercel Environment Variables.");
+    if (!isNumericAppId || !resolvedConfigId) {
+      toast.error("WhatsApp signup isn't available right now. Please contact support.");
+      console.error("[Meta Embedded Signup] Missing META_APP_ID / META_CONFIG_ID from backend config.");
       return;
     }
 
@@ -248,19 +265,46 @@ const WhatsAppConnection = () => {
             <p className="text-xs text-muted-foreground">Your store is powered by Meta WhatsApp Business Platform.</p>
           </div>
 
+          {status.registered === false && (
+            <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/50 rounded-xl space-y-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-amber-900 dark:text-amber-200">Messaging not enabled yet</p>
+                  <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5 leading-relaxed">
+                    Your number is linked to Meta but is not registered for Cloud API messaging, so sends fail with
+                    "Account not registered". Register it to start sending.
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                className="w-full text-xs"
+                onClick={() => registerMutation.mutate()}
+                disabled={registerMutation.isPending}
+              >
+                {registerMutation.isPending ? "Registering..." : "Enable Messaging"}
+              </Button>
+            </div>
+          )}
+
+          {status.degraded && (
+            <p className="text-xs text-muted-foreground text-center">
+              Meta is temporarily unreachable — showing last known status.
+            </p>
+          )}
+
           <div className="space-y-3 p-4 bg-muted/40 rounded-xl border border-border">
             <div className="flex items-center justify-between text-xs py-1">
               <span className="text-muted-foreground font-medium">Verified Number:</span>
               <span className="font-bold text-foreground">{status.phoneNumber || "Verified WhatsApp Number"}</span>
             </div>
-            <div className="flex items-center justify-between text-xs py-1 border-t border-border/50">
-              <span className="text-muted-foreground font-medium">Quality Rating:</span>
-              <span className="font-semibold text-success uppercase">{status.qualityRating || "GREEN (GOOD)"}</span>
-            </div>
-            <div className="flex items-center justify-between text-xs py-1 border-t border-border/50">
-              <span className="text-muted-foreground font-medium">Messaging Limit:</span>
-              <span className="font-semibold text-foreground">1,000 Conversations / 24h</span>
-            </div>
+            {status.qualityRating && (
+              <div className="flex items-center justify-between text-xs py-1 border-t border-border/50">
+                <span className="text-muted-foreground font-medium">Quality Rating:</span>
+                <span className="font-semibold text-success uppercase">{status.qualityRating}</span>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-3">

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye, Edit2, Trash2, Plus, X, Send, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { Zap, ShoppingCart, MessageSquare, Truck, XCircle, Bell, Eye, Edit2, Trash2, Plus, X, Send, CheckCircle2, Clock, AlertTriangle, RefreshCw } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings, getCurrentShop, updateTemplate, createTemplate, fetchCloudTemplates, createCloudTemplate } from "@/lib/api";
+import { fetchAutomationsStats, toggleAutomation, fetchTemplates, fetchSettings, getCurrentShop, updateTemplate, createTemplate, fetchCloudTemplates, createCloudTemplate, syncCloudTemplates } from "@/lib/api";
 import { toast } from "sonner";
 
 const eventMap: Record<string, string> = {
@@ -162,9 +162,24 @@ const AutomationsOverview = () => {
         onSuccess: (data) => {
             toast.success(data.message || "Template submitted to Meta for approval!");
             queryClient.invalidateQueries({ queryKey: ["cloud-templates", getCurrentShop()] });
+            queryClient.invalidateQueries({ queryKey: ["templates", getCurrentShop()] });
         },
         onError: (err: any) => {
             toast.error(err.message || "Failed to submit template to Meta");
+        }
+    });
+
+    // Meta approves asynchronously, so a template submitted as PENDING only becomes
+    // sendable once its status is refreshed from Meta.
+    const syncMetaMut = useMutation({
+        mutationFn: syncCloudTemplates,
+        onSuccess: (data: any) => {
+            toast.success(`${data.approved} approved · ${data.updated} updated`);
+            queryClient.invalidateQueries({ queryKey: ["cloud-templates", getCurrentShop()] });
+            queryClient.invalidateQueries({ queryKey: ["templates", getCurrentShop()] });
+        },
+        onError: (err: any) => {
+            toast.error(err.message || "Failed to refresh Meta approval status");
         }
     });
 
@@ -172,10 +187,16 @@ const AutomationsOverview = () => {
         const rawMessage = flow.template?.message || defaultMessages[flow.id] || "";
         let varIndex = 1;
         const examples: string[] = [];
-        
+        // Records which placeholder feeds each positional {{n}} slot, in order, so the
+        // backend can put the right value in the right slot when sending the approved
+        // template. Without it an approved template is sent with no parameters and Meta
+        // rejects it for a parameter-count mismatch.
+        const variables: string[] = [];
+
         // Convert placeholders like {{customer_name}}, {{order_number}} to {{1}}, {{2}} for Meta Graph API
         const metaBody = rawMessage.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_: string, varName: string) => {
             const idx = varIndex++;
+            variables.push(varName);
             if (varName.includes("name")) examples.push("John");
             else if (varName.includes("order") || varName.includes("number")) examples.push("1001");
             else if (varName.includes("total") || varName.includes("price")) examples.push("$49.99");
@@ -191,7 +212,10 @@ const AutomationsOverview = () => {
             category: flow.id === "abandoned_cart" ? "MARKETING" : "UTILITY",
             language: "en_US",
             bodyText: metaBody,
-            examples: examples.length > 0 ? examples : undefined
+            examples: examples.length > 0 ? examples : undefined,
+            variables,
+            // Links the Meta template back to this automation's local template record.
+            templateId: flow.template?._id || flow.template?.id,
         });
     };
 
@@ -318,6 +342,23 @@ const AutomationsOverview = () => {
                         Increase conversions and keep customers updated with automated flows.
                     </p>
                 </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs shrink-0"
+                    onClick={() => syncMetaMut.mutate()}
+                    disabled={syncMetaMut.isPending}
+                >
+                    <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${syncMetaMut.isPending ? "animate-spin" : ""}`} />
+                    {syncMetaMut.isPending ? "Checking Meta..." : "Refresh Meta Status"}
+                </Button>
+            </div>
+
+            <div className="p-3 rounded-xl border border-border bg-muted/40 text-xs text-muted-foreground leading-relaxed">
+                <span className="font-semibold text-foreground">WhatsApp requires approved templates.</span>{" "}
+                Customers who have not messaged you in the last 24 hours can only receive an
+                approved Meta template. Submit each automation to Meta, then refresh the status
+                once Meta approves it — until then those messages cannot be delivered.
             </div>
 
             <div className="grid grid-cols-1 gap-4">

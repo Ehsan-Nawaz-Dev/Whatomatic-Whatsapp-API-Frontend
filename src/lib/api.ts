@@ -6,6 +6,8 @@ export const getAuthUrl = (shop: string): string => {
   return `${API_BASE_URL}/auth/shopify?shop=${shop}`;
 };
 
+const SHOP_STORAGE_KEY = "whatomatic_shop_domain";
+
 // Dynamic shop detection - called fresh every time, not cached at module level
 const getShopFromUrl = (): string => {
   try {
@@ -16,9 +18,53 @@ const getShopFromUrl = (): string => {
   }
 };
 
-// Get current shop - always fresh from URL
+// App Bridge knows the shop even when the query string doesn't.
+const getShopFromAppBridge = (): string => {
+  try {
+    // @ts-ignore - injected by app-bridge.js
+    return window.shopify?.config?.shop || "";
+  } catch (e) {
+    return "";
+  }
+};
+
+const readStoredShop = (): string => {
+  try {
+    return sessionStorage.getItem(SHOP_STORAGE_KEY) || localStorage.getItem(SHOP_STORAGE_KEY) || "";
+  } catch (e) {
+    return "";
+  }
+};
+
+const rememberShop = (shop: string) => {
+  if (!shop) return;
+  try {
+    sessionStorage.setItem(SHOP_STORAGE_KEY, shop);
+    localStorage.setItem(SHOP_STORAGE_KEY, shop);
+  } catch (e) {
+    // Storage unavailable (private mode / blocked cookies) - non-fatal
+  }
+};
+
+/**
+ * Resolves the current shop domain.
+ *
+ * The URL is only a reliable source on the initial embedded load. In-app
+ * navigation (the App Bridge NavMenu links are plain `/dashboard?tab=...`)
+ * replaces the query string and drops `shop`, after which every request went out
+ * as `?shop=` and the backend answered 401. So we fall back to App Bridge and to
+ * the last shop we saw, and persist whichever one resolves.
+ */
 export const getCurrentShop = (): string => {
-  return getShopFromUrl() || import.meta.env.VITE_SHOP_DOMAIN || "";
+  const shop =
+    getShopFromUrl() ||
+    getShopFromAppBridge() ||
+    readStoredShop() ||
+    import.meta.env.VITE_SHOP_DOMAIN ||
+    "";
+
+  rememberShop(shop);
+  return shop;
 };
 
 // Keep DEFAULT_SHOP for backward compat
@@ -28,13 +74,33 @@ export const withShopParam = (path: string) => {
   const shop = getCurrentShop(); // Always get fresh shop from URL
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   const url = new URL(`${API_BASE_URL}/${cleanPath}`);
-  url.searchParams.set("shop", shop);
+  // Never send `shop=` empty - the backend treats that as "no shop" and 401s.
+  if (shop) url.searchParams.set("shop", shop);
   return url.toString();
 };
 
 const sanitizePhone = (phone: string) => {
   // Remove everything except digits and +
   return phone.replace(/[^\d+]/g, "");
+};
+
+/**
+ * Waits for App Bridge to expose idToken().
+ *
+ * app-bridge.js is loaded from Shopify's CDN, so on a cold/slow load the first
+ * few React queries can fire before `window.shopify.idToken` exists. Those
+ * requests previously went out with no Authorization header at all and came back
+ * 401, which surfaced as the dashboard randomly showing "Not Connected".
+ */
+const waitForAppBridge = async (timeoutMs = 4000): Promise<boolean> => {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    // @ts-ignore - injected by app-bridge.js
+    if (window.shopify && typeof window.shopify.idToken === "function") return true;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  // @ts-ignore
+  return !!(window.shopify && typeof window.shopify.idToken === "function");
 };
 
 // Helper to get authenticated headers (Shopify Session Token)
@@ -44,10 +110,15 @@ export const getAuthHeaders = async (existingHeaders = {}) => {
     "Content-Type": "application/json"
   };
 
+  // Second identifier the backend accepts, so a request still resolves its shop
+  // if the session token is momentarily unavailable.
+  const shop = getCurrentShop();
+  if (shop) headers["x-shop-domain"] = shop;
+
   try {
     // App Bridge 4 provides idToken() which returns a Promise for the JWT session token
-    // @ts-ignore
-    if (window.shopify && typeof window.shopify.idToken === 'function') {
+    const ready = await waitForAppBridge();
+    if (ready) {
       // @ts-ignore
       const token = await window.shopify.idToken();
       if (token) {
@@ -251,9 +322,13 @@ export interface WhatsAppStatusResponse {
   deviceName?: string;
   qualityRating?: string;
   lastConnected?: string;
-  dailyUsage?: number;
-  dailyLimit?: number;
   errorMessage?: string;
+  /** False when the number is not registered for Cloud API messaging (Meta error 133010). */
+  registered?: boolean;
+  /** True when Meta was unreachable and this is last-known-good state, not a live check. */
+  degraded?: boolean;
+  /** True when the Meta access token is dead and the merchant must reconnect. */
+  requiresReconnect?: boolean;
 }
 
 export interface WhatsAppQRCodeResponse {
@@ -378,6 +453,24 @@ export const fetchWhatsAppStatus = async (): Promise<WhatsAppStatusResponse> => 
   return res.json();
 };
 
+/**
+ * Registers the connected number for Cloud API messaging.
+ * Recovery for merchants stuck on Meta error 133010 ("Account not registered").
+ */
+export const registerWhatsAppNumber = async (pin?: string) => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp/register"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify(pin ? { pin } : {}),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to register WhatsApp number");
+  }
+  return res.json();
+};
+
 export const connectWhatsApp = async () => {
   const headers = await getAuthHeaders();
   const res = await fetch(withShopParam("/whatsapp/connect"), {
@@ -471,7 +564,25 @@ export interface CreateCloudTemplatePayload {
   footerText?: string;
   buttons?: string[];
   examples?: string[];
+  /** Ordered placeholder names behind Meta's positional {{1}}, {{2}} body params. */
+  variables?: string[];
+  /** Local Template id, so the Meta template is linked to this automation. */
+  templateId?: string;
 }
+
+/** Refreshes Meta approval status for submitted templates (approval is async). */
+export const syncCloudTemplates = async () => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp-cloud/templates/sync"), {
+    method: "POST",
+    headers,
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to sync template status");
+  }
+  return res.json();
+};
 
 export const createCloudTemplate = async (payload: CreateCloudTemplatePayload) => {
   const headers = await getAuthHeaders();
