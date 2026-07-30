@@ -564,7 +564,25 @@ export interface CreateCloudTemplatePayload {
   footerText?: string;
   buttons?: string[];
   examples?: string[];
+  /** Ordered placeholder names behind Meta's positional {{1}}, {{2}} body params. */
+  variables?: string[];
+  /** Local Template id, so the Meta template is linked to this automation. */
+  templateId?: string;
 }
+
+/** Refreshes Meta approval status for submitted templates (approval is async). */
+export const syncCloudTemplates = async () => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp-cloud/templates/sync"), {
+    method: "POST",
+    headers,
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to sync template status");
+  }
+  return res.json();
+};
 
 export const createCloudTemplate = async (payload: CreateCloudTemplatePayload) => {
   const headers = await getAuthHeaders();
