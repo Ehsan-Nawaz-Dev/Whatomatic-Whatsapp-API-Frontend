@@ -77,10 +77,21 @@ const WhatsAppConnection = () => {
   // Embedded Signup Mutation
   const embeddedSignupMutation = useMutation({
     mutationFn: connectEmbeddedSignup,
-    onSuccess: (data) => {
+    onSuccess: async (data: any) => {
       toast.success(data.message || "Meta WhatsApp Business Account Connected!");
-      queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
-      queryClient.invalidateQueries({ queryKey: ["merchant-settings", getCurrentShop()] });
+      
+      // Update React Query cache instantly so status & buttons change immediately
+      queryClient.setQueryData(["whatsapp-status", getCurrentShop()], (old: any) => ({
+        ...old,
+        connected: true,
+        phoneNumber: data.displayPhone || data.phoneNumber || "Verified Meta Phone",
+        qualityRating: "GREEN",
+        deviceName: "Meta Cloud API",
+        status: "connected"
+      }));
+
+      await queryClient.refetchQueries({ queryKey: ["whatsapp-status"] });
+      await queryClient.refetchQueries({ queryKey: ["merchant-settings"] });
     },
     onError: (err: any) => {
       toast.error(err.message || "Embedded Signup connection failed");
