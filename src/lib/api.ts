@@ -325,6 +325,8 @@ export interface WhatsAppStatusResponse {
   errorMessage?: string;
   /** False when the number is not registered for Cloud API messaging (Meta error 133010). */
   registered?: boolean;
+  codeVerificationStatus?: string;
+  needsVerification?: boolean;
   /** True when Meta was unreachable and this is last-known-good state, not a live check. */
   degraded?: boolean;
   /** True when the Meta access token is dead and the merchant must reconnect. */
@@ -467,6 +469,40 @@ export const registerWhatsAppNumber = async (pin?: string) => {
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error || "Failed to register WhatsApp number");
+  }
+  return res.json();
+};
+
+/**
+  * Requests Meta to send an SMS/Voice OTP verification code to the merchant phone number.
+  */
+export const requestMetaVerification = async (method: "SMS" | "VOICE" = "SMS") => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp/request-verification"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ method }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to send verification code from Meta");
+  }
+  return res.json();
+};
+
+/**
+  * Verifies Meta's 6-digit OTP code and enables WhatsApp Cloud API messaging.
+  */
+export const verifyMetaCode = async (code: string) => {
+  const headers = await getAuthHeaders();
+  const res = await fetch(withShopParam("/whatsapp/verify-code"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ code }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to verify Meta OTP code");
   }
   return res.json();
 };

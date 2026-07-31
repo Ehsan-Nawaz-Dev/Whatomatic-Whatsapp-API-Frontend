@@ -9,6 +9,8 @@ import {
   disconnectWhatsApp,
   connectEmbeddedSignup,
   registerWhatsAppNumber,
+  requestMetaVerification,
+  verifyMetaCode,
   sendCloudMessage,
   WhatsAppStatusResponse,
   getCurrentShop,
@@ -178,16 +180,33 @@ const WhatsAppConnection = () => {
     }
   }, [status?.connected]);
 
-  // Register Mutation - recovers a connected number that Meta rejects with 133010
-  const registerMutation = useMutation({
-    mutationFn: () => registerWhatsAppNumber(),
+  const [otpCode, setOtpCode] = useState("");
+  const [showOtpInput, setShowOtpInput] = useState(false);
+
+  // Request Meta Verification OTP SMS/Voice Code
+  const requestOtpMutation = useMutation({
+    mutationFn: (method: "SMS" | "VOICE") => requestMetaVerification(method),
     onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
-      toast.success(data?.message || "WhatsApp number registered for messaging");
+      toast.success(data?.message || "Verification OTP sent from Meta! Check your phone.");
+      setShowOtpInput(true);
     },
     onError: (err: any) => {
-      toast.error(err?.message || "Failed to register WhatsApp number");
+      toast.error(err?.message || "Failed to send OTP code from Meta");
+    }
+  });
+
+  // Verify Meta 6-Digit Verification Code
+  const verifyOtpMutation = useMutation({
+    mutationFn: (code: string) => verifyMetaCode(code),
+    onSuccess: (data: any) => {
+      toast.success(data?.message || "Phone number verified and enabled for Cloud API messaging!");
+      setShowOtpInput(false);
+      setOtpCode("");
+      queryClient.invalidateQueries({ queryKey: ["whatsapp-status", getCurrentShop()] });
     },
+    onError: (err: any) => {
+      toast.error(err?.message || "Failed to verify Meta OTP code");
+    }
   });
 
   // Disconnect Mutation
@@ -298,21 +317,67 @@ const WhatsAppConnection = () => {
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-xs font-bold text-amber-900 dark:text-amber-200">Messaging not enabled yet</p>
+                  <p className="text-xs font-bold text-amber-900 dark:text-amber-200">Phone Verification Required</p>
                   <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5 leading-relaxed">
-                    Your number is linked to Meta but is not registered for Cloud API messaging, so sends fail with
-                    "Account not registered". Register it to start sending.
+                    Your number is linked to Meta. Click <strong>"Send SMS OTP Code"</strong> below to receive Meta's 6-digit verification code directly on your phone and enable Cloud API messaging dynamically.
                   </p>
                 </div>
               </div>
-              <Button
-                size="sm"
-                className="w-full text-xs"
-                onClick={() => registerMutation.mutate()}
-                disabled={registerMutation.isPending}
-              >
-                {registerMutation.isPending ? "Registering..." : "Enable Messaging"}
-              </Button>
+
+              {!showOtpInput ? (
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    className="flex-1 text-xs bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                    onClick={() => requestOtpMutation.mutate("SMS")}
+                    disabled={requestOtpMutation.isPending}
+                  >
+                    {requestOtpMutation.isPending ? "Sending OTP..." : "Send SMS OTP Code"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                    onClick={() => requestOtpMutation.mutate("VOICE")}
+                    disabled={requestOtpMutation.isPending}
+                  >
+                    Voice Call OTP
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2 pt-2 border-t border-amber-200/60 dark:border-amber-900/40">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-amber-900 dark:text-amber-200">
+                      Enter Meta 6-Digit Verification Code:
+                    </span>
+                    <button
+                      className="text-[10px] text-amber-700 dark:text-amber-300 underline"
+                      onClick={() => requestOtpMutation.mutate("SMS")}
+                      disabled={requestOtpMutation.isPending}
+                    >
+                      Resend SMS
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="123456"
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      className="flex-1 text-xs px-3 py-2 rounded-lg border border-amber-300 dark:border-amber-800 bg-background text-foreground tracking-widest font-mono text-center focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    />
+                    <Button
+                      size="sm"
+                      className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4"
+                      onClick={() => verifyOtpMutation.mutate(otpCode)}
+                      disabled={verifyOtpMutation.isPending || otpCode.length !== 6}
+                    >
+                      {verifyOtpMutation.isPending ? "Verifying..." : "Verify & Enable"}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
