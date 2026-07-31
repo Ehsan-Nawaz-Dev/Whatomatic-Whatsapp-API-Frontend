@@ -449,7 +449,7 @@ const WhatsAppConnection = () => {
             </Button>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -461,6 +461,14 @@ const WhatsAppConnection = () => {
               Verify Status
             </Button>
             <Button
+              variant="outline"
+              size="sm"
+              className="text-xs border-amber-500/30 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+              onClick={() => setShowOtpInput(!showOtpInput)}
+            >
+              {showOtpInput ? "Hide OTP Box" : "SMS OTP Verification"}
+            </Button>
+            <Button
               variant="ghost"
               size="sm"
               className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -470,6 +478,61 @@ const WhatsAppConnection = () => {
               {disconnectMutation.isPending ? "Disconnecting..." : "Disconnect Meta API"}
             </Button>
           </div>
+
+          {showOtpInput && (
+            <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/50 rounded-xl space-y-3 animate-in fade-in duration-300">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-amber-900 dark:text-amber-200">Dynamic Meta OTP Verification</p>
+                  <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5 leading-relaxed">
+                    Click <strong>"Send SMS OTP Code"</strong> to receive a 6-digit verification code directly from Meta on your phone.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-1 border-t border-amber-200/60 dark:border-amber-900/40">
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="flex-1 text-xs bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                    onClick={() => requestOtpMutation.mutate("SMS")}
+                    disabled={requestOtpMutation.isPending}
+                  >
+                    {requestOtpMutation.isPending ? "Sending OTP..." : "Send SMS OTP Code"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                    onClick={() => requestOtpMutation.mutate("VOICE")}
+                    disabled={requestOtpMutation.isPending}
+                  >
+                    Voice Call OTP
+                  </Button>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="Enter 6-digit OTP"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                    className="flex-1 text-xs px-3 py-2 rounded-lg border border-amber-300 dark:border-amber-800 bg-background text-foreground tracking-widest font-mono text-center focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                  <Button
+                    size="sm"
+                    className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4"
+                    onClick={() => verifyOtpMutation.mutate(otpCode)}
+                    disabled={verifyOtpMutation.isPending || otpCode.length !== 6}
+                  >
+                    {verifyOtpMutation.isPending ? "Verifying..." : "Verify Code"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-5">
